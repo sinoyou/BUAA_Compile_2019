@@ -8,15 +8,15 @@ using namespace std;
 class GrammaticalParser
 {
 public:
-	GrammaticalParser(vector<Token>* token_list,vector<string>* output);
+	GrammaticalParser(vector<Token>& token_list,vector<string>& output);
 	void parse();						// 解析器暂时没有返回
 private:
 	int ptoken;							// 遍历token列表的索引
-	Token* token;						// 当前索引ptoken下的token
-	vector<Token>* token_list;			// token的列表
+	Token * token;						// 当前索引ptoken下的token
+	vector<Token> & token_list;			// token的列表
 	
 	/* Unit3 输出支持 */
-	vector<string>* output_list;		// 输出的列表
+	vector<string> & output_list;		// 输出的列表
 	void _save(const char* s);			// 中文字符串保存
 	void _save(int head, int tail);		// 标识符字符串保存
 

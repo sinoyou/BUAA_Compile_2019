@@ -5,12 +5,6 @@ Token::Token(SYMBOL symbol, string token)
 	this->token = token;
 }
 
-Token::Token()
-{
-	this->symbol = SYMBOL::UNKNOWN;
-	this->token = string("NULL");
-}
-
 bool Token::equal(SYMBOL symbol)
 {
 	return this->symbol == symbol;

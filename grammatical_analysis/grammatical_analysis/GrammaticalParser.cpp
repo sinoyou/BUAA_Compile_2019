@@ -6,9 +6,8 @@ void _gettoken();					// 获取一个单词
 void _retract();					// 回退一个单词
 
 /* 初始化函数 */
-GrammaticalParser::GrammaticalParser(vector<Token>* token_list, vector<string>* output) {
-	this->token_list = token_list;
-	this->output_list = output;
+GrammaticalParser::GrammaticalParser(vector<Token>& token_list, vector<string>& output)
+	:token_list(token_list), output_list(output){
 	token = NULL;
 	ptoken = 0;
 }
@@ -20,15 +19,15 @@ void GrammaticalParser::_error(const char * s) {
 
 Token GrammaticalParser::_gettoken_index(int index)
 {
-	return (*token_list)[index];
+	return token_list[index];
 }
 void GrammaticalParser::_gettoken()
 {
 	ptoken++;
-	token = &((*token_list)[ptoken]);
+	token = &(token_list[ptoken]);
 }
 void GrammaticalParser::_retract()
 {
 	ptoken--;
-	token = &((*token_list)[ptoken]);
+	token = &(token_list[ptoken]);
 }

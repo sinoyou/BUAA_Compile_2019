@@ -3,7 +3,7 @@
 void GrammaticalParser::_save(const char* s)
 {
 	string t = string(s);
-	output_list->push_back(t);
+	output_list.push_back(t);
 }
 
 void GrammaticalParser::_save(int h, int t)
@@ -11,6 +11,6 @@ void GrammaticalParser::_save(int h, int t)
 	for (int i = h; i <= t; i++) {
 		Token token = _gettoken_index(i);
 		string t = symbol_dict[token.symbol] + " " + token.token;
-		output_list->push_back(t);
+		output_list.push_back(t);
 	}
 }
