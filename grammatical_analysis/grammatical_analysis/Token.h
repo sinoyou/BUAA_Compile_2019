@@ -8,6 +8,8 @@ public:
 	SYMBOL symbol;
 	string token;
 	Token(SYMBOL symbol, string token);
+	
 	int transnum();
+	bool equal(SYMBOL symbol);
 };
 

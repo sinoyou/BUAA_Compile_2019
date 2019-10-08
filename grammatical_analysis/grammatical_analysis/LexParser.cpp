@@ -7,7 +7,7 @@ LexParser::LexParser(FileReader* reader) {
 	this->reader = reader;
 }
 
-list<Token>* LexParser::parse() {
+vector<Token>* LexParser::parse() {
 	while (_getsym() >= 0) {
 		if(symbol != SYMBOL::UNKNOWN)
 			token_list.push_back(Token(symbol, reader->getToken()));

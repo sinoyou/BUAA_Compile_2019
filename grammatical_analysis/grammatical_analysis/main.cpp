@@ -1,11 +1,9 @@
-// token_analysis.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
 
 #include "FileReader.h"
 #include "utils.h"
 #include "LexParser.h"
 #include <cstdio>
-#include <list>
+#include <vector>
 
 // Global Variable and Pointer
 FileReader* reader;
@@ -13,16 +11,17 @@ FILE* f;
 
 int main()
 {
-	// initial output
-	f = fopen("output.txt", "w");
-	// initial reader class
+	/* Lexcial Parse */
 	FileReader t("testfile.txt");
 	reader = &t;
-
 	LexParser lexParser = LexParser(reader);
-	list<Token>* token_list_ptr = lexParser.parse();
+	vector<Token>* token_list_ptr = lexParser.parse();
 
-	list<Token>::iterator itr = token_list_ptr->begin();
+	/* Grammatical Parse */
+
+	/* Course Evaluation Output */
+	f = fopen("output.txt", "w");
+	vector<Token>::iterator itr = token_list_ptr->begin();
 	while (itr!= token_list_ptr->end()) {
 		print_token(f,itr->symbol, itr->token);
 		itr++;
