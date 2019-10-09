@@ -9,7 +9,7 @@ void GrammaticalParser::_save(const char* s)
 void GrammaticalParser::_save(int h, int t)
 {
 	for (int i = h; i <= t; i++) {
-		Token token = _gettoken_index(i);
+		Token token = _export_token(i);
 		string t = symbol_dict[token.symbol] + " " + token.token;
 		output_list.push_back(t);
 	}

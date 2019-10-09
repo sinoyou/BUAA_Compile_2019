@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <iostream>
+#include <cstdio>
 #include "Token.h"
 
 using namespace std;
@@ -14,6 +16,7 @@ private:
 	int ptoken;							// 遍历token列表的索引
 	Token * token;						// 当前索引ptoken下的token
 	vector<Token> & token_list;			// token的列表
+	vector<int> ptoken_record;			// ptoken的备份空间
 	
 	/* Unit3 输出支持 */
 	vector<string> & output_list;		// 输出的列表
@@ -22,9 +25,13 @@ private:
 
 	/* 支持函数 */
 	void _error(const char* s);			// 错误输出处理
-	Token _gettoken_index(int index);	// 根据索引获取一个单词
-	void _gettoken();					// 获取一个单词
+	Token _export_token(int index);		// 根据索引导出一个单词
+	void _update_token();				// 更新单词
+	Token* _peek();						// 偷窥单词（不更改ptoken和token）
+	void _next();						// 获取一个单词
 	void _retract();					// 回退一个单词
+	void _backup();						// 压入一个指针
+	void _recover();					// 恢复一个指针备份
 
 	/* 规则函数：递归下降调用 */
 	int __add_operator();
@@ -36,7 +43,7 @@ private:
 	int __char();
 	int __string();
 	int __program();
-	int __const_declar();
+	int __const_des();
 	int __const_def();
 	int __unsigned_integer();
 	int __integer();
