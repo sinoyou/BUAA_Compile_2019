@@ -15,19 +15,29 @@
 // FLAG_PASS ： 需要读入一个新的token进行判断
 #define FLAG_PASS						\
 {										\
-	_next();							\
 	return 0;							\
 }
 
 #define FLAG_SYMBOL_CHECK(symbol)  \
 {										\
+	_next();							\
 	if (!token->equal(symbol))			\
+		{FLAG_FAIL;}					\
+}
+
+#define FLAG_MULTI_SYMBOL_CHECK(symbols,len) \
+{										\
+	_next();							\
+	int symbol_exist_check=0;			\
+	for(int i = 0; i < len; i++)		\
+		if(token->equal(symbols[i]))	\
+			symbol_exist_check += 1;	\
+	if (symbol_exist_check==0)			\
 		{FLAG_FAIL;}					\
 }
 
 #define FLAG_RECUR(func) \
 {										\
-	_next();							\
 	int x = func();						\
 	if(x != 0)							\
 	{									\
@@ -97,12 +107,9 @@ void GrammaticalParser::_recover() {
  */
 int GrammaticalParser::__add_operator() {
 	BACKUP;
-	if (token->equal(SYMBOL::PLUS) || token->equal(SYMBOL::MINU)) {
-		FLAG_PASS;
-	}
-	else {
-		FLAG_FAIL;
-	}
+	SYMBOL candidate[] = { SYMBOL::PLUS,SYMBOL::MINU };
+	FLAG_MULTI_SYMBOL_CHECK(candidate, 2);
+	FLAG_PASS;
 }
 
 /**
@@ -111,12 +118,9 @@ int GrammaticalParser::__add_operator() {
  */
 int GrammaticalParser::__mult_operator() {
 	BACKUP;
-	if (token->equal(SYMBOL::MULT) || token->equal(SYMBOL::DIV)) {
-		FLAG_PASS;
-	}
-	else {
-		FLAG_FAIL;
-	}
+	SYMBOL candidate[] = { SYMBOL::MULT,SYMBOL::DIV };
+	FLAG_MULTI_SYMBOL_CHECK(candidate, 2);
+	FLAG_PASS;
 }
 
 /**
@@ -126,16 +130,8 @@ int GrammaticalParser::__mult_operator() {
 int GrammaticalParser::__rel_operator() {
 	BACKUP;
 	SYMBOL list[6] = {SYMBOL::LSS, SYMBOL::LEQ, SYMBOL::GRE, SYMBOL::GEQ, SYMBOL::NEQ, SYMBOL::EQL};
-	int x = 0;
-	for (int i = 0; i < 6; i++)
-		if (token->equal(list[i]))
-			x = 1;
-	if (x == 1) {
-		FLAG_PASS;
-	}
-	else {
-		FLAG_FAIL;
-	}
+	FLAG_MULTI_SYMBOL_CHECK(list, 6);
+	FLAG_PASS;
 }
 
 /**
@@ -175,12 +171,8 @@ int GrammaticalParser::__non_zero_number() {
 */
 int GrammaticalParser::__char() {
 	BACKUP;
-	if (token->equal(SYMBOL::CHARTK)) {
-		FLAG_PASS;
-	}
-	else {
-		FLAG_FAIL;
-	}
+	FLAG_SYMBOL_CHECK(SYMBOL::CHARTK);
+	FLAG_PASS;
 }
 
 /**
@@ -190,8 +182,8 @@ int GrammaticalParser::__char() {
 */
 int GrammaticalParser::__string() {
 	BACKUP;
-	if (token->equal(SYMBOL::STRCON)) {FLAG_PASS;}
-	else {FLAG_FAIL;}
+	FLAG_SYMBOL_CHECK(SYMBOL::STRCON);
+	FLAG_PASS;
 }
 
 /**
@@ -211,15 +203,11 @@ int GrammaticalParser::__const_des()
 {
 	BACKUP;
 	int cnt = 0;
-	while(token->equal(SYMBOL::CONSTTK)){
+	while(_peek()->equal(SYMBOL::CONSTTK)){
 		cnt += 1;
-		if (token->equal(SYMBOL::CONSTTK)) {
-			_next();
-			FLAG_RECUR(__const_def);
-		}
-		else {
-			FLAG_FAIL;
-		}
+		FLAG_SYMBOL_CHECK(SYMBOL::CONSTTK);
+		FLAG_RECUR(__const_def);
+		FLAG_SYMBOL_CHECK(SYMBOL::COMMA);
 	};
 	if (cnt > 0) { FLAG_PASS; }
 	else { FLAG_PASS; }
@@ -232,27 +220,88 @@ int GrammaticalParser::__const_des()
 int GrammaticalParser::__const_def()
 {
 	BACKUP;
-	if (token->equal(SYMBOL::INTTK)) {
+	if (_peek()->equal(SYMBOL::INTTK)) {
+		FLAG_SYMBOL_CHECK(SYMBOL::INTTK);
 		FLAG_RECUR(__idenfr);					// <标识符>
 		FLAG_SYMBOL_CHECK(SYMBOL::ASSIGN);		// 赋值符号
 		FLAG_RECUR(__integer);					// <整数>
-		while (token->equal(SYMBOL::COMMA)) {
+		while (_peek()->equal(SYMBOL::COMMA)) {
+			FLAG_SYMBOL_CHECK(SYMBOL::COMMA);
 			FLAG_RECUR(__idenfr);
 			FLAG_SYMBOL_CHECK(SYMBOL::ASSIGN);
 			FLAG_RECUR(__integer);
 		}
 		FLAG_PASS;
 	}
-	else if (token->equal(SYMBOL::CHARTK)) {
+	else if (_peek()->equal(SYMBOL::CHARTK)) {
+		FLAG_SYMBOL_CHECK(SYMBOL::CHARTK);
 		FLAG_RECUR(__idenfr);					// <标识符>
 		FLAG_SYMBOL_CHECK(SYMBOL::ASSIGN);		// 赋值符号
 		FLAG_RECUR(__char);						// <符号数>
-		while (token->equal(SYMBOL::COMMA)) {
+		while (_peek()->equal(SYMBOL::COMMA)) {
+			FLAG_SYMBOL_CHECK(SYMBOL::COMMA);
 			FLAG_RECUR(__idenfr);
 			FLAG_SYMBOL_CHECK(SYMBOL::ASSIGN);
 			FLAG_RECUR(__char);
 		}
 		FLAG_PASS;
+	}
+	else {
+		FLAG_FAIL;
+	}
+}
+
+/**
+ * ＜无符号整数＞  ::= ＜非零数字＞｛＜数字＞｝| 0
+ * FIRST: ...
+*/
+int GrammaticalParser::__unsigned_integer() {
+	BACKUP;
+	FLAG_SYMBOL_CHECK(SYMBOL::INTCON);
+	FLAG_PASS;
+}
+
+/**
+ * ＜整数＞::= ［＋｜－］＜无符号整数＞
+ * FIRST(1) = {PLUS}, FIRST(2) = {MINU}, FIRST(3) = {INTCON}
+*/
+int GrammaticalParser::__integer()
+{
+	BACKUP;
+	if (_peek()->equal(SYMBOL::PLUS)) {
+		FLAG_SYMBOL_CHECK(SYMBOL::PLUS);
+	}
+	else if (_peek()->equal(SYMBOL::MINU)) {
+		FLAG_SYMBOL_CHECK(SYMBOL::MINU);
+	}
+	FLAG_RECUR(__unsigned_integer);
+	FLAG_PASS;
+}
+
+/**
+ * ＜标识符＞::=  ＜字母＞｛＜字母＞｜＜数字＞｝
+ * FIRST: ...
+*/
+int GrammaticalParser::__idenfr() {
+	BACKUP;
+	FLAG_SYMBOL_CHECK(SYMBOL::IDENFR);
+	FLAG_PASS;
+}
+
+/**
+ * ＜声明头部＞::=  int＜标识符＞ | char＜标识符＞
+ * FIRST(1) = {INTTK}, FIRST(2) = {CHARTK}
+*/
+int GrammaticalParser::__declar_head() {
+	BACKUP;
+	if (_peek()->equal(SYMBOL::INTTK))
+	{
+		FLAG_SYMBOL_CHECK(SYMBOL::INTTK);
+		FLAG_RECUR(__idenfr);
+	}
+	else if (_peek()->equal(SYMBOL::CHARTK)) {
+		FLAG_SYMBOL_CHECK(SYMBOL::CHARTK);
+		FLAG_RECUR(__idenfr);
 	}
 	else {
 		FLAG_FAIL;
