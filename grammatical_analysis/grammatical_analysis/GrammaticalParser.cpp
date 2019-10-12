@@ -2,12 +2,18 @@
 
 #define DEBUG_PRINT(msg) fprintf(stderr, "%s %s - line: %d, file : %s %s \n", __DATE__, __TIME__, __LINE__, __FILE__, msg); 
 
-#define BACKUP _backup();
+#define BACKUP \
+{										\
+	_backup();							\
+	string s = string("[ENTER]");	\
+	DEBUG_PRINT(s.c_str());				\
+}										\
 
 // FLAG_FAIL : 假设当前token是需要判断的token
 #define FLAG_FAIL \
 {										\
-	DEBUG_PRINT("ERROR WHEN PARSING")	\
+	string s = string("ERROR WHEN PARSING ") + token->token;	\
+	DEBUG_PRINT(s.c_str());				\
 	_recover();							\
 	return -1;							\
 }
@@ -15,6 +21,8 @@
 // FLAG_PASS ： 需要读入一个新的token进行判断
 #define FLAG_PASS						\
 {										\
+	string s = string("[LEAVE]");	\
+	DEBUG_PRINT(s.c_str());				\
 	return 0;							\
 }
 
@@ -122,7 +130,7 @@ void GrammaticalParser::_recover() {
  * 1. 部分过简单的数字与字母类型识别被忽略，已被词法分析解决。					
  * 2. <字符>匹配不是严格的。
  * 3. 在对每条规则分析时，部分计算了FOLLOW集合，但FOLLOW集合并不应该纳入该规则的策略选择中，只是为了验证规则不产生回溯情况。
- * 4. 使用反向判断代替正向判断的位置规则：<程序>
+ * 4. 超前偷窥：<程序>, <变量说明>, <复合语句>, <因子>
  */
 
 /**
@@ -195,14 +203,14 @@ int GrammaticalParser::__non_zero_number() {
 */
 int GrammaticalParser::__char() {
 	BACKUP;
-	FLAG_SYMBOL_CHECK(SYMBOL::CHARTK);
+	FLAG_SYMBOL_CHECK(SYMBOL::CHARCON);
 	FLAG_PASS;
 }
 
 /**
  * ＜字符串＞::=  "｛十进制编码为32,33,35-126的ASCII字符｝"
  * FIRST: "
- * !: 词法分析时由于已经忽略了双引号并判断了字符，因此该规则匹配不完全严格.
+ * !: 词法分析时由于已经忽略了双引号"并判断了字符，因此该规则匹配不完全严格.
 */
 int GrammaticalParser::__string() {
 	BACKUP;
@@ -226,7 +234,6 @@ int GrammaticalParser::__program()
 	BACKUP;
 	// <常量说明>
 	if (_peek()->equal(SYMBOL::CONSTTK)) {
-		FLAG_SYMBOL_CHECK(SYMBOL::CONSTTK);
 		FLAG_RECUR(__const_description);
 	}
 
@@ -258,25 +265,32 @@ int GrammaticalParser::__program()
 
 /**
  * ＜常量说明＞ ::=  const＜常量定义＞;{ const＜常量定义＞;}
- * FISRT(x) = {CONSTTK}
+ * FISRT(<常量说明>) = {CONSTTK}
+ * FOLLOW(<常量说明>) = {...}
+ * 不存在FISRT(< const＜常量定义＞;>)和FOLLOW(<常量说明>)集合交叉情况。
 */
 int GrammaticalParser::__const_description()
 {
 	BACKUP;
-	int cnt = 0;
+
+	FLAG_SYMBOL_CHECK(SYMBOL::CONSTTK);
+	FLAG_RECUR(__const_def);
+	FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);
+
 	while(_peek()->equal(SYMBOL::CONSTTK)){
-		cnt += 1;
 		FLAG_SYMBOL_CHECK(SYMBOL::CONSTTK);
 		FLAG_RECUR(__const_def);
-		FLAG_SYMBOL_CHECK(SYMBOL::COMMA);
+		FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);
 	};
-	if (cnt > 0) { FLAG_PASS; }
-	else { FLAG_PASS; }
+
+	FLAG_PASS;
 }
 
 /**
  * ＜常量定义＞::=int＜标识符＞＝＜整数＞{,＜标识符＞＝＜整数＞} | char＜标识符＞＝＜字符＞{,＜标识符＞＝＜字符＞}
  * FIRST(1) = {INTTK}, FIRST(2) = {CHARTK}
+ * FOLLOW(<常量定义>) = {SEMICN}
+ * 不存在FOLLOW(<常量定义>)与FIRST(,＜标识符＞＝＜整数＞| <字符>) 相交情况。
 */
 int GrammaticalParser::__const_def()
 {
@@ -292,7 +306,6 @@ int GrammaticalParser::__const_def()
 			FLAG_SYMBOL_CHECK(SYMBOL::ASSIGN);
 			FLAG_RECUR(__integer);
 		}
-		FLAG_PASS;
 	}
 	else if (_peek()->equal(SYMBOL::CHARTK)) {
 		FLAG_SYMBOL_CHECK(SYMBOL::CHARTK);
@@ -305,11 +318,11 @@ int GrammaticalParser::__const_def()
 			FLAG_SYMBOL_CHECK(SYMBOL::ASSIGN);
 			FLAG_RECUR(__char);
 		}
-		FLAG_PASS;
 	}
 	else {
 		FLAG_FAIL;
 	}
+	FLAG_PASS;
 }
 
 /**
@@ -372,14 +385,23 @@ int GrammaticalParser::__declar_head() {
 
 /**
  * ＜变量说明＞::= ＜变量定义＞;{＜变量定义＞;}
- * FIRST(<变量定义>) = {INTTK, CHARTK}
-*/
+ * FIRST(<变量说明>) = FISRT(<变量定义>) = {INTTK, CHARTK}
+ * FOLLOW(<变量说明>) = FISRT(<有返回值函数定义>) + FISRT(<无返回值函数定义>) + FIRST(<主函数>) + FIRST(<语句列>)
+ * {INTTK, CHARTK} // _peek(3) = ( ? 
+ * {VOIDTK}		   // _peek() = VOIDTK
+ * {VOIDTK}        // _peek() = VOIDTK 
+ * {IFTK, WHILETK, DOTK, FORTK, LBRACE, INTTK, CHARTK,    // _peek(3) = (?
+ *  VOIDTK, IDENFR, SCANFTK, PRINTFTK, SEMICN, RETURNTK}
+ */
 int GrammaticalParser::__var_description()
 {
 	BACKUP;
+	SYMBOL fisrt_list[] = { SYMBOL::INTTK, SYMBOL::CHARTK };
 	FLAG_RECUR(__var_def);
 	FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);
-	while (_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) {
+
+	// 用反例修正仅参考FIRST集合的不足
+	while (_peek()->equal(fisrt_list,2) && !_peek(3)->equal(SYMBOL::LPARENT)) {
 		FLAG_RECUR(__var_def);
 		FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);
 	}
@@ -388,6 +410,8 @@ int GrammaticalParser::__var_description()
 
 /**
  * ＜变量定义＞::= ＜类型标识符＞(＜标识符＞|＜标识符＞'['＜无符号整数＞']'){,(＜标识符＞|＜标识符＞'['＜无符号整数＞']' )} 
+ * FOLLOW(<变量定义>) = {SEMICN}, FISRT(, <标识符>...) 与 FIRST(<'[' <无符号函数> ']'>)没有交集.
+ * FOLLOW(<变量定义>) = {SEMICN} 与 FIRST(<, <标识符>>) 没有交集
  * * 单变量和数组变量的声明差异[]取或不取来表示
 */
 int GrammaticalParser::__var_def()
@@ -467,15 +491,18 @@ int GrammaticalParser::__function_void()
 /**
  * ＜复合语句＞::=［＜常量说明＞］［＜变量说明＞］＜语句列＞
  * FISRT(<常量说明>) = {CONSTK}， FIRST(<变量说明>) = {FIRST(<变量定义>)} = {INTTK, CHARTK}
+ * FOLLOW(...<[变量说明]>) = FISRT(<语句列>) = {INTTK, CONSTTK, ...}
+ * !: [<变量说明>] 的选择性需要排除,_peek(3) = ( ?
 */
 int GrammaticalParser::__compound_statement() {
 	BACKUP;
+	SYMBOL first_list[] = { SYMBOL::INTTK, SYMBOL::CONSTTK };
 	// [<const des>]
 	if (_peek()->equal(SYMBOL::CONSTTK)) {
 		FLAG_RECUR(__const_description);
 	}
 	// [<var des>]
-	if (_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) {
+	if (_peek()->equal(first_list,2) && !_peek(3)->equal(SYMBOL::LPARENT)) {
 		FLAG_RECUR(__var_description);
 	}
 	FLAG_RECUR(__statement_list);
@@ -486,6 +513,7 @@ int GrammaticalParser::__compound_statement() {
  * ＜参数表＞::=  ＜类型标识符＞＜标识符＞{,＜类型标识符＞＜标识符＞} | ＜空＞
  * 不带回溯的文法分析方式：1.两种选择的FIRST集合不能有交集。 2.至多一个空。 3.导出空的选择，非空导出退出的序列中不能含有FOLLOW(<参数表>)
  * FIRST(1) = {INTTK, CHARTK}, FOLLOW(参数表) =  {RPARENT}
+ * FOLLOW(<标识符>) = {RPARENT} 与 FIRST(<,<类型标识符><标识符>>) 无交集
 */
 int GrammaticalParser::__parameter_list()
 {
@@ -527,7 +555,7 @@ int GrammaticalParser::__main_function()
 
 /**
  * ＜表达式＞::= ［＋｜－］＜项＞{＜加法运算符＞＜项＞}   //[+|-]只作用于第一个<项>
- * FIRST(<表达式>): {PLUS, MINU, FIRST(项)} = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
+ * FIRST(<表达式>): {PLUS, MINU, FIRST(项)} = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
  * 表达式将允许 ++5 - 1 的情况出现
  * 
  * FIRST(<加法运算符>) = {PLUS, MINU} 
@@ -543,6 +571,7 @@ int GrammaticalParser::__expression() {
 	else if (_peek()->equal(SYMBOL::MINU)) {
 		FLAG_SYMBOL_CHECK(SYMBOL::MINU);
 	}
+
 	FLAG_RECUR(__item);								// <项>
 	while (_peek()->equal(SYMBOL::PLUS) || _peek()->equal(SYMBOL::MINU)) {
 		FLAG_RECUR(__add_operator);
@@ -578,14 +607,18 @@ int GrammaticalParser::__item() {
 */
 int GrammaticalParser::__factor() {
 	BACKUP;
-	// <标识符> [ '[' <表达式> ']' ]
-	if (_peek()->equal(SYMBOL::IDENFR)) {
+	// <标识符> [ '[' <表达式> ']' ] 
+	if (_peek()->equal(SYMBOL::IDENFR) && !_peek(2)->equal(SYMBOL::LPARENT)) {
 		FLAG_SYMBOL_CHECK(SYMBOL::IDENFR);
 		if (_peek()->equal(SYMBOL::LBRACK)) {
 			FLAG_SYMBOL_CHECK(SYMBOL::LBRACK);
 			FLAG_RECUR(__expression);
 			FLAG_SYMBOL_CHECK(SYMBOL::RBRACK);
 		}
+	}
+	// ＜有返回值函数调用语句＞  
+	else if (_peek()->equal(SYMBOL::IDENFR) && _peek(2)->equal(SYMBOL::LPARENT)) {
+		FLAG_RECUR(__function_call_return);
 	}
 	// '(' <表达式> ')'
 	else if (_peek()->equal(SYMBOL::LPARENT)) {
@@ -600,10 +633,6 @@ int GrammaticalParser::__factor() {
 	// <字符>
 	else if (_peek()->equal(SYMBOL::CHARCON)) {
 		FLAG_RECUR(__char);
-	}
-	// <有返回值的函数调用语句>
-	else if (_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) {
-		FLAG_RECUR(__function_call_return);
 	}
 	else {
 		FLAG_FAIL;
@@ -688,10 +717,10 @@ int GrammaticalParser::__condition_statement() {
 
 /**
  * ＜条件＞ ::=  ＜表达式＞＜关系运算符＞＜表达式＞｜＜表达式＞
- * FIRST(<条件>) = FISRT(<表达式>) = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
+ * FIRST(<条件>) = FISRT(<表达式>) = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
  * 规则改写：<条件> ::= <表达式>  [ <关系运算符> <表达式> ]
 
- * FOLLOW<条件> = {SIMICN, RPARENT}
+ * FOLLOW<条件> = {SIMICN, RPARENT}, 与FIRST(<表达式>)无交集
  * FIRST(<关系运算符> <表达式>) = {GRE, GEQ, LSS, LEQ, NEQ, EQL}
 */
 int GrammaticalParser::__condition() {
@@ -807,7 +836,7 @@ int GrammaticalParser::__function_call_void() {
 /**
  * ＜值参数表＞::= ＜表达式＞{,＜表达式＞}｜＜空＞
  * FISRT() = FIRST(<表达式>)
- * FISRT(<表达式>) = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
+ * FISRT(<表达式>) = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
  * FOLLOW(<值参数表>) = {RPARENT}
  * 
  * !: 也可以采用用FOLLOW判断空的情况，避免枚举FIRST遗漏
@@ -816,13 +845,15 @@ int GrammaticalParser::__value_parameter_list()
 {
 	BACKUP;
 
+	SYMBOL first_list[] = { SYMBOL::IDENFR, SYMBOL::LPARENT,
+						 SYMBOL::PLUS, SYMBOL::MINU, SYMBOL::INTCON,
+						 SYMBOL::CHARCON, SYMBOL::INTTK, SYMBOL::CHARTK };
+
 	// <表达式>
-	if (_peek()->equal(SYMBOL::IDENFR) || _peek()->equal(SYMBOL::RPARENT) || _peek()->equal(SYMBOL::PLUS) ||
-		_peek()->equal(SYMBOL::MINU) || _peek()->equal(SYMBOL::INTCON) || _peek()->equal(SYMBOL::CHARCON) ||
-		_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) {
+	if (_peek()->equal(first_list, 8)) {
 		FLAG_RECUR(__expression);
-		while (_peek()->equal(SYMBOL::SEMICN)) {
-			FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);
+		while (_peek()->equal(SYMBOL::COMMA)) {
+			FLAG_SYMBOL_CHECK(SYMBOL::COMMA);
 			FLAG_RECUR(__expression);
 		}
 	}
@@ -883,7 +914,7 @@ int GrammaticalParser::__read_statement() {
  * ＜写语句＞ ::= printf '(' ＜字符串＞,＜表达式＞ ')'| printf '('＜字符串＞ ')'| printf '('＜表达式＞')'
  * FISRT(<读语句>) = {PRINTFTK}
  * FISRT(<字符串>) = {STRCON}, 
- * FISRT(<表达式>) = {PLUS, MINU, FIRST(项)} = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
+ * FISRT(<表达式>) = {PLUS, MINU, FIRST(项)} = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
  * 
  * !: 在判断字符串与表达式走向时，也可以采用if-else型，非字符串即表达式。
 */
@@ -891,7 +922,7 @@ int GrammaticalParser::__write_statement() {
 	BACKUP;
 
 	SYMBOL exp_first[] =
-	{ SYMBOL::IDENFR, SYMBOL::RPARENT, SYMBOL::PLUS, SYMBOL::MINU,
+	{ SYMBOL::IDENFR, SYMBOL::LPARENT, SYMBOL::PLUS, SYMBOL::MINU,
 	  SYMBOL::INTCON, SYMBOL::CHARCON, SYMBOL::INTTK, SYMBOL::CHARTK };
 	
 	FLAG_SYMBOL_CHECK(SYMBOL::PRINTFTK);

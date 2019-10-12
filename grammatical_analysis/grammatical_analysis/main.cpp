@@ -21,7 +21,7 @@ int main()
 	vector<string> output_list;
 	GrammaticalParser gram_parser(token_list,output_list);
 
-	/* Course Evaluation Output */
+	/* Lexical : Course Evaluation Output */
 	f = fopen("output.txt", "w");
 	vector<Token>::iterator itr = token_list.begin();
 	while (itr!= token_list.end()) {
@@ -29,5 +29,8 @@ int main()
 		itr++;
 	}
 	fclose(f);
+
+	/* Grammatical Parse :  */
+	gram_parser.parse();
 	return 0;
 }
