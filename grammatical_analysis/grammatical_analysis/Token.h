@@ -11,5 +11,6 @@ public:
 	
 	int transnum();
 	bool equal(SYMBOL symbol);
+	bool equal(SYMBOL* symbols, int len);
 };
 

@@ -28,6 +28,7 @@ private:
 	Token _export_token(int index);		// 根据索引导出一个单词
 	void _update_token();				// 更新单词
 	Token* _peek();						// 偷窥单词（不更改ptoken和token）
+	Token* _peek(int x);				// 偷窥单词 (指定后面的第几个)
 	void _next();						// 获取一个单词
 	void _retract();					// 回退一个单词
 	void _backup();						// 压入一个指针
@@ -43,14 +44,15 @@ private:
 	int __char();
 	int __string();
 	int __program();
-	int __const_des();
+	int __const_description();
 	int __const_def();
 	int __unsigned_integer();
 	int __integer();
 	int __idenfr();
 	int __declar_head();
-	int __var_declar();
+	int __var_description();
 	int __var_def();
+	int __type_idenfr();
 	int __function_return();
 	int __function_void();
 	int __compound_statement();
