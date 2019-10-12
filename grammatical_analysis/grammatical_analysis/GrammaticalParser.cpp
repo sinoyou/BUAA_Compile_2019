@@ -1,11 +1,14 @@
 #include "GrammaticalParser.h"
 
-#define DEBUG_PRINT(msg) fprintf(stderr, "%s %s - line: %d, file : %s %s \n", __DATE__, __TIME__, __LINE__, __FILE__, msg); 
+int cnt = 0;
+
+#define DEBUG_PRINT(msg) fprintf(stderr, "%d line: %d, file : %s %s \n", cnt, __LINE__, __FILE__, msg); 
 
 #define BACKUP \
 {										\
 	_backup();							\
 	string s = string("[ENTER]");	\
+	cnt ++;								\
 	DEBUG_PRINT(s.c_str());				\
 }										\
 
@@ -23,6 +26,7 @@
 {										\
 	string s = string("[LEAVE]");	\
 	DEBUG_PRINT(s.c_str());				\
+	cnt--;								\
 	return 0;							\
 }
 
@@ -130,7 +134,7 @@ void GrammaticalParser::_recover() {
  * 1. 部分过简单的数字与字母类型识别被忽略，已被词法分析解决。					
  * 2. <字符>匹配不是严格的。
  * 3. 在对每条规则分析时，部分计算了FOLLOW集合，但FOLLOW集合并不应该纳入该规则的策略选择中，只是为了验证规则不产生回溯情况。
- * 4. 超前偷窥：<程序>, <变量说明>, <复合语句>, <因子>
+ * 4. 超前偷窥：<程序>, <变量说明>, <复合语句>, <因子>, <语句>
  */
 
 /**
@@ -644,20 +648,26 @@ int GrammaticalParser::__factor() {
  * ＜语句＞::= ＜条件语句＞｜＜循环语句＞| '{'＜语句列＞'}'| ＜有返回值函数调用语句＞; 
              |＜无返回值函数调用语句＞;｜＜赋值语句＞;｜＜读语句＞;｜＜写语句＞;｜＜空＞;|＜返回语句＞;
  * FIRST = IFTK / WHILETK, DOTK, FORTK / LBRACE / CHARTK, INTTK / VOIDTK / IDENFR / SCANFTK / PRINTFTK / SEMICN / RETURNTK
+ * !: FISRT(＜有返回值函数调用语句＞)与FISRT(<赋值语句>) 有重合，需要用_peek(2) = (
 */
 int GrammaticalParser::__statement()
 {
 	BACKUP;
 
 	SYMBOL loop_first[] = { SYMBOL::WHILETK, SYMBOL::FORTK, SYMBOL::DOTK };
-	SYMBOL func_call_return[] = { SYMBOL::CHARTK, SYMBOL::INTTK };
 
 	if (_peek()->equal(SYMBOL::IFTK)) { FLAG_RECUR(__condition_statement); }
 	else if (_peek()->equal(loop_first, 3)) { FLAG_RECUR(__loop_statement); }
-	else if (_peek()->equal(SYMBOL::LBRACE)) { FLAG_RECUR(__statement_list); }
-	else if (_peek()->equal(func_call_return,2)) { FLAG_RECUR(__function_call_return); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);}
+	else if (_peek()->equal(SYMBOL::LBRACE)) { 
+		FLAG_SYMBOL_CHECK(SYMBOL::LBRACE);
+		FLAG_RECUR(__statement_list);
+		FLAG_SYMBOL_CHECK(SYMBOL::RBRACE);
+	}
+	else if (_peek()->equal(SYMBOL::IDENFR) && _peek(2)->equal(SYMBOL::LPARENT)) 
+	{ FLAG_RECUR(__function_call_return); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);}
 	else if (_peek()->equal(SYMBOL::VOIDTK)) { FLAG_RECUR(__function_call_void); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);}
-	else if (_peek()->equal(SYMBOL::IDENFR)) { FLAG_RECUR(__assign_statment); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);}
+	else if (_peek()->equal(SYMBOL::IDENFR) && !_peek(2)->equal(SYMBOL::LPARENT)) 
+	{ FLAG_RECUR(__assign_statment); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);}
 	else if (_peek()->equal(SYMBOL::SCANFTK)) { FLAG_RECUR(__read_statement); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);}
 	else if (_peek()->equal(SYMBOL::PRINTFTK)) { FLAG_RECUR(__write_statement); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);}
 	else if (_peek()->equal(SYMBOL::SEMICN)) { FLAG_SYMBOL_CHECK(SYMBOL::SEMICN); }
@@ -873,7 +883,8 @@ int GrammaticalParser::__value_parameter_list()
 int GrammaticalParser::__statement_list() {
 	BACKUP;
 
-	SYMBOL list[] = { SYMBOL::IFTK,
+	SYMBOL list[] = { 
+		SYMBOL::IFTK,
 		SYMBOL::WHILETK,
 		SYMBOL::DOTK,
 		SYMBOL::FORTK,
