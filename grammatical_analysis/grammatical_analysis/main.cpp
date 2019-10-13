@@ -37,7 +37,6 @@ int main()
 	gram.open("output.txt", ios::out | ios::trunc);
 	vector<string>::iterator itr1 = output_list.begin();
 	while (itr1 != output_list.end()) {
-		cout << "wula" << endl;
 		gram << itr1->c_str() << endl;
 		itr1++;
 	}
