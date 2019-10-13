@@ -21,7 +21,7 @@ private:
 	/* Unit3 输出支持 */
 	vector<string> & output_list;		// 输出的列表
 	void _save(const char* s);			// 中文字符串保存
-	void _save(int head, int tail);		// 标识符字符串保存
+	void _save(Token* token);			// 标识符字符串保存
 
 	/* 支持函数 */
 	void _error(const char* s);			// 错误输出处理
@@ -30,8 +30,9 @@ private:
 	Token* _peek();						// 偷窥单词（不更改ptoken和token）
 	Token* _peek(int x);				// 偷窥单词 (指定后面的第几个)
 	void _next();						// 获取一个单词
-	void _retract();					// 回退一个单词
+
 	void _backup();						// 压入一个指针
+	void _backdown();					// 释放一个指针
 	void _recover();					// 恢复一个指针备份
 
 	/* 规则函数：递归下降调用 */

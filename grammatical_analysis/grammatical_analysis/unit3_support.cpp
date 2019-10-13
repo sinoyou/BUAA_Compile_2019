@@ -6,11 +6,15 @@ void GrammaticalParser::_save(const char* s)
 	output_list.push_back(t);
 }
 
-void GrammaticalParser::_save(int h, int t)
+void GrammaticalParser::_save(Token * token)
 {
-	for (int i = h; i <= t; i++) {
-		Token token = _export_token(i);
-		string t = symbol_dict[token.symbol] + " " + token.token;
-		output_list.push_back(t);
-	}
+	//int h = ptoken_record.back() + 1;
+	//int t = ptoken;
+	//for (int i = h; i <= t; i++) {
+	//	Token token = _export_token(i);
+	//	string t = symbol_dict[token.symbol] + " " + token.token;
+	//	output_list.push_back(t);
+	//}
+	string t = symbol_dict[token->symbol] + " " + token->token;
+	output_list.push_back(t);
 }

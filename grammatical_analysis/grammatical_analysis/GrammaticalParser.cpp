@@ -7,7 +7,7 @@ int cnt = 0;
 #define BACKUP \
 {										\
 	_backup();							\
-	string s = string("[ENTER]");	\
+	string s = string("[ENTER]");		\
 	cnt ++;								\
 	DEBUG_PRINT(s.c_str());				\
 }										\
@@ -24,9 +24,10 @@ int cnt = 0;
 // FLAG_PASS ： 需要读入一个新的token进行判断
 #define FLAG_PASS						\
 {										\
-	string s = string("[LEAVE]");	\
+	string s = string("[LEAVE]");		\
 	DEBUG_PRINT(s.c_str());				\
 	cnt--;								\
+	_backdown();						\
 	return 0;							\
 }
 
@@ -35,12 +36,23 @@ int cnt = 0;
 	_next();							\
 	if (!token->equal(symbol))			\
 		{FLAG_FAIL;}					\
+	else								\
+	 {_save(token);}					\
 }
 
 #define FLAG_MULTI_SYMBOL_CHECK(symbols,len) \
 {										\
 	_next();							\
-	if (!token->equal(symbols,len))		\
+	int cnt = 0;						\
+	for(int i = 0; i < len; i++)		\
+	{									\
+		if(token->equal(symbols[i]))	\
+		{								\
+			cnt += 1;					\
+			_save(token);				\
+		}								\
+	}									\
+	if (cnt  == 0)						\
 		{FLAG_FAIL;}					\
 }
 
@@ -64,12 +76,6 @@ int cnt = 0;
 	}										\
 	DEBUG_PRINT("### End of Try Zone");		\
 }
-
-/* 支持函数 */
-void _error(const char* s);			// 错误输出处理
-Token _gettoken_index(int index);	// 根据索引获取一个单词
-void _gettoken();					// 获取一个单词
-void _retract();					// 回退一个单词
 
 /* 初始化函数 */
 GrammaticalParser::GrammaticalParser(vector<Token>& token_list, vector<string>& output)
@@ -111,15 +117,14 @@ void GrammaticalParser::_next()
 	_update_token();
 }
 
-void GrammaticalParser::_retract()
-{
-	ptoken--;
-	_update_token();
-}
-
 void GrammaticalParser::_backup() {
 	// ptoken备份
 	ptoken_record.push_back(ptoken);
+}
+
+void GrammaticalParser::_backdown() {
+	// ptoken 备份在顺利完成后的删除
+	ptoken_record.pop_back();
 }
 
 void GrammaticalParser::_recover() {
