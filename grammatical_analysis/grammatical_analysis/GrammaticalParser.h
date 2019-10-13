@@ -15,8 +15,14 @@ public:
 private:
 	int ptoken;							// 遍历token列表的索引
 	Token * token;						// 当前索引ptoken下的token
+
 	vector<Token> & token_list;			// token的列表
 	vector<int> ptoken_record;			// ptoken的备份空间
+
+	/* 文法解析辅助工具 */
+	// 单凭文法无法解析两者的差异
+	vector<string> func_call_return_idenfr;
+	vector<string> func_call_void_idenfr;
 	
 	/* Unit3 输出支持 */
 	vector<string> & output_list;		// 输出的列表

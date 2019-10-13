@@ -135,7 +135,8 @@ void GrammaticalParser::_recover() {
  * 1. 部分过简单的数字与字母类型识别被忽略，已被词法分析解决。
  * 2. <字符>匹配不是严格的。
  * 3. 在对每条规则分析时，部分计算了FOLLOW集合，但FOLLOW集合并不应该纳入该规则的策略选择中，只是为了验证规则不产生回溯情况。
- * 4. 超前偷窥：<程序>, <变量说明>, <复合语句>, <因子>, <语句>
+ * 4. 特例-超前偷窥：<程序>, <变量说明>, <复合语句>, <因子>, <语句>
+ * 5. 特例-不同规则，相同结构：需建立符号表判断<有返回函数调用语句>和<无返回函数调用语句>
  */
 
  /**
@@ -461,15 +462,16 @@ int GrammaticalParser::__type_idenfr() {
 int GrammaticalParser::__function_return() {
 	FLAG_ENTER("<有返回值函数定义>");
 	FLAG_RECUR(__declar_head);
+	Token save = *token;
 
 	FLAG_SYMBOL_CHECK(SYMBOL::LPARENT);
 	FLAG_RECUR(__parameter_list);
 	FLAG_SYMBOL_CHECK(SYMBOL::RPARENT);
-
 	FLAG_SYMBOL_CHECK(SYMBOL::LBRACE);
 	FLAG_RECUR(__compound_statement);
 	FLAG_SYMBOL_CHECK(SYMBOL::RBRACE);
 
+	func_call_return_idenfr.push_back(save.token);
 	FLAG_PASS;
 }
 
@@ -481,6 +483,7 @@ int GrammaticalParser::__function_void()
 	FLAG_ENTER("<无返回值函数定义>");
 	FLAG_SYMBOL_CHECK(SYMBOL::VOIDTK);
 	FLAG_RECUR(__idenfr);
+	Token save = *token;
 
 	FLAG_SYMBOL_CHECK(SYMBOL::LPARENT);
 	FLAG_RECUR(__parameter_list);
@@ -490,6 +493,7 @@ int GrammaticalParser::__function_void()
 	FLAG_RECUR(__compound_statement);
 	FLAG_SYMBOL_CHECK(SYMBOL::RBRACE);
 
+	func_call_void_idenfr.push_back(save.token);
 	FLAG_PASS;
 }
 
@@ -666,12 +670,33 @@ int GrammaticalParser::__statement()
 	}
 	else if (_peek()->equal(SYMBOL::IDENFR) && _peek(2)->equal(SYMBOL::LPARENT))
 	{
-		FLAG_RECUR(__function_call_return); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);
+		// 有返回值函数调用与无返回值函数调用形式完全一致，需要提前使用符号表特判。
+		vector<string>::iterator itr_return = func_call_return_idenfr.begin();
+		vector<string>::iterator itr_void = func_call_void_idenfr.begin();
+		int x = 0;
+		while (itr_return != func_call_return_idenfr.end()) {
+			if (*itr_return == _peek()->token) {
+				x++;
+				break;
+			}
+			itr_return++;
+		}
+		while (itr_void != func_call_void_idenfr.end()) {
+			if (*itr_void == _peek()->token) {
+				x--;
+				break;
+			}
+			itr_void++;
+		}
+		if (x == 1) { FLAG_RECUR(__function_call_return); }
+		else if (x == -1) { FLAG_RECUR(__function_call_void); }
+		else { FLAG_FAIL; }	// 在类型为函数名的标识符中没有找到对应的。
+		FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);
 	}
-	else if (_peek()->equal(SYMBOL::VOIDTK)) { FLAG_RECUR(__function_call_void); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN); }
 	else if (_peek()->equal(SYMBOL::IDENFR) && !_peek(2)->equal(SYMBOL::LPARENT))
 	{
-		FLAG_RECUR(__assign_statment); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);
+		FLAG_RECUR(__assign_statment); 
+		FLAG_SYMBOL_CHECK(SYMBOL::SEMICN);
 	}
 	else if (_peek()->equal(SYMBOL::SCANFTK)) { FLAG_RECUR(__read_statement); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN); }
 	else if (_peek()->equal(SYMBOL::PRINTFTK)) { FLAG_RECUR(__write_statement); FLAG_SYMBOL_CHECK(SYMBOL::SEMICN); }
