@@ -1,8 +1,7 @@
 #include "GrammaticalParser.h"
 #include "utils.h"
-void GrammaticalParser::_save(const char* s)
+void GrammaticalParser::_save(string t)
 {
-	string t = string(s);
 	output_list.push_back(t);
 }
 
