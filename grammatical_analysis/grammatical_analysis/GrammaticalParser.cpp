@@ -135,7 +135,7 @@ void GrammaticalParser::_recover() {
  * 1. 部分过简单的数字与字母类型识别被忽略，已被词法分析解决。
  * 2. <字符>匹配不是严格的。
  * 3. 在对每条规则分析时，部分计算了FOLLOW集合，但FOLLOW集合并不应该纳入该规则的策略选择中，只是为了验证规则不产生回溯情况。
- * 4. 特例-超前偷窥：<程序>, <变量说明>, <复合语句>, <因子>, <语句>
+ * 4. 特例-超前偷窥：<程序>, <变量说明>, <因子>, <语句>
  * 5. 特例-不同规则，相同结构：需建立符号表判断<有返回函数调用语句>和<无返回函数调用语句>
  */
 
@@ -501,17 +501,16 @@ int GrammaticalParser::__function_void()
  * ＜复合语句＞::=［＜常量说明＞］［＜变量说明＞］＜语句列＞
  * FISRT(<常量说明>) = {CONSTK}， FIRST(<变量说明>) = {FIRST(<变量定义>)} = {INTTK, CHARTK}
  * FOLLOW(...<[变量说明]>) = FISRT(<语句列>) = {INTTK, CONSTTK, ...}
- * !: [<变量说明>] 的选择性需要排除,_peek(3) = ( ?
 */
 int GrammaticalParser::__compound_statement() {
 	FLAG_ENTER("<复合语句>");
-	SYMBOL first_list[] = { SYMBOL::INTTK, SYMBOL::CONSTTK };
+	SYMBOL first_list[] = { SYMBOL::INTTK, SYMBOL::CHARTK };
 	// [<const des>]
 	if (_peek()->equal(SYMBOL::CONSTTK)) {
 		FLAG_RECUR(__const_description);
 	}
 	// [<var des>]
-	if (_peek()->equal(first_list, 2) && !_peek(3)->equal(SYMBOL::LPARENT)) {
+	if (_peek()->equal(first_list, 2)) {
 		FLAG_RECUR(__var_description);
 	}
 	FLAG_RECUR(__statement_list);
