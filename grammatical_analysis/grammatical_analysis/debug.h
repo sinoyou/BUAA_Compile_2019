@@ -8,14 +8,14 @@
 // 适用于GrammaticalParser语法解析的输出
 #define RECUR_PRINT(head, level, rule)	{						\
 	string space = "";											\
-	for (int i = 0; i < level; i++) space += " ";				\
+	for (int i = 0; i < level; i++) space += "   ";				\
 	cout << space << head << " " << rule << endl;				\
 }
 
 // 适用于GrammaticalParser语法解析的输出
 #define PARSE_PRINT(level, token, symbol){						\
 	string space = "";											\
-	for (int i = 0; i < level; i++) space += " ";				\
+	for (int i = 0; i < level; i++) space += "   ";				\
 	cout << space << " @ " << token << " " << symbol << endl;				\
 }
 
