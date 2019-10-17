@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\class">
+      <UniqueIdentifier>{57a75e44-d487-4ce3-9f91-a378653bdbdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\class">
+      <UniqueIdentifier>{181b20d0-41cf-443b-b4c1-62789c6ff222}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\global">
+      <UniqueIdentifier>{42b905b4-203c-4fad-b6e7-0ec3d662e1b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\class\grammatical_parser">
+      <UniqueIdentifier>{7d4c26b4-ce01-4333-ac06-65d5f05ffe6b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Token.h">
+      <Filter>Header Files\class</Filter>
+    </ClInclude>
+    <ClInclude Include="FileReader.h">
+      <Filter>Header Files\class</Filter>
+    </ClInclude>
+    <ClInclude Include="LexParser.h">
+      <Filter>Header Files\class</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files\global</Filter>
+    </ClInclude>
+    <ClInclude Include="symbol.h">
+      <Filter>Header Files\global</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files\global</Filter>
+    </ClInclude>
+    <ClInclude Include="GrammaticalParser.h">
+      <Filter>Header Files\class</Filter>
+    </ClInclude>
+    <ClInclude Include="debug.h">
+      <Filter>Header Files\class</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileReader.cpp">
+      <Filter>Source Files\class</Filter>
+    </ClCompile>
+    <ClCompile Include="Token.cpp">
+      <Filter>Source Files\class</Filter>
+    </ClCompile>
+    <ClCompile Include="LexParser.cpp">
+      <Filter>Source Files\class</Filter>
+    </ClCompile>
+    <ClCompile Include="unit3_support.cpp">
+      <Filter>Source Files\class\grammatical_parser</Filter>
+    </ClCompile>
+    <ClCompile Include="GrammaticalParser.cpp">
+      <Filter>Source Files\class\grammatical_parser</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
