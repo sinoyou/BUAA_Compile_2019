@@ -429,7 +429,7 @@ int GrammaticalParser::__function_void(FLAG_FUNC_HEAD)
 /**
  * ＜复合语句＞::=［＜常量说明＞］［＜变量说明＞］＜语句列＞
  * FISRT(<常量说明>) = {CONSTK}， FIRST(<变量说明>) = {FIRST(<变量定义>)} = {INTTK, CHARTK}
- * FOLLOW(...<[变量说明]>) = FISRT(<语句列>) = {INTTK, CONSTTK, ...}
+ * FOLLOW(...<[变量说明]>) = FISRT(<语句列>) 与 FISRT(<变量说明>) 没有交集
 */
 int GrammaticalParser::__compound_statement(FLAG_FUNC_HEAD) {
 	FLAG_ENTER("<复合语句>");
@@ -492,7 +492,7 @@ int GrammaticalParser::__main_function(FLAG_FUNC_HEAD)
 
 /**
  * ＜表达式＞::= ［＋｜－］＜项＞{＜加法运算符＞＜项＞}   //[+|-]只作用于第一个<项>
- * FIRST(<表达式>): {PLUS, MINU, FIRST(项)} = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
+ * FIRST(<表达式>): {PLUS, MINU, FIRST(项)} = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
  * 表达式将允许 ++5 - 1 的情况出现
  *
  * FIRST(<加法运算符>) = {PLUS, MINU}
@@ -520,7 +520,7 @@ int GrammaticalParser::__expression(FLAG_FUNC_HEAD) {
 
 /**
  * ＜项＞::= ＜因子＞{＜乘法运算符＞＜因子＞}
- * FIRST(<项>) = FIRST(<因子>) = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
+ * FIRST(<项>) = FIRST(<因子>) = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
 
  * FIRST(<乘法运算符>) = {MULT, DIV}
  * FOLLOW(<项>) = {RBRACK, RPARENT, GRE,GEQ,LSS,LEQ,NEQ,EQL, COMMA, SEMICN} + {PLUS, MINU}
@@ -538,7 +538,7 @@ int GrammaticalParser::__item(FLAG_FUNC_HEAD) {
 
 /**
  * ＜因子＞::= ＜标识符＞ ｜ ＜标识符＞'['＜表达式＞']' | '('＜表达式＞')' ｜ ＜整数＞ | ＜字符＞｜＜有返回值函数调用语句＞
- * FIRST(<因子>) = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
+ * FIRST(<因子>) = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
  * !: 因子的前两种选择不满足FIRST集合不相交的原则，改写为<标识符>[ '[' <表达式> ']' ]，
  *    并且FIRST([...]) = {LBRACK} 与 FOLLOW{<因子>} = {MULT, DIV} + FOLLOW(<项>)没有交集
 */
@@ -580,7 +580,7 @@ int GrammaticalParser::__factor(FLAG_FUNC_HEAD) {
 /**
  * ＜语句＞::= ＜条件语句＞｜＜循环语句＞| '{'＜语句列＞'}'| ＜有返回值函数调用语句＞;
 			 |＜无返回值函数调用语句＞;｜＜赋值语句＞;｜＜读语句＞;｜＜写语句＞;｜＜空＞;|＜返回语句＞;
- * FIRST = IFTK / WHILETK, DOTK, FORTK / LBRACE / CHARTK, INTTK / VOIDTK / IDENFR / SCANFTK / PRINTFTK / SEMICN / RETURNTK
+ * FIRST = IFTK / WHILETK, DOTK, FORTK / LBRACE / IDENFR / IDENFR / IDENFR / SCANFTK / PRINTFTK / SEMICN / RETURNTK
  * !: FISRT(＜有返回值函数调用语句＞)与FISRT(<赋值语句>) 有重合，需要用_peek(2) = (
 */
 int GrammaticalParser::__statement(FLAG_FUNC_HEAD)
@@ -661,9 +661,9 @@ int GrammaticalParser::__assign_statment(FLAG_FUNC_HEAD) {
  * ＜条件语句＞  ::= if '('＜条件＞')'＜语句＞［else＜语句＞］
  * FISRT(<条件语句>) = {IFTK}
  *
- * FOLLOW(<条件语句>) = {ELSETK, SEMICN, WHILETK} + {RBRACE} // <语句> + <语句列> 的follow
+ * FOLLOW(<条件语句>) = {RBRACE} // <语句> + <语句列> 的follow
  * FIRST(else <语句>) = {else}
- * FOLLOW 与 FIRST 在else上存在冲突，此时需要人为规定优先级次序，else粘粘至最近的if即可。
+ * 两个if+一个else的情况下文法层级解析存在歧义，此时需要人为规定优先级次序，进行贪婪匹配，else粘粘至最近的if即可。
 */
 int GrammaticalParser::__condition_statement(FLAG_FUNC_HEAD) {
 	FLAG_ENTER("<条件语句>");
@@ -685,10 +685,10 @@ int GrammaticalParser::__condition_statement(FLAG_FUNC_HEAD) {
 
 /**
  * ＜条件＞ ::=  ＜表达式＞＜关系运算符＞＜表达式＞｜＜表达式＞
- * FIRST(<条件>) = FISRT(<表达式>) = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
+ * FIRST(<条件>) = FISRT(<表达式>) = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
  * 规则改写：<条件> ::= <表达式>  [ <关系运算符> <表达式> ]
 
- * FOLLOW<条件> = {SIMICN, RPARENT}, 与FIRST(<表达式>)无交集
+ * FOLLOW<条件> = {SIMICN, RPARENT}, 与FIRST(<关系运算符> <表达式>)无交集
  * FIRST(<关系运算符> <表达式>) = {GRE, GEQ, LSS, LEQ, NEQ, EQL}
 */
 int GrammaticalParser::__condition(FLAG_FUNC_HEAD) {
@@ -804,7 +804,7 @@ int GrammaticalParser::__function_call_void(FLAG_FUNC_HEAD) {
 /**
  * ＜值参数表＞::= ＜表达式＞{,＜表达式＞}｜＜空＞
  * FISRT() = FIRST(<表达式>)
- * FISRT(<表达式>) = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
+ * FISRT(<表达式>) = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
  * FOLLOW(<值参数表>) = {RPARENT}
  *
  * !: 也可以采用用FOLLOW判断空的情况，避免枚举FIRST遗漏
@@ -815,10 +815,10 @@ int GrammaticalParser::__value_parameter_list(FLAG_FUNC_HEAD)
 
 	SYMBOL first_list[] = { SYMBOL::IDENFR, SYMBOL::LPARENT,
 						 SYMBOL::PLUS, SYMBOL::MINU, SYMBOL::INTCON,
-						 SYMBOL::CHARCON, SYMBOL::INTTK, SYMBOL::CHARTK };
+						 SYMBOL::CHARCON};
 
 	// <表达式>
-	if (_peek()->equal(first_list, 8)) {
+	if (_peek()->equal(first_list, 6)) {
 		FLAG_RECUR(__expression);
 		while (_peek()->equal(SYMBOL::COMMA)) {
 			FLAG_SYMBOL_CHECK(SYMBOL::COMMA);
@@ -832,7 +832,7 @@ int GrammaticalParser::__value_parameter_list(FLAG_FUNC_HEAD)
 /**
  * ＜语句列＞::=｛＜语句＞｝
  * FIRST(<语句>) =
- * {IFTK} + {WHILETK} + {DOTK} + {FORTK} + {LBRACE} + {INTTK, CHARTK} + {VOIDTK} + {IDENFR} + {SCANFTK} + {PRINTFTK}
+ * {IFTK} + {WHILETK} + {DOTK} + {FORTK} + {LBRACE} + {IDENFR*3} + {IDENFR} + {SCANFTK} + {PRINTFTK}
  * + {SEMICN} + {RETURNTK}
  * FOLLOW(<语句列>) = {RBRACE}, 因此<空>选择与<语句>选择不存在回溯问题。
  *
@@ -847,14 +847,12 @@ int GrammaticalParser::__statement_list(FLAG_FUNC_HEAD) {
 		SYMBOL::DOTK,
 		SYMBOL::FORTK,
 		SYMBOL::LBRACE,
-		SYMBOL::INTTK, SYMBOL::CHARTK,
-		SYMBOL::VOIDTK,
 		SYMBOL::IDENFR,
 		SYMBOL::SCANFTK,
 		SYMBOL::PRINTFTK,
 		SYMBOL::SEMICN,
 		SYMBOL::RETURNTK };
-	while (_peek()->equal(list, 13)) {
+	while (_peek()->equal(list, 10)) {
 		FLAG_RECUR(__statement);
 	}
 
@@ -883,7 +881,7 @@ int GrammaticalParser::__read_statement(FLAG_FUNC_HEAD) {
  * ＜写语句＞ ::= printf '(' ＜字符串＞,＜表达式＞ ')'| printf '('＜字符串＞ ')'| printf '('＜表达式＞')'
  * FISRT(<读语句>) = {PRINTFTK}
  * FISRT(<字符串>) = {STRCON},
- * FISRT(<表达式>) = {PLUS, MINU, FIRST(项)} = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON} + {INTTK, CHARTK}
+ * FISRT(<表达式>) = {PLUS, MINU, FIRST(项)} = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
  *
  * !: 在判断字符串与表达式走向时，也可以采用if-else型，非字符串即表达式。
 */
@@ -892,7 +890,7 @@ int GrammaticalParser::__write_statement(FLAG_FUNC_HEAD) {
 
 	SYMBOL exp_first[] =
 	{ SYMBOL::IDENFR, SYMBOL::LPARENT, SYMBOL::PLUS, SYMBOL::MINU,
-	  SYMBOL::INTCON, SYMBOL::CHARCON, SYMBOL::INTTK, SYMBOL::CHARTK };
+	  SYMBOL::INTCON, SYMBOL::CHARCON };
 
 	FLAG_SYMBOL_CHECK(SYMBOL::PRINTFTK);
 	FLAG_SYMBOL_CHECK(SYMBOL::LPARENT);
@@ -906,7 +904,7 @@ int GrammaticalParser::__write_statement(FLAG_FUNC_HEAD) {
 		}
 	}
 	// printf '('＜表达式＞')'
-	else if (_peek()->equal(exp_first, 8)) {
+	else if (_peek()->equal(exp_first, 6)) {
 		FLAG_RECUR(__expression);
 	}
 	else {
