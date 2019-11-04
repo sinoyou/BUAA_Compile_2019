@@ -5,26 +5,37 @@
 #include <cstdio>
 #include "Token.h"
 #include "debug.h"
+#include "error.h"
 
 using namespace std;
 
-// macro 宏定义
+// 宏定义与结构体
+struct PARSE_HEAD {
+	int level;
+};
 
-#define FLAG_FUNC_HEAD int __level__
-	
-#define FLAG_ENTER(name)										\
+/* 所有带下划线的只能在宏定义中使用 */
+#define FLAG_ENTER(name,level)									\
 string __name_save__(name);										\
+int __level__ = level;											\
 {																\
 	_backup();													\
 	RECUR_PRINT(">>>",__level__, __name_save__);				\
 }															
 
-#define FLAG_FAIL \
+// #define FLAG_FAIL \
 {										\
 	string s = string("ERROR WHEN PARSING ") + token->token;	\
 	DEBUG_PRINT(s.c_str());				\
 	_recover();							\
 	return -1;							\
+}
+
+ #define FLAG_FAIL \
+{										\
+	string s = string("ERROR WHEN PARSING ") + token->token;	\
+	DEBUG_PRINT(s.c_str());				\
+	_recover();							\
 }
 
 #define FLAG_PASS						\
@@ -36,7 +47,7 @@ string __name_save__(name);										\
 	return 0;							\
 }
 
-#define FLAG_SYMBOL_CHECK(tar_symbol)   \
+// #define FLAG_SYMBOL_CHECK(tar_symbol)   \
 {										\
 	_next();							\
 	if (!token->equal(tar_symbol))		\
@@ -48,7 +59,7 @@ string __name_save__(name);										\
 	}									\
 }
 
-#define FLAG_MULTI_SYMBOL_CHECK(symbols,len) \
+// #define FLAG_MULTI_SYMBOL_CHECK(symbols,len) \
 {										\
 	_next();							\
 	int cnt = 0;						\
@@ -65,7 +76,9 @@ string __name_save__(name);										\
 		{FLAG_FAIL;}					\
 }
 
-#define FLAG_RECUR(func) \
+#define RECUR_CHECK(func) func(PARSE_HEAD{head.level + 1});
+
+// #define FLAG_RECUR(func) \
 {										\
 	int x = func(__level__ + 1);		\
 	if(x != 0)							\
@@ -76,7 +89,7 @@ string __name_save__(name);										\
 }
 
 // 支持回溯的“试探性”递归，当失败时不会递归式返回。
-#define FLAG_RECUR_TRY(func) \
+// #define FLAG_RECUR_TRY(func) \
 {											\
 	DEBUG_PRINT("### Begin of Try Zone");	\
 	int x = func();							\
@@ -121,44 +134,47 @@ private:
 	void _backdown();					// 释放一个指针
 	void _recover();					// 恢复一个指针备份
 
+	void SYMBOL_CHECK(SYMBOL symbol) throw();							// 检查一个终结符
+	void MULTI_SYMBOL_CHECK(SYMBOL symbols[],int len) throw(); 			// 检查多个终结符
+
 	/* 规则函数：递归下降调用 */
-	int __add_operator(FLAG_FUNC_HEAD);
-	int __mult_operator(FLAG_FUNC_HEAD);
-	int __rel_operator(FLAG_FUNC_HEAD);
-	int __letter(FLAG_FUNC_HEAD);
-	int __number(FLAG_FUNC_HEAD);
-	int __non_zero_number(FLAG_FUNC_HEAD);
-	int __char(FLAG_FUNC_HEAD);
-	int __string(FLAG_FUNC_HEAD);
-	int __program(FLAG_FUNC_HEAD);
-	int __const_description(FLAG_FUNC_HEAD);
-	int __const_def(FLAG_FUNC_HEAD);
-	int __unsigned_integer(FLAG_FUNC_HEAD);
-	int __integer(FLAG_FUNC_HEAD);
-	int __idenfr(FLAG_FUNC_HEAD);
-	int __declar_head(FLAG_FUNC_HEAD);
-	int __var_description(FLAG_FUNC_HEAD);
-	int __var_def(FLAG_FUNC_HEAD);
-	int __type_idenfr(FLAG_FUNC_HEAD);
-	int __function_return(FLAG_FUNC_HEAD);
-	int __function_void(FLAG_FUNC_HEAD);
-	int __compound_statement(FLAG_FUNC_HEAD);
-	int __parameter_list(FLAG_FUNC_HEAD);
-	int __main_function(FLAG_FUNC_HEAD);
-	int __expression(FLAG_FUNC_HEAD);
-	int __item(FLAG_FUNC_HEAD);
-	int __factor(FLAG_FUNC_HEAD);
-	int __statement(FLAG_FUNC_HEAD);
-	int __assign_statment(FLAG_FUNC_HEAD);
-	int __condition_statement(FLAG_FUNC_HEAD);
-	int __condition(FLAG_FUNC_HEAD);
-	int __loop_statement(FLAG_FUNC_HEAD);
-	int __step_length(FLAG_FUNC_HEAD);
-	int __function_call_return(FLAG_FUNC_HEAD);
-	int __function_call_void(FLAG_FUNC_HEAD);
-	int __value_parameter_list(FLAG_FUNC_HEAD);
-	int __statement_list(FLAG_FUNC_HEAD);
-	int __read_statement(FLAG_FUNC_HEAD);
-	int __write_statement(FLAG_FUNC_HEAD);
-	int __return_statement(FLAG_FUNC_HEAD);
+	int __add_operator(PARSE_HEAD head);
+	int __mult_operator(PARSE_HEAD head);
+	int __rel_operator(PARSE_HEAD head);
+	int __letter(PARSE_HEAD head);
+	int __number(PARSE_HEAD head);
+	int __non_zero_number(PARSE_HEAD head);
+	int __char(PARSE_HEAD head);
+	int __string(PARSE_HEAD head);
+	int __program(PARSE_HEAD head);
+	int __const_description(PARSE_HEAD head);
+	int __const_def(PARSE_HEAD head);
+	int __unsigned_integer(PARSE_HEAD head);
+	int __integer(PARSE_HEAD head);
+	int __idenfr(PARSE_HEAD head);
+	int __declar_head(PARSE_HEAD head);
+	int __var_description(PARSE_HEAD head);
+	int __var_def(PARSE_HEAD head);
+	int __type_idenfr(PARSE_HEAD head);
+	int __function_return(PARSE_HEAD head);
+	int __function_void(PARSE_HEAD head);
+	int __compound_statement(PARSE_HEAD head);
+	int __parameter_list(PARSE_HEAD head);
+	int __main_function(PARSE_HEAD head);
+	int __expression(PARSE_HEAD head);
+	int __item(PARSE_HEAD head);
+	int __factor(PARSE_HEAD head);
+	int __statement(PARSE_HEAD head);
+	int __assign_statment(PARSE_HEAD head);
+	int __condition_statement(PARSE_HEAD head);
+	int __condition(PARSE_HEAD head);
+	int __loop_statement(PARSE_HEAD head);
+	int __step_length(PARSE_HEAD head);
+	int __function_call_return(PARSE_HEAD head);
+	int __function_call_void(PARSE_HEAD head);
+	int __value_parameter_list(PARSE_HEAD head);
+	int __statement_list(PARSE_HEAD head);
+	int __read_statement(PARSE_HEAD head);
+	int __write_statement(PARSE_HEAD head);
+	int __return_statement(PARSE_HEAD head);
 };

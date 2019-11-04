@@ -6,13 +6,13 @@
 #include <cstdio>
 #include <vector>
 #include <fstream>
+#include "error.h"
 
 // Global Variable and Pointer
 FileReader* reader;
 FILE* f;
 
-int main()
-{
+void run() {
 	/* Lexcial Parse */
 	FileReader reader("testfile.txt");
 	LexParser lexParser(reader);
@@ -20,7 +20,7 @@ int main()
 
 	/* Grammatical Parse */
 	vector<string> output_list;
-	GrammaticalParser gram_parser(token_list,output_list);
+	GrammaticalParser gram_parser(token_list, output_list);
 
 	/* Lexical : Course Evaluation Output */
 	//f = fopen("output.txt", "w");
@@ -41,5 +41,16 @@ int main()
 		itr1++;
 	}
 	gram.close();
+}
+
+int main()
+{
+	try {
+		throw ParseException(ErrorType::Unknown, "HAHAHA");
+	}
+	catch (ParseException& e) {
+		cout << e.what() << endl;
+		cout << e.errorType;
+	}
 	return 0;
 }

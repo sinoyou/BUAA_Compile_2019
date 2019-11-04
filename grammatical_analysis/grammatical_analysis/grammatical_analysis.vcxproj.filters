@@ -51,6 +51,9 @@
     <ClInclude Include="debug.h">
       <Filter>Header Files\class</Filter>
     </ClInclude>
+    <ClInclude Include="error.h">
+      <Filter>Header Files\class</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -73,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="GrammaticalParser.cpp">
       <Filter>Source Files\class\grammatical_parser</Filter>
+    </ClCompile>
+    <ClCompile Include="error.cpp">
+      <Filter>Source Files\class</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
