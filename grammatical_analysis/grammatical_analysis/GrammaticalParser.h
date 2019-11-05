@@ -134,8 +134,8 @@ private:
 	void _backdown();					// 释放一个指针
 	void _recover();					// 恢复一个指针备份
 
-	void SYMBOL_CHECK(SYMBOL symbol) throw();							// 检查一个终结符
-	void MULTI_SYMBOL_CHECK(SYMBOL symbols[],int len) throw(); 			// 检查多个终结符
+	void SYMBOL_CHECK(SYMBOL symbol)	;							// 检查一个终结符
+	void MULTI_SYMBOL_CHECK(SYMBOL symbols[],int len) ; 			// 检查多个终结符
 
 	/* 规则函数：递归下降调用 */
 	int __add_operator(PARSE_HEAD head);

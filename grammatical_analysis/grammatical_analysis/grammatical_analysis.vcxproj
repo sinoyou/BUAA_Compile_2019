@@ -30,6 +30,7 @@
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="check.cpp" />
     <ClCompile Include="error.cpp" />
     <ClCompile Include="GrammaticalParser.cpp" />
     <ClCompile Include="Token.cpp" />

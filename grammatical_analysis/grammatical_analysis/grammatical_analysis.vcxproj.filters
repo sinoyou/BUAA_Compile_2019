@@ -80,5 +80,8 @@
     <ClCompile Include="error.cpp">
       <Filter>Source Files\class</Filter>
     </ClCompile>
+    <ClCompile Include="check.cpp">
+      <Filter>Source Files\class\grammatical_parser</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

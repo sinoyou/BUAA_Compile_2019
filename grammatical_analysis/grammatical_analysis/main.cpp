@@ -45,6 +45,8 @@ void run() {
 
 int main()
 {
+	run();
+	/*
 	try {
 		throw ParseException(ErrorType::Unknown, "HAHAHA");
 	}
@@ -52,5 +54,6 @@ int main()
 		cout << e.what() << endl;
 		cout << e.errorType;
 	}
+	*/
 	return 0;
 }
