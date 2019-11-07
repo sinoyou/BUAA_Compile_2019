@@ -3,12 +3,13 @@
 
 using namespace std;
 
-LexParser::LexParser(FileReader& reader) :reader(reader) {}
+LexParser::LexParser(FileReader& reader, vector<tuple<int,string>> error_list) 
+	:reader(reader), error_output_list(error_list), current_line(1) {}
 
 const vector<Token>& LexParser::parse() {
 	while (_getsym() >= 0) {
 		if(symbol != SYMBOL::UNKNOWN)
-			token_list.push_back(Token(symbol, reader.getToken()));
+			token_list.push_back(Token(symbol, reader.getToken(), current_line));
 		/* 默认：当前解析程序为下一步解析设定好指针  */
 		reader.getchar();
 	}
@@ -19,7 +20,10 @@ const vector<Token>& LexParser::parse() {
 int LexParser::_getsym() {
 	reader.clearToken();
 	/* 清除无关空白符 */
-	while (reader.isSpace() || reader.isNewline() || reader.isTab()) {
+	while (reader.isSpace() || reader.isNewlineN() || reader.isNewlineR() || reader.isTab()) {
+		if (reader.isNewlineN()) {
+			current_line += 1;
+		}
 		reader.getchar();
 	}
 

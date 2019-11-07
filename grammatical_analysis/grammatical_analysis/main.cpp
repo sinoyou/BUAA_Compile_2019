@@ -5,22 +5,25 @@
 #include "GrammaticalParser.h"
 #include <cstdio>
 #include <vector>
+#include <tuple>
 #include <fstream>
-#include "error.h"
+#include "ParseException.h"
 
 // Global Variable and Pointer
 FileReader* reader;
 FILE* f;
 
 void run() {
+	vector<tuple<int, string>> error_output_list;
+
 	/* Lexcial Parse */
 	FileReader reader("testfile.txt");
-	LexParser lexParser(reader);
+	LexParser lexParser(reader, error_output_list);
 	vector<Token> token_list = lexParser.parse();
 
-	/* Grammatical Parse */
+	/* Grammatical Parse + error process */
 	vector<string> output_list;
-	GrammaticalParser gram_parser(token_list, output_list);
+	GrammaticalParser gram_parser(token_list, output_list, error_output_list);
 
 	/* Lexical : Course Evaluation Output */
 	//f = fopen("output.txt", "w");
@@ -31,7 +34,7 @@ void run() {
 	//}
 	//fclose(f);
 
-	/* Grammatical Parse :  */
+	/* Grammatical Parse :  Recursive Output + Error Output */
 	gram_parser.parse();
 	ofstream gram;
 	gram.open("output.txt", ios::out | ios::trunc);
@@ -46,14 +49,5 @@ void run() {
 int main()
 {
 	run();
-	/*
-	try {
-		throw ParseException(ErrorType::Unknown, "HAHAHA");
-	}
-	catch (ParseException& e) {
-		cout << e.what() << endl;
-		cout << e.errorType;
-	}
-	*/
 	return 0;
 }

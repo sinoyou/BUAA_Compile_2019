@@ -20,8 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="debug.h" />
-    <ClInclude Include="error.h" />
+    <ClInclude Include="ParseException.h" />
     <ClInclude Include="GrammaticalParser.h" />
+    <ClInclude Include="SymbolTable.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="LexParser.h" />
     <ClInclude Include="resource.h" />
@@ -31,13 +32,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="check.cpp" />
-    <ClCompile Include="error.cpp" />
+    <ClCompile Include="ParseException.cpp" />
     <ClCompile Include="GrammaticalParser.cpp" />
+    <ClCompile Include="SymbolTable.cpp" />
     <ClCompile Include="Token.cpp" />
     <ClCompile Include="LexParser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="unit3_support.cpp" />
+    <ClCompile Include="unit4_support.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

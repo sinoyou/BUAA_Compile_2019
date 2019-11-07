@@ -26,7 +26,8 @@ public:
 	// 成员函数：字符级判断函数
 	/* 识别相关 */
 	bool isSpace() { return text[ptr] == ' '; }							// 判断是否为空格
-	bool isNewline() { return text[ptr] == '\n' || text[ptr] == '\r'; }	// 判断是否为换行符
+	bool isNewlineN() { return text[ptr] == '\n'; }						// 判断是否为换行符 \n
+	bool isNewlineR() { return text[ptr] == '\r'; }						// 判断是否为换行符 \r
 	bool isTab() { return text[ptr] == '\t'; }							// 判断是否Tab
 	bool isLetter() { return (text[ptr] >= 'a' && text[ptr] <= 'z') 
 		|| (text[ptr] >= 'A' && (text[ptr] <= 'Z')) 

@@ -25,6 +25,9 @@
     <Filter Include="Source Files\class\grammatical_parser">
       <UniqueIdentifier>{7d4c26b4-ce01-4333-ac06-65d5f05ffe6b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\class\symbol_table">
+      <UniqueIdentifier>{f7f0a894-bb3d-4647-beb6-788569314eec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Token.h">
@@ -51,7 +54,10 @@
     <ClInclude Include="debug.h">
       <Filter>Header Files\class</Filter>
     </ClInclude>
-    <ClInclude Include="error.h">
+    <ClInclude Include="SymbolTable.h">
+      <Filter>Header Files\class</Filter>
+    </ClInclude>
+    <ClInclude Include="ParseException.h">
       <Filter>Header Files\class</Filter>
     </ClInclude>
   </ItemGroup>
@@ -77,11 +83,17 @@
     <ClCompile Include="GrammaticalParser.cpp">
       <Filter>Source Files\class\grammatical_parser</Filter>
     </ClCompile>
-    <ClCompile Include="error.cpp">
-      <Filter>Source Files\class</Filter>
-    </ClCompile>
     <ClCompile Include="check.cpp">
       <Filter>Source Files\class\grammatical_parser</Filter>
+    </ClCompile>
+    <ClCompile Include="unit4_support.cpp">
+      <Filter>Source Files\class\grammatical_parser</Filter>
+    </ClCompile>
+    <ClCompile Include="SymbolTable.cpp">
+      <Filter>Source Files\class\symbol_table</Filter>
+    </ClCompile>
+    <ClCompile Include="ParseException.cpp">
+      <Filter>Source Files\class</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

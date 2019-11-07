@@ -3,8 +3,11 @@
 #include "debug.h"
 
 /* 初始化函数 */
-GrammaticalParser::GrammaticalParser(vector<Token>& token_list, vector<string>& output)
-	:token_list(token_list), output_list(output) {
+GrammaticalParser::GrammaticalParser(
+	vector<Token>& token_list, 
+	vector<string>& output,
+	vector<tuple<int, string>>& error_output)
+	:token_list(token_list), output_list(output), error_output_list(error_output) {
 	token = NULL;
 	ptoken = -1;
 }
@@ -72,7 +75,7 @@ void GrammaticalParser::_recover() {
   * ＜加法运算符＞ ::= +｜-
   * FIRST(+) = {PLUS}, FIRST(-) = {SUB}
   */
-int GrammaticalParser::__add_operator(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__add_operator(PARSE_HEAD head) {
 	FLAG_ENTER("<加法运算符>",head.level);
 	try {
 		SYMBOL candidate[] = { SYMBOL::PLUS,SYMBOL::MINU };
@@ -83,13 +86,14 @@ int GrammaticalParser::__add_operator(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜乘法运算符＞  ::= *｜/
  * FIRST(*) = {MULT}, FIRST(/) = {DIV}
  */
-int GrammaticalParser::__mult_operator(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__mult_operator(PARSE_HEAD head) {
 	FLAG_ENTER("<乘法运算符>", head.level);
 	try {
 		SYMBOL candidate[] = { SYMBOL::MULT,SYMBOL::DIV };
@@ -100,13 +104,14 @@ int GrammaticalParser::__mult_operator(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜关系运算符＞  ::=  <｜<=｜>｜>=｜!=｜==
  * FIRST：...
 */
-int GrammaticalParser::__rel_operator(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__rel_operator(PARSE_HEAD head) {
 	FLAG_ENTER("<关系运算符>", head.level);
 	try {
 		SYMBOL list[6] = { SYMBOL::LSS, SYMBOL::LEQ, SYMBOL::GRE, SYMBOL::GEQ, SYMBOL::NEQ, SYMBOL::EQL };
@@ -117,39 +122,40 @@ int GrammaticalParser::__rel_operator(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜字母＞::= ＿｜a｜．．．｜z｜A｜．．．｜Z
  * FIRST: ...
 */
-int GrammaticalParser::__letter(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__letter(PARSE_HEAD head) {
 	// 词法分析充足，该非终结符被忽略
 	FLAG_ENTER("<字母>", head.level);
 	FLAG_FAIL;
-	throw ParseException(ErrorType::Unexpected, string("<Char>"));
+	throw ParseException(ParseExceptionType::Unexpected, string("<Char>"));
 }
 
 /**
  * ＜数字＞::= ０｜＜非零数字＞
  * FIRST: ...
 */
-int GrammaticalParser::__number(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__number(PARSE_HEAD head) {
 	// 词法分析充足，该非终结符被忽略
 	FLAG_ENTER("<数字>", head.level);
 	FLAG_FAIL;
-	throw ParseException(ErrorType::Unexpected, string("<Number>"));
+	throw ParseException(ParseExceptionType::Unexpected, string("<Number>"));
 }
 
 /**
  * ＜非零数字＞::= １｜．．．｜９
  * FIRST: ...
  */
-int GrammaticalParser::__non_zero_number(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__non_zero_number(PARSE_HEAD head) {
 	// 词法分析充足，该非终结符被忽略
 	FLAG_ENTER("<非零数字>", head.level);
 	FLAG_FAIL;
-	throw ParseException(ErrorType::Unexpected, string("<Non-Zero Number>"));
+	throw ParseException(ParseExceptionType::Unexpected, string("<Non-Zero Number>"));
 }
 
 /**
@@ -157,7 +163,7 @@ int GrammaticalParser::__non_zero_number(PARSE_HEAD head) {
  * FIRST: '
  * !: 词法分析时由于已经忽略了单引号'并判断了字符，因此该规则匹配不完全严格。
 */
-int GrammaticalParser::__char(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__char(PARSE_HEAD head) {
 	FLAG_ENTER("<字符>", head.level);
 	try {
 		SYMBOL_CHECK(SYMBOL::CHARCON);
@@ -167,6 +173,7 @@ int GrammaticalParser::__char(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -174,7 +181,7 @@ int GrammaticalParser::__char(PARSE_HEAD head) {
  * FIRST: "
  * !: 词法分析时由于已经忽略了双引号"并判断了字符，因此该规则匹配不完全严格.
 */
-int GrammaticalParser::__string(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__string(PARSE_HEAD head) {
 	FLAG_ENTER("<字符串>", head.level);
 	try {
 		SYMBOL_CHECK(SYMBOL::STRCON);
@@ -184,6 +191,7 @@ int GrammaticalParser::__string(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -197,7 +205,7 @@ int GrammaticalParser::__string(PARSE_HEAD head) {
  * !:{INTTK, CHARTK} 出现了FISRT集合的冲突，需要更多的偷窥 - 针对<变量说明>和<有函数值函数定义>
  * !:{VOIDTK} 出现了FIRST集合的冲突，需要更多的偷窥
  */
-int GrammaticalParser::__program(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__program(PARSE_HEAD head)
 {
 	FLAG_ENTER("<程序>", head.level);
 	try {
@@ -233,6 +241,7 @@ int GrammaticalParser::__program(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -241,7 +250,7 @@ int GrammaticalParser::__program(PARSE_HEAD head)
  * FOLLOW(<常量说明>) = {...}
  * 不存在FISRT(< const＜常量定义＞;>)和FOLLOW(<常量说明>)集合交叉情况。
 */
-int GrammaticalParser::__const_description(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__const_description(PARSE_HEAD head)
 {
 	FLAG_ENTER("<常量说明>", head.level);
 	try {
@@ -261,6 +270,7 @@ int GrammaticalParser::__const_description(PARSE_HEAD head)
 	}
 
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -269,7 +279,7 @@ int GrammaticalParser::__const_description(PARSE_HEAD head)
  * FOLLOW(<常量定义>) = {SEMICN}
  * 不存在FOLLOW(<常量定义>)与FIRST(,＜标识符＞＝＜整数＞| <字符>) 相交情况。
 */
-int GrammaticalParser::__const_def(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__const_def(PARSE_HEAD head)
 {
 	FLAG_ENTER("<常量定义>", head.level);
 	try {
@@ -298,7 +308,7 @@ int GrammaticalParser::__const_def(PARSE_HEAD head)
 			}
 		}
 		else {
-			throw ParseException(ErrorType::UnknownBranch, token->token);
+			throw ParseException(ParseExceptionType::UnknownBranch, token->token);
 		}
 	}
 	catch (ParseException& e) {
@@ -306,13 +316,14 @@ int GrammaticalParser::__const_def(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜无符号整数＞  ::= ＜非零数字＞｛＜数字＞｝| 0
  * FIRST: ...
 */
-int GrammaticalParser::__unsigned_integer(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__unsigned_integer(PARSE_HEAD head) {
 	FLAG_ENTER("<无符号整数>", head.level);
 	try {
 		SYMBOL_CHECK(SYMBOL::INTCON);
@@ -322,13 +333,14 @@ int GrammaticalParser::__unsigned_integer(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜整数＞::= ［＋｜－］＜无符号整数＞
  * FIRST(1) = {PLUS}, FIRST(2) = {MINU}, FIRST(3) = {INTCON}
 */
-int GrammaticalParser::__integer(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__integer(PARSE_HEAD head)
 {
 	FLAG_ENTER("<整数>", head.level);
 	try {
@@ -345,13 +357,14 @@ int GrammaticalParser::__integer(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜标识符＞::=  ＜字母＞｛＜字母＞｜＜数字＞｝
  * FIRST: ...
 */
-int GrammaticalParser::__idenfr(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__idenfr(PARSE_HEAD head) {
 	FLAG_ENTER("<标识符>", head.level);
 	try {
 		SYMBOL_CHECK(SYMBOL::IDENFR);
@@ -361,13 +374,14 @@ int GrammaticalParser::__idenfr(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜声明头部＞::=  int＜标识符＞ | char＜标识符＞
  * FIRST(1) = {INTTK}, FIRST(2) = {CHARTK}
 */
-int GrammaticalParser::__declar_head(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__declar_head(PARSE_HEAD head) {
 	FLAG_ENTER("<声明头部>", head.level);
 	try {
 		if (_peek()->equal(SYMBOL::INTTK))
@@ -380,7 +394,7 @@ int GrammaticalParser::__declar_head(PARSE_HEAD head) {
 			RECUR_CHECK(__idenfr);
 		}
 		else {
-			throw ParseException(ErrorType::UnknownBranch, string("<Declaration Head>"));
+			throw ParseException(ParseExceptionType::UnknownBranch, string("<Declaration Head>"));
 		}
 	}
 	catch(ParseException & e) {
@@ -388,6 +402,7 @@ int GrammaticalParser::__declar_head(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -400,7 +415,7 @@ int GrammaticalParser::__declar_head(PARSE_HEAD head) {
  * {IFTK, WHILETK, DOTK, FORTK, LBRACE, INTTK, CHARTK,    // _peek(3) = (?
  *  VOIDTK, IDENFR, SCANFTK, PRINTFTK, SEMICN, RETURNTK}
  */
-int GrammaticalParser::__var_description(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__var_description(PARSE_HEAD head)
 {
 	FLAG_ENTER("<变量说明>", head.level);
 	try {
@@ -419,6 +434,7 @@ int GrammaticalParser::__var_description(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -427,7 +443,7 @@ int GrammaticalParser::__var_description(PARSE_HEAD head)
  * FOLLOW(<变量定义>) = {SEMICN} 与 FIRST(<, <标识符>>) 没有交集
  * * 单变量和数组变量的声明差异[]取或不取来表示
 */
-int GrammaticalParser::__var_def(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__var_def(PARSE_HEAD head)
 {
 	FLAG_ENTER("<变量定义>", head.level);
 	try {
@@ -456,13 +472,14 @@ int GrammaticalParser::__var_def(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 
 /**
  * ＜类型标识符＞::=  int | char
 */
-int GrammaticalParser::__type_idenfr(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__type_idenfr(PARSE_HEAD head) {
 	FLAG_ENTER("<类型标识符>", head.level);
 	try {
 		SYMBOL list[] = { SYMBOL::INTTK, SYMBOL::CHARTK };
@@ -473,12 +490,13 @@ int GrammaticalParser::__type_idenfr(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜有返回值函数定义＞  ::=  ＜声明头部＞'('＜参数表＞')' '{'＜复合语句＞'}'
 */
-int GrammaticalParser::__function_return(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__function_return(PARSE_HEAD head) {
 	FLAG_ENTER("<有返回值函数定义>", head.level);
 	try {
 		RECUR_CHECK(__declar_head);
@@ -498,12 +516,13 @@ int GrammaticalParser::__function_return(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜无返回值函数定义＞  ::= void＜标识符＞'('＜参数表＞')''{'＜复合语句＞'}'
 */
-int GrammaticalParser::__function_void(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__function_void(PARSE_HEAD head)
 {
 	FLAG_ENTER("<无返回值函数定义>", head.level);
 	try {
@@ -526,6 +545,7 @@ int GrammaticalParser::__function_void(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -533,7 +553,7 @@ int GrammaticalParser::__function_void(PARSE_HEAD head)
  * FISRT(<常量说明>) = {CONSTK}， FIRST(<变量说明>) = {FIRST(<变量定义>)} = {INTTK, CHARTK}
  * FOLLOW(...<[变量说明]>) = FISRT(<语句列>) 与 FISRT(<变量说明>) 没有交集
 */
-int GrammaticalParser::__compound_statement(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__compound_statement(PARSE_HEAD head) {
 	FLAG_ENTER("<复合语句>", head.level);
 	try {
 		SYMBOL first_list[] = { SYMBOL::INTTK, SYMBOL::CHARTK };
@@ -552,6 +572,7 @@ int GrammaticalParser::__compound_statement(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -560,7 +581,7 @@ int GrammaticalParser::__compound_statement(PARSE_HEAD head) {
  * FIRST(1) = {INTTK, CHARTK}, FOLLOW(参数表) =  {RPARENT}
  * FOLLOW(<标识符>) = {RPARENT} 与 FIRST(<,<类型标识符><标识符>>) 无交集
 */
-int GrammaticalParser::__parameter_list(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__parameter_list(PARSE_HEAD head)
 {
 	FLAG_ENTER("<参数表>", head.level);
 	try {
@@ -585,13 +606,14 @@ int GrammaticalParser::__parameter_list(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜主函数＞::= void main‘(’‘)’ ‘{’＜复合语句＞‘}’
  * FIRST(x): {VOIDTK}
 */
-int GrammaticalParser::__main_function(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__main_function(PARSE_HEAD head)
 {
 	FLAG_ENTER("<主函数>", head.level);
 	try {
@@ -608,6 +630,7 @@ int GrammaticalParser::__main_function(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -619,7 +642,7 @@ int GrammaticalParser::__main_function(PARSE_HEAD head)
  * FOLLOW(<表达式>) = {RBRACK, RPARENT, GRE,GEQ,LSS,LEQ,NEQ,EQL, COMMA} + {SEMICN}(<赋值语句新增>)
  * FIRST<加法运算符> 与 FOLLOW<表达式> 没有交集, 因此无回溯.
 */
-int GrammaticalParser::__expression(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__expression(PARSE_HEAD head) {
 	FLAG_ENTER("<表达式>", head.level);
 	try {
 		// match +/- if have
@@ -641,6 +664,7 @@ int GrammaticalParser::__expression(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 
@@ -652,7 +676,7 @@ int GrammaticalParser::__expression(PARSE_HEAD head) {
  * FOLLOW(<项>) = {RBRACK, RPARENT, GRE,GEQ,LSS,LEQ,NEQ,EQL, COMMA, SEMICN} + {PLUS, MINU}
  * FIRST 与 FOLLOW 交集，故不存在回溯
 */
-int GrammaticalParser::__item(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__item(PARSE_HEAD head) {
 	FLAG_ENTER("<项>", head.level);
 	try {
 		RECUR_CHECK(__factor);
@@ -666,6 +690,7 @@ int GrammaticalParser::__item(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -674,7 +699,7 @@ int GrammaticalParser::__item(PARSE_HEAD head) {
  * !: 因子的前两种选择不满足FIRST集合不相交的原则，改写为<标识符>[ '[' <表达式> ']' ]，
  *    并且FIRST([...]) = {LBRACK} 与 FOLLOW{<因子>} = {MULT, DIV} + FOLLOW(<项>)没有交集
 */
-int GrammaticalParser::__factor(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__factor(PARSE_HEAD head) {
 	FLAG_ENTER("<因子>", head.level);
 	try {
 		// <标识符> [ '[' <表达式> ']' ] 
@@ -705,7 +730,7 @@ int GrammaticalParser::__factor(PARSE_HEAD head) {
 			RECUR_CHECK(__char);
 		}
 		else {
-			throw ParseException(ErrorType::UnknownBranch, string("<factor>"));
+			throw ParseException(ParseExceptionType::UnknownBranch, string("<factor>"));
 		}
 	}
 	catch (ParseException& e) {
@@ -713,6 +738,7 @@ int GrammaticalParser::__factor(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -721,7 +747,7 @@ int GrammaticalParser::__factor(PARSE_HEAD head) {
  * FIRST = IFTK / WHILETK, DOTK, FORTK / LBRACE / IDENFR / IDENFR / IDENFR / SCANFTK / PRINTFTK / SEMICN / RETURNTK
  * !: FISRT(＜有返回值函数调用语句＞)与FISRT(<赋值语句>) 有重合，需要用_peek(2) = (
 */
-int GrammaticalParser::__statement(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__statement(PARSE_HEAD head)
 {
 	FLAG_ENTER("<语句>", head.level);
 	try {
@@ -769,7 +795,7 @@ int GrammaticalParser::__statement(PARSE_HEAD head)
 		else if (_peek()->equal(SYMBOL::SEMICN)) { SYMBOL_CHECK(SYMBOL::SEMICN); }
 		else if (_peek()->equal(SYMBOL::RETURNTK)) { RECUR_CHECK(__return_statement); SYMBOL_CHECK(SYMBOL::SEMICN); }
 		else {
-			throw ParseException(ErrorType::UnknownBranch, string("<statement>"));
+			throw ParseException(ParseExceptionType::UnknownBranch, string("<statement>"));
 		}
 	}
 	catch (ParseException& e) {
@@ -777,6 +803,7 @@ int GrammaticalParser::__statement(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 
@@ -785,7 +812,7 @@ int GrammaticalParser::__statement(PARSE_HEAD head)
  * 规则改写 <赋值语句> ::= <标识符> ['[' <表达式> ']'] = <表达式>
  * FIRST(<赋值语句>) = {IDENFR}
 */
-int GrammaticalParser::__assign_statment(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__assign_statment(PARSE_HEAD head) {
 	FLAG_ENTER("<赋值语句>", head.level);
 	
 	try {
@@ -804,6 +831,7 @@ int GrammaticalParser::__assign_statment(PARSE_HEAD head) {
 	}
 
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -814,7 +842,7 @@ int GrammaticalParser::__assign_statment(PARSE_HEAD head) {
  * FIRST(else <语句>) = {else}
  * 两个if+一个else的情况下文法层级解析存在歧义，此时需要人为规定优先级次序，进行贪婪匹配，else粘粘至最近的if即可。
 */
-int GrammaticalParser::__condition_statement(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__condition_statement(PARSE_HEAD head) {
 	FLAG_ENTER("<条件语句>", head.level);
 
 	try {
@@ -835,6 +863,7 @@ int GrammaticalParser::__condition_statement(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -845,7 +874,7 @@ int GrammaticalParser::__condition_statement(PARSE_HEAD head) {
  * FOLLOW<条件> = {SIMICN, RPARENT}, 与FIRST(<关系运算符> <表达式>)无交集
  * FIRST(<关系运算符> <表达式>) = {GRE, GEQ, LSS, LEQ, NEQ, EQL}
 */
-int GrammaticalParser::__condition(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__condition(PARSE_HEAD head) {
 	FLAG_ENTER("<条件>", head.level);
 
 	try {
@@ -863,6 +892,7 @@ int GrammaticalParser::__condition(PARSE_HEAD head) {
 	}
 
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -872,7 +902,7 @@ int GrammaticalParser::__condition(PARSE_HEAD head) {
  * FISRT(<循环语句>) = {WHILETK, DOTK, FORTK}
  * FIRST(1) != FIRST(2) != FIRST(3)
 */
-int GrammaticalParser::__loop_statement(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__loop_statement(PARSE_HEAD head)
 {
 	FLAG_ENTER("<循环语句>", head.level);
 	try {
@@ -918,7 +948,7 @@ int GrammaticalParser::__loop_statement(PARSE_HEAD head)
 			RECUR_CHECK(__statement);							// <语句>
 		}
 		else {
-			throw ParseException(ErrorType::UnknownBranch, string("loop statement"));
+			throw ParseException(ParseExceptionType::UnknownBranch, string("loop statement"));
 		}
 	}
 	catch (ParseException& e) {
@@ -926,12 +956,13 @@ int GrammaticalParser::__loop_statement(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜步长＞::= ＜无符号整数＞
 */
-int GrammaticalParser::__step_length(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__step_length(PARSE_HEAD head) {
 	FLAG_ENTER("<步长>", head.level);
 	try {
 		RECUR_CHECK(__unsigned_integer);
@@ -941,13 +972,14 @@ int GrammaticalParser::__step_length(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜有返回值函数调用语句＞ ::= ＜标识符＞'('＜值参数表＞')'
  * FISRT(＜有返回值函数调用语句＞) = {<标识符>}
 */
-int GrammaticalParser::__function_call_return(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__function_call_return(PARSE_HEAD head) {
 	FLAG_ENTER("<有返回值函数调用语句>", head.level);
 
 	try {
@@ -962,13 +994,14 @@ int GrammaticalParser::__function_call_return(PARSE_HEAD head) {
 	}
 
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜无返回值函数调用语句＞ ::= ＜标识符＞'('＜值参数表＞')'
  * FISRT(＜无返回值函数调用语句＞) = {<标识符>}
 */
-int GrammaticalParser::__function_call_void(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__function_call_void(PARSE_HEAD head) {
 	FLAG_ENTER("<无返回值函数调用语句>", head.level);
 
 	try {
@@ -983,6 +1016,7 @@ int GrammaticalParser::__function_call_void(PARSE_HEAD head) {
 	}
 
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -993,7 +1027,7 @@ int GrammaticalParser::__function_call_void(PARSE_HEAD head) {
  *
  * !: 也可以采用用FOLLOW判断空的情况，避免枚举FIRST遗漏
 */
-int GrammaticalParser::__value_parameter_list(PARSE_HEAD head)
+PARSE_RETURN GrammaticalParser::__value_parameter_list(PARSE_HEAD head)
 {
 	FLAG_ENTER("<值参数表>", head.level);
 
@@ -1020,6 +1054,7 @@ int GrammaticalParser::__value_parameter_list(PARSE_HEAD head)
 	}
 
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -1031,7 +1066,7 @@ int GrammaticalParser::__value_parameter_list(PARSE_HEAD head)
  *
  * !: 也可以采用判断follow集合的方式，避免枚举FISRT遗漏.
 */
-int GrammaticalParser::__statement_list(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__statement_list(PARSE_HEAD head) {
 	FLAG_ENTER("<语句列>", head.level);
 
 	try {
@@ -1055,13 +1090,14 @@ int GrammaticalParser::__statement_list(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
  * ＜读语句＞::=  scanf '('＜标识符＞{,＜标识符＞}')'
  * FIRST(<读语句>) = {SCANFTK}
 */
-int GrammaticalParser::__read_statement(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__read_statement(PARSE_HEAD head) {
 	FLAG_ENTER("<读语句>", head.level);
 
 	try {
@@ -1080,6 +1116,7 @@ int GrammaticalParser::__read_statement(PARSE_HEAD head) {
 	}
 
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -1090,7 +1127,7 @@ int GrammaticalParser::__read_statement(PARSE_HEAD head) {
  *
  * !: 在判断字符串与表达式走向时，也可以采用if-else型，非字符串即表达式。
 */
-int GrammaticalParser::__write_statement(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__write_statement(PARSE_HEAD head) {
 	FLAG_ENTER("<写语句>", head.level);
 
 	try {
@@ -1114,7 +1151,7 @@ int GrammaticalParser::__write_statement(PARSE_HEAD head) {
 			RECUR_CHECK(__expression);
 		}
 		else {
-			throw ParseException(ErrorType::UnknownBranch, string("<write statement>"));
+			throw ParseException(ParseExceptionType::UnknownBranch, string("<write statement>"));
 		}
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 	}
@@ -1124,6 +1161,7 @@ int GrammaticalParser::__write_statement(PARSE_HEAD head) {
 	}
 
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }
 
 /**
@@ -1131,7 +1169,7 @@ int GrammaticalParser::__write_statement(PARSE_HEAD head) {
  * FISRT('('＜表达式＞')') = {LPARENT};
  * FOLLOW{<返回语句>} = {SEMICN}，无交叉集合
 */
-int GrammaticalParser::__return_statement(PARSE_HEAD head) {
+PARSE_RETURN GrammaticalParser::__return_statement(PARSE_HEAD head) {
 	FLAG_ENTER("<返回语句>", head.level);
 	try {
 		SYMBOL_CHECK(SYMBOL::RETURNTK);
@@ -1146,4 +1184,5 @@ int GrammaticalParser::__return_statement(PARSE_HEAD head) {
 		throw e;
 	}
 	FLAG_PASS;
+	return PARSE_RETURN{ 0 };
 }

@@ -1,8 +1,9 @@
 #include "Token.h"
-Token::Token(SYMBOL symbol, string token)
+Token::Token(SYMBOL symbol, string token, int line)
 {
 	this->symbol = symbol;
 	this->token = token;
+	this->line = line;
 }
 
 bool Token::equal(SYMBOL symbol)
