@@ -614,6 +614,7 @@ PARSE_RETURN GrammaticalParser::__function_return(PARSE_HEAD head) {
 		string func_name = token->token;
 		func_head.name = func_name;
 		func_head.returnType = func_type;
+		update_function_head(symbol_table.get_present_block(), func_head);
 
 		Token save = *token;
 
@@ -621,7 +622,6 @@ PARSE_RETURN GrammaticalParser::__function_return(PARSE_HEAD head) {
 		RECUR_CHECK(__parameter_list, RECUR_params);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 
-		update_function_head(symbol_table.get_present_block(), func_head);
 		
 		SYMBOL_CHECK(SYMBOL::LBRACE);
 		bool has_return = false;
@@ -667,6 +667,7 @@ PARSE_RETURN GrammaticalParser::__function_void(PARSE_HEAD head)
 		string func_name = token->token;
 		func_head.name = func_name;
 		func_head.returnType = type;
+		update_function_head(symbol_table.get_present_block(), func_head);
 
 		Token save = *token;
 
@@ -674,7 +675,6 @@ PARSE_RETURN GrammaticalParser::__function_void(PARSE_HEAD head)
 		RECUR_CHECK(__parameter_list, RECUR_params);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 
-		update_function_head(symbol_table.get_present_block(), func_head);
 
 		SYMBOL_CHECK(SYMBOL::LBRACE);
 
@@ -915,7 +915,7 @@ PARSE_RETURN GrammaticalParser::__factor(PARSE_HEAD head, bool *is_char) {
 			void* p = find_indefr(symbol_table.get_present_block(), token->token);
 			if (p != NULL) {
 				ParamRecord* param_p = (ParamRecord*)p;
-				if (param_p->type == "char" && is_char) {
+				if (param_p->type == "char" && is_char != NULL) {
 					*is_char = true;
 				}
 			}
@@ -938,7 +938,7 @@ PARSE_RETURN GrammaticalParser::__factor(PARSE_HEAD head, bool *is_char) {
 			void* p = find_indefr(symbol_table.get_present_block(), name);
 			if (p != NULL) {
 				FuncHead* func_p = (FuncHead*)p;
-				if (func_p->returnType == "char" && is_char) {
+				if (func_p->returnType == "char" && is_char != NULL) {
 					*is_char = true;
 				}
 			}

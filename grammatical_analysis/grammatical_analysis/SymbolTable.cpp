@@ -17,7 +17,7 @@ SymbolTable::SymbolTable() {
 void SymbolTable::add_one_block() {
 	Block* temp = new Block();
 	temp->pre = present;
-	if(present)
+	if(present != NULL)
 		present->nexts.push_back(temp);
 	present = temp;
 }
