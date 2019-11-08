@@ -15,7 +15,7 @@ using namespace std;
 // 结构体 头和尾
 struct PARSE_HEAD {
 	int level;
-	bool is_def=false;
+	bool is_def;
 	FuncHead* func_head;
 };
 struct PARSE_RETURN {
