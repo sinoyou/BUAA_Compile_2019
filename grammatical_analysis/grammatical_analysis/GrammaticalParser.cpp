@@ -691,6 +691,9 @@ PARSE_RETURN GrammaticalParser::__function_void(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+
+	symbol_table.exit_present_block();											// 离开当前块
+
 	return PARSE_RETURN{ 0 };
 }
 
@@ -783,6 +786,8 @@ PARSE_RETURN GrammaticalParser::__main_function(PARSE_HEAD head)
 {
 	FLAG_ENTER("<主函数>", head.level);
 	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
+	FuncHead func_head = FuncHead{"main","void"};
+	update_function_head(symbol_table.get_present_block(), func_head);
 	try {
 		SYMBOL_CHECK(SYMBOL::VOIDTK);				// void
 		SYMBOL_CHECK(SYMBOL::MAINTK);				// main
@@ -802,6 +807,7 @@ PARSE_RETURN GrammaticalParser::__main_function(PARSE_HEAD head)
 		throw e;
 	}
 	FLAG_PASS;
+	symbol_table.exit_present_block();
 	return PARSE_RETURN{ 0 };
 }
 

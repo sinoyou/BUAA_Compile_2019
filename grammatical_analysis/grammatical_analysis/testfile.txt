@@ -1,25 +1,6 @@
-const int const1 = 1, const2 = -100;
-const char const3 = 'c';
-int change1;
-int change1;
-int xjxjxj[100];
-char change3;
-int gets1(int var1,int var2){
-   change1 = var1 + var4 ;
-   xjxjxj[const3] = 100;
-   xjxjxj[1] = 100;
-   return (change1);
-   return (const3);
-   
-   do{
-	change1 = 1;
-   }(change1!=0)
-}
-void main(){
-   change1 = 10;
-   printf("Hello World");
-   printf(gets1(10, 20, 10));
-   printf(gets1(10, const3));
-	if('c') change1 = 10;
-	if(('c')) change1 = 10;
+void main()
+{
+    int x;
+    x = gets(x);
+    return;
 }
