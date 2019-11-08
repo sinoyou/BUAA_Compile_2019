@@ -4,8 +4,10 @@
 
 using namespace std;
 
-LexParser::LexParser(FileReader& reader, vector<tuple<int,string>> error_list) 
-	:reader(reader), error_output_list(error_list), current_line(1) {}
+LexParser::LexParser(FileReader& reader, vector<tuple<int,string>>& error_list) 
+	:reader(reader), error_output_list(error_list) {
+	current_line = 1;
+}
 
 const vector<Token>& LexParser::parse() {
 	while (_getsym() >= 0) {

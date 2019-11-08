@@ -7,6 +7,7 @@
 #include "Token.h"
 #include "debug.h"
 #include "ParseException.h"
+#include "error.h"
 
 using namespace std;
 
@@ -45,7 +46,7 @@ int __level__ = level;											\
 		_save(__name_save__);			\
 }
 
-#define RECUR_CHECK(func) func(PARSE_HEAD{head.level + 1});
+#define RECUR_CHECK(func, head) func(head);
 #define SYMBOL_CHECK(symbol) symbol_check(symbol, __level__);
 #define MULTI_SYMBOL_CHECK(symbols, len) multi_symbol_check(symbols, len, __level__);
 

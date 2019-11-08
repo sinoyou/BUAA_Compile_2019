@@ -208,15 +208,16 @@ PARSE_RETURN GrammaticalParser::__string(PARSE_HEAD head) {
 PARSE_RETURN GrammaticalParser::__program(PARSE_HEAD head)
 {
 	FLAG_ENTER("<程序>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		// <常量说明>
 		if (_peek()->equal(SYMBOL::CONSTTK)) {
-			RECUR_CHECK(__const_description);
+			RECUR_CHECK(__const_description, RECUR_DEFAULT);
 		}
 
 		// <变量说明>: 用反例判断，<变量说明>和<有返回值的函数定义>从后续第三个字符起出现差异
 		if ((_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) && !_peek(3)->equal(SYMBOL::LPARENT)) {
-			RECUR_CHECK(__var_description);
+			RECUR_CHECK(__var_description, RECUR_DEFAULT);
 		}
 
 		// {＜有返回值函数定义＞ | ＜无返回值函数定义＞}
@@ -227,14 +228,14 @@ PARSE_RETURN GrammaticalParser::__program(PARSE_HEAD head)
 			)
 		{
 			if (_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) {
-				RECUR_CHECK(__function_return);
+				RECUR_CHECK(__function_return, RECUR_DEFAULT);
 			}
 			else {
-				RECUR_CHECK(__function_void);
+				RECUR_CHECK(__function_void, RECUR_DEFAULT);
 			}
 		}
 		// <主函数>
-		RECUR_CHECK(__main_function);
+		RECUR_CHECK(__main_function, RECUR_DEFAULT);
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
@@ -253,14 +254,15 @@ PARSE_RETURN GrammaticalParser::__program(PARSE_HEAD head)
 PARSE_RETURN GrammaticalParser::__const_description(PARSE_HEAD head)
 {
 	FLAG_ENTER("<常量说明>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		SYMBOL_CHECK(SYMBOL::CONSTTK);
-		RECUR_CHECK(__const_def);
+		RECUR_CHECK(__const_def, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::SEMICN);
 
 		while (_peek()->equal(SYMBOL::CONSTTK)) {
 			SYMBOL_CHECK(SYMBOL::CONSTTK);
-			RECUR_CHECK(__const_def);
+			RECUR_CHECK(__const_def, RECUR_DEFAULT);
 			SYMBOL_CHECK(SYMBOL::SEMICN);
 		};
 	}
@@ -282,29 +284,30 @@ PARSE_RETURN GrammaticalParser::__const_description(PARSE_HEAD head)
 PARSE_RETURN GrammaticalParser::__const_def(PARSE_HEAD head)
 {
 	FLAG_ENTER("<常量定义>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		if (_peek()->equal(SYMBOL::INTTK)) {
 			SYMBOL_CHECK(SYMBOL::INTTK);
-			RECUR_CHECK(__idenfr);					// <标识符>
+			RECUR_CHECK(__idenfr, RECUR_DEFAULT);					// <标识符>
 			SYMBOL_CHECK(SYMBOL::ASSIGN);			// 赋值符号
-			RECUR_CHECK(__integer);					// <整数>
+			RECUR_CHECK(__integer, RECUR_DEFAULT);					// <整数>
 			while (_peek()->equal(SYMBOL::COMMA)) {
 				SYMBOL_CHECK(SYMBOL::COMMA);
-				RECUR_CHECK(__idenfr);
+				RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 				SYMBOL_CHECK(SYMBOL::ASSIGN);
-				RECUR_CHECK(__integer);
+				RECUR_CHECK(__integer, RECUR_DEFAULT);
 			}
 		}
 		else if (_peek()->equal(SYMBOL::CHARTK)) {
 			SYMBOL_CHECK(SYMBOL::CHARTK);
-			RECUR_CHECK(__idenfr);					// <标识符>
+			RECUR_CHECK(__idenfr, RECUR_DEFAULT);					// <标识符>
 			SYMBOL_CHECK(SYMBOL::ASSIGN);			// 赋值符号
-			RECUR_CHECK(__char);						// <符号数>
+			RECUR_CHECK(__char, RECUR_DEFAULT);						// <符号数>
 			while (_peek()->equal(SYMBOL::COMMA)) {
 				SYMBOL_CHECK(SYMBOL::COMMA);
-				RECUR_CHECK(__idenfr);
+				RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 				SYMBOL_CHECK(SYMBOL::ASSIGN);
-				RECUR_CHECK(__char);
+				RECUR_CHECK(__char, RECUR_DEFAULT);
 			}
 		}
 		else {
@@ -343,6 +346,7 @@ PARSE_RETURN GrammaticalParser::__unsigned_integer(PARSE_HEAD head) {
 PARSE_RETURN GrammaticalParser::__integer(PARSE_HEAD head)
 {
 	FLAG_ENTER("<整数>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		if (_peek()->equal(SYMBOL::PLUS)) {
 			SYMBOL_CHECK(SYMBOL::PLUS);
@@ -350,7 +354,7 @@ PARSE_RETURN GrammaticalParser::__integer(PARSE_HEAD head)
 		else if (_peek()->equal(SYMBOL::MINU)) {
 			SYMBOL_CHECK(SYMBOL::MINU);
 		}
-		RECUR_CHECK(__unsigned_integer);
+		RECUR_CHECK(__unsigned_integer, RECUR_DEFAULT);
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
@@ -383,15 +387,16 @@ PARSE_RETURN GrammaticalParser::__idenfr(PARSE_HEAD head) {
 */
 PARSE_RETURN GrammaticalParser::__declar_head(PARSE_HEAD head) {
 	FLAG_ENTER("<声明头部>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		if (_peek()->equal(SYMBOL::INTTK))
 		{
 			SYMBOL_CHECK(SYMBOL::INTTK);
-			RECUR_CHECK(__idenfr);
+			RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 		}
 		else if (_peek()->equal(SYMBOL::CHARTK)) {
 			SYMBOL_CHECK(SYMBOL::CHARTK);
-			RECUR_CHECK(__idenfr);
+			RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 		}
 		else {
 			throw ParseException(ParseExceptionType::UnknownBranch, string("<Declaration Head>"));
@@ -418,14 +423,15 @@ PARSE_RETURN GrammaticalParser::__declar_head(PARSE_HEAD head) {
 PARSE_RETURN GrammaticalParser::__var_description(PARSE_HEAD head)
 {
 	FLAG_ENTER("<变量说明>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		SYMBOL fisrt_list[] = { SYMBOL::INTTK, SYMBOL::CHARTK };
-		RECUR_CHECK(__var_def);
+		RECUR_CHECK(__var_def, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::SEMICN);
 
 		// 用反例修正仅参考FIRST集合的不足
 		while (_peek()->equal(fisrt_list, 2) && !_peek(3)->equal(SYMBOL::LPARENT)) {
-			RECUR_CHECK(__var_def);
+			RECUR_CHECK(__var_def, RECUR_DEFAULT);
 			SYMBOL_CHECK(SYMBOL::SEMICN);
 		}
 	}
@@ -446,23 +452,24 @@ PARSE_RETURN GrammaticalParser::__var_description(PARSE_HEAD head)
 PARSE_RETURN GrammaticalParser::__var_def(PARSE_HEAD head)
 {
 	FLAG_ENTER("<变量定义>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
-		RECUR_CHECK(__type_idenfr);
-		RECUR_CHECK(__idenfr);
+		RECUR_CHECK(__type_idenfr, RECUR_DEFAULT);
+		RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 		// '[' <无符号整数> ']'
 		if (_peek()->equal(SYMBOL::LBRACK)) {
 			SYMBOL_CHECK(SYMBOL::LBRACK);
-			RECUR_CHECK(__unsigned_integer);
+			RECUR_CHECK(__unsigned_integer, RECUR_DEFAULT);
 			SYMBOL_CHECK(SYMBOL::RBRACK);
 		}
 		// {} 
 		while (_peek()->equal(SYMBOL::COMMA)) {
 			SYMBOL_CHECK(SYMBOL::COMMA);
-			RECUR_CHECK(__idenfr);
+			RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 			// '[' <无符号整数> ']'
 			if (_peek()->equal(SYMBOL::LBRACK)) {
 				SYMBOL_CHECK(SYMBOL::LBRACK);
-				RECUR_CHECK(__unsigned_integer);
+				RECUR_CHECK(__unsigned_integer, RECUR_DEFAULT);
 				SYMBOL_CHECK(SYMBOL::RBRACK);
 			}
 		}
@@ -481,6 +488,7 @@ PARSE_RETURN GrammaticalParser::__var_def(PARSE_HEAD head)
 */
 PARSE_RETURN GrammaticalParser::__type_idenfr(PARSE_HEAD head) {
 	FLAG_ENTER("<类型标识符>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		SYMBOL list[] = { SYMBOL::INTTK, SYMBOL::CHARTK };
 		MULTI_SYMBOL_CHECK(list, 2);
@@ -498,15 +506,16 @@ PARSE_RETURN GrammaticalParser::__type_idenfr(PARSE_HEAD head) {
 */
 PARSE_RETURN GrammaticalParser::__function_return(PARSE_HEAD head) {
 	FLAG_ENTER("<有返回值函数定义>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
-		RECUR_CHECK(__declar_head);
+		RECUR_CHECK(__declar_head, RECUR_DEFAULT);
 		Token save = *token;
 
 		SYMBOL_CHECK(SYMBOL::LPARENT);
-		RECUR_CHECK(__parameter_list);
+		RECUR_CHECK(__parameter_list, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 		SYMBOL_CHECK(SYMBOL::LBRACE);
-		RECUR_CHECK(__compound_statement);
+		RECUR_CHECK(__compound_statement, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::RBRACE);
 
 		func_call_return_idenfr.push_back(save.token);
@@ -525,17 +534,18 @@ PARSE_RETURN GrammaticalParser::__function_return(PARSE_HEAD head) {
 PARSE_RETURN GrammaticalParser::__function_void(PARSE_HEAD head)
 {
 	FLAG_ENTER("<无返回值函数定义>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		SYMBOL_CHECK(SYMBOL::VOIDTK);
-		RECUR_CHECK(__idenfr);
+		RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 		Token save = *token;
 
 		SYMBOL_CHECK(SYMBOL::LPARENT);
-		RECUR_CHECK(__parameter_list);
+		RECUR_CHECK(__parameter_list, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 
 		SYMBOL_CHECK(SYMBOL::LBRACE);
-		RECUR_CHECK(__compound_statement);
+		RECUR_CHECK(__compound_statement, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::RBRACE);
 
 		func_call_void_idenfr.push_back(save.token);
@@ -555,17 +565,18 @@ PARSE_RETURN GrammaticalParser::__function_void(PARSE_HEAD head)
 */
 PARSE_RETURN GrammaticalParser::__compound_statement(PARSE_HEAD head) {
 	FLAG_ENTER("<复合语句>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		SYMBOL first_list[] = { SYMBOL::INTTK, SYMBOL::CHARTK };
 		// [<const des>]
 		if (_peek()->equal(SYMBOL::CONSTTK)) {
-			RECUR_CHECK(__const_description);
+			RECUR_CHECK(__const_description, RECUR_DEFAULT);
 		}
 		// [<var des>]
 		if (_peek()->equal(first_list, 2)) {
-			RECUR_CHECK(__var_description);
+			RECUR_CHECK(__var_description, RECUR_DEFAULT);
 		}
-		RECUR_CHECK(__statement_list);
+		RECUR_CHECK(__statement_list, RECUR_DEFAULT);
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
@@ -584,16 +595,17 @@ PARSE_RETURN GrammaticalParser::__compound_statement(PARSE_HEAD head) {
 PARSE_RETURN GrammaticalParser::__parameter_list(PARSE_HEAD head)
 {
 	FLAG_ENTER("<参数表>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		// ~<空>
 		if (_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) {
-			RECUR_CHECK(__type_idenfr);
-			RECUR_CHECK(__idenfr);
+			RECUR_CHECK(__type_idenfr, RECUR_DEFAULT);
+			RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 			while (_peek()->equal(SYMBOL::COMMA))
 			{
 				SYMBOL_CHECK(SYMBOL::COMMA);
-				RECUR_CHECK(__type_idenfr);
-				RECUR_CHECK(__idenfr);
+				RECUR_CHECK(__type_idenfr, RECUR_DEFAULT);
+				RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 			}
 		}
 		// <空>
@@ -616,13 +628,14 @@ PARSE_RETURN GrammaticalParser::__parameter_list(PARSE_HEAD head)
 PARSE_RETURN GrammaticalParser::__main_function(PARSE_HEAD head)
 {
 	FLAG_ENTER("<主函数>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		SYMBOL_CHECK(SYMBOL::VOIDTK);				// void
 		SYMBOL_CHECK(SYMBOL::MAINTK);				// main
 		SYMBOL_CHECK(SYMBOL::LPARENT);				// (
 		SYMBOL_CHECK(SYMBOL::RPARENT);				// )
 		SYMBOL_CHECK(SYMBOL::LBRACE);				// {
-		RECUR_CHECK(__compound_statement);			// <复合语句>
+		RECUR_CHECK(__compound_statement, RECUR_DEFAULT);			// <复合语句>
 		SYMBOL_CHECK(SYMBOL::RBRACE);				// }
 	}
 	catch (ParseException& e) {
@@ -644,6 +657,7 @@ PARSE_RETURN GrammaticalParser::__main_function(PARSE_HEAD head)
 */
 PARSE_RETURN GrammaticalParser::__expression(PARSE_HEAD head) {
 	FLAG_ENTER("<表达式>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		// match +/- if have
 		if (_peek()->equal(SYMBOL::PLUS)) {
@@ -653,10 +667,10 @@ PARSE_RETURN GrammaticalParser::__expression(PARSE_HEAD head) {
 			SYMBOL_CHECK(SYMBOL::MINU);
 		}
 
-		RECUR_CHECK(__item);								// <项>
+		RECUR_CHECK(__item, RECUR_DEFAULT);								// <项>
 		while (_peek()->equal(SYMBOL::PLUS) || _peek()->equal(SYMBOL::MINU)) {
-			RECUR_CHECK(__add_operator);
-			RECUR_CHECK(__item);
+			RECUR_CHECK(__add_operator, RECUR_DEFAULT);
+			RECUR_CHECK(__item, RECUR_DEFAULT);
 		}
 	}
 	catch (ParseException& e) {
@@ -678,11 +692,12 @@ PARSE_RETURN GrammaticalParser::__expression(PARSE_HEAD head) {
 */
 PARSE_RETURN GrammaticalParser::__item(PARSE_HEAD head) {
 	FLAG_ENTER("<项>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
-		RECUR_CHECK(__factor);
+		RECUR_CHECK(__factor, RECUR_DEFAULT);
 		while (_peek()->equal(SYMBOL::MULT) || _peek()->equal(SYMBOL::DIV)) {
-			RECUR_CHECK(__mult_operator);
-			RECUR_CHECK(__factor);
+			RECUR_CHECK(__mult_operator, RECUR_DEFAULT);
+			RECUR_CHECK(__factor, RECUR_DEFAULT);
 		}
 	}
 	catch (ParseException& e) {
@@ -701,33 +716,34 @@ PARSE_RETURN GrammaticalParser::__item(PARSE_HEAD head) {
 */
 PARSE_RETURN GrammaticalParser::__factor(PARSE_HEAD head) {
 	FLAG_ENTER("<因子>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		// <标识符> [ '[' <表达式> ']' ] 
 		if (_peek()->equal(SYMBOL::IDENFR) && !_peek(2)->equal(SYMBOL::LPARENT)) {
 			SYMBOL_CHECK(SYMBOL::IDENFR);
 			if (_peek()->equal(SYMBOL::LBRACK)) {
 				SYMBOL_CHECK(SYMBOL::LBRACK);
-				RECUR_CHECK(__expression);
+				RECUR_CHECK(__expression, RECUR_DEFAULT);
 				SYMBOL_CHECK(SYMBOL::RBRACK);
 			}
 		}
 		// ＜有返回值函数调用语句＞  
 		else if (_peek()->equal(SYMBOL::IDENFR) && _peek(2)->equal(SYMBOL::LPARENT)) {
-			RECUR_CHECK(__function_call_return);
+			RECUR_CHECK(__function_call_return, RECUR_DEFAULT);
 		}
 		// '(' <表达式> ')'
 		else if (_peek()->equal(SYMBOL::LPARENT)) {
 			SYMBOL_CHECK(SYMBOL::LPARENT);
-			RECUR_CHECK(__expression);
+			RECUR_CHECK(__expression, RECUR_DEFAULT);
 			SYMBOL_CHECK(SYMBOL::RPARENT);
 		}
 		// <整数>
 		else if (_peek()->equal(SYMBOL::PLUS) || _peek()->equal(SYMBOL::MINU) || _peek()->equal(SYMBOL::INTCON)) {
-			RECUR_CHECK(__integer);
+			RECUR_CHECK(__integer, RECUR_DEFAULT);
 		}
 		// <字符>
 		else if (_peek()->equal(SYMBOL::CHARCON)) {
-			RECUR_CHECK(__char);
+			RECUR_CHECK(__char, RECUR_DEFAULT);
 		}
 		else {
 			throw ParseException(ParseExceptionType::UnknownBranch, string("<factor>"));
@@ -750,14 +766,15 @@ PARSE_RETURN GrammaticalParser::__factor(PARSE_HEAD head) {
 PARSE_RETURN GrammaticalParser::__statement(PARSE_HEAD head)
 {
 	FLAG_ENTER("<语句>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		SYMBOL loop_first[] = { SYMBOL::WHILETK, SYMBOL::FORTK, SYMBOL::DOTK };
 
-		if (_peek()->equal(SYMBOL::IFTK)) { RECUR_CHECK(__condition_statement); }
-		else if (_peek()->equal(loop_first, 3)) { RECUR_CHECK(__loop_statement); }
+		if (_peek()->equal(SYMBOL::IFTK)) { RECUR_CHECK(__condition_statement, RECUR_DEFAULT); }
+		else if (_peek()->equal(loop_first, 3)) { RECUR_CHECK(__loop_statement, RECUR_DEFAULT); }
 		else if (_peek()->equal(SYMBOL::LBRACE)) {
 			SYMBOL_CHECK(SYMBOL::LBRACE);
-			RECUR_CHECK(__statement_list)
+			RECUR_CHECK(__statement_list, RECUR_DEFAULT)
 			SYMBOL_CHECK(SYMBOL::RBRACE);
 		}
 		else if (_peek()->equal(SYMBOL::IDENFR) && _peek(2)->equal(SYMBOL::LPARENT))
@@ -780,20 +797,20 @@ PARSE_RETURN GrammaticalParser::__statement(PARSE_HEAD head)
 				}
 				itr_void++;
 			}
-			if (x == 1) { RECUR_CHECK(__function_call_return) }
-			else if (x == -1) { RECUR_CHECK(__function_call_void); }
+			if (x == 1) { RECUR_CHECK(__function_call_return, RECUR_DEFAULT) }
+			else if (x == -1) { RECUR_CHECK(__function_call_void, RECUR_DEFAULT); }
 			else { FLAG_FAIL; }	// 在类型为函数名的标识符中没有找到对应的。
 			SYMBOL_CHECK(SYMBOL::SEMICN);
 		}
 		else if (_peek()->equal(SYMBOL::IDENFR) && !_peek(2)->equal(SYMBOL::LPARENT))
 		{
-			RECUR_CHECK(__assign_statment);
+			RECUR_CHECK(__assign_statment, RECUR_DEFAULT);
 			SYMBOL_CHECK(SYMBOL::SEMICN);
 		}
-		else if (_peek()->equal(SYMBOL::SCANFTK)) { RECUR_CHECK(__read_statement); SYMBOL_CHECK(SYMBOL::SEMICN); }
-		else if (_peek()->equal(SYMBOL::PRINTFTK)) { RECUR_CHECK(__write_statement); SYMBOL_CHECK(SYMBOL::SEMICN); }
+		else if (_peek()->equal(SYMBOL::SCANFTK)) { RECUR_CHECK(__read_statement, RECUR_DEFAULT); SYMBOL_CHECK(SYMBOL::SEMICN); }
+		else if (_peek()->equal(SYMBOL::PRINTFTK)) { RECUR_CHECK(__write_statement, RECUR_DEFAULT); SYMBOL_CHECK(SYMBOL::SEMICN); }
 		else if (_peek()->equal(SYMBOL::SEMICN)) { SYMBOL_CHECK(SYMBOL::SEMICN); }
-		else if (_peek()->equal(SYMBOL::RETURNTK)) { RECUR_CHECK(__return_statement); SYMBOL_CHECK(SYMBOL::SEMICN); }
+		else if (_peek()->equal(SYMBOL::RETURNTK)) { RECUR_CHECK(__return_statement, RECUR_DEFAULT); SYMBOL_CHECK(SYMBOL::SEMICN); }
 		else {
 			throw ParseException(ParseExceptionType::UnknownBranch, string("<statement>"));
 		}
@@ -814,16 +831,17 @@ PARSE_RETURN GrammaticalParser::__statement(PARSE_HEAD head)
 */
 PARSE_RETURN GrammaticalParser::__assign_statment(PARSE_HEAD head) {
 	FLAG_ENTER("<赋值语句>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	
 	try {
 		SYMBOL_CHECK(SYMBOL::IDENFR);
 		if (_peek()->equal(SYMBOL::LBRACK)) {
 			SYMBOL_CHECK(SYMBOL::LBRACK);
-			RECUR_CHECK(__expression);
+			RECUR_CHECK(__expression, RECUR_DEFAULT);
 			SYMBOL_CHECK(SYMBOL::RBRACK);
 		}
 		SYMBOL_CHECK(SYMBOL::ASSIGN);					// ASSIGN: = ,  EQL: ==
-		RECUR_CHECK(__expression);
+		RECUR_CHECK(__expression, RECUR_DEFAULT);
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
@@ -844,18 +862,19 @@ PARSE_RETURN GrammaticalParser::__assign_statment(PARSE_HEAD head) {
 */
 PARSE_RETURN GrammaticalParser::__condition_statement(PARSE_HEAD head) {
 	FLAG_ENTER("<条件语句>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 
 	try {
 		SYMBOL_CHECK(SYMBOL::IFTK);
 		SYMBOL_CHECK(SYMBOL::LPARENT);
-		RECUR_CHECK(__condition);
+		RECUR_CHECK(__condition, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 
-		RECUR_CHECK(__statement);
+		RECUR_CHECK(__statement, RECUR_DEFAULT);
 
 		if (_peek()->equal(SYMBOL::ELSETK)) {
 			SYMBOL_CHECK(SYMBOL::ELSETK);
-			RECUR_CHECK(__statement);
+			RECUR_CHECK(__statement, RECUR_DEFAULT);
 		}
 	}
 	catch (ParseException& e) {
@@ -876,14 +895,15 @@ PARSE_RETURN GrammaticalParser::__condition_statement(PARSE_HEAD head) {
 */
 PARSE_RETURN GrammaticalParser::__condition(PARSE_HEAD head) {
 	FLAG_ENTER("<条件>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 
 	try {
-		RECUR_CHECK(__expression);
+		RECUR_CHECK(__expression, RECUR_DEFAULT);
 
 		if (_peek()->equal(SYMBOL::GRE) || _peek()->equal(SYMBOL::GEQ) || _peek()->equal(SYMBOL::LSS) ||
 			_peek()->equal(SYMBOL::LEQ) || _peek()->equal(SYMBOL::NEQ) || _peek()->equal(SYMBOL::EQL)) {
-			RECUR_CHECK(__rel_operator);				// <关系运算符>
-			RECUR_CHECK(__expression);				// <表达式>
+			RECUR_CHECK(__rel_operator, RECUR_DEFAULT);				// <关系运算符>
+			RECUR_CHECK(__expression, RECUR_DEFAULT);				// <表达式>
 		}
 	}
 	catch (ParseException& e) {
@@ -905,47 +925,48 @@ PARSE_RETURN GrammaticalParser::__condition(PARSE_HEAD head) {
 PARSE_RETURN GrammaticalParser::__loop_statement(PARSE_HEAD head)
 {
 	FLAG_ENTER("<循环语句>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		// while while '('＜条件＞')'＜语句＞
 		if (_peek()->equal(SYMBOL::WHILETK)) {
 			SYMBOL_CHECK(SYMBOL::WHILETK);					// while
 			SYMBOL_CHECK(SYMBOL::LPARENT);					// (
-			RECUR_CHECK(__condition);							// <条件>
+			RECUR_CHECK(__condition, RECUR_DEFAULT);							// <条件>
 			SYMBOL_CHECK(SYMBOL::RPARENT);					// ）
-			RECUR_CHECK(__statement);							// <语句>
+			RECUR_CHECK(__statement, RECUR_DEFAULT);							// <语句>
 		}
 		// do while do＜语句＞while '('＜条件＞')'
 		else if (_peek()->equal(SYMBOL::DOTK)) {
 			SYMBOL_CHECK(SYMBOL::DOTK);					// do
-			RECUR_CHECK(__statement);							// <语句>
+			RECUR_CHECK(__statement, RECUR_DEFAULT);							// <语句>
 			SYMBOL_CHECK(SYMBOL::WHILETK);					// <while>
 
 			SYMBOL_CHECK(SYMBOL::LPARENT);					// (
-			RECUR_CHECK(__condition);							// <条件>
+			RECUR_CHECK(__condition, RECUR_DEFAULT);							// <条件>
 			SYMBOL_CHECK(SYMBOL::RPARENT);					// )
 		}
 		// for: for'('＜标识符＞＝＜表达式＞;＜条件＞;＜标识符＞＝＜标识符＞(+|-)＜步长＞')'＜语句＞
 		else if (_peek()->equal(SYMBOL::FORTK)) {
 			SYMBOL_CHECK(SYMBOL::FORTK);					// for
 			SYMBOL_CHECK(SYMBOL::LPARENT);					// (
-			RECUR_CHECK(__idenfr);								// <标识符>
+			RECUR_CHECK(__idenfr, RECUR_DEFAULT);								// <标识符>
 			SYMBOL_CHECK(SYMBOL::ASSIGN);					// =
-			RECUR_CHECK(__expression);							// <表达式>
+			RECUR_CHECK(__expression, RECUR_DEFAULT);							// <表达式>
 			SYMBOL_CHECK(SYMBOL::SEMICN);					// ;
-			RECUR_CHECK(__condition);							// <条件>
+			RECUR_CHECK(__condition, RECUR_DEFAULT);							// <条件>
 			SYMBOL_CHECK(SYMBOL::SEMICN);					// ;
-			RECUR_CHECK(__idenfr);								// <标识符>
+			RECUR_CHECK(__idenfr, RECUR_DEFAULT);								// <标识符>
 			SYMBOL_CHECK(SYMBOL::ASSIGN);					// =
-			RECUR_CHECK(__idenfr);								// <标识符>
+			RECUR_CHECK(__idenfr, RECUR_DEFAULT);								// <标识符>
 			if (_peek()->equal(SYMBOL::PLUS)) {					// (+ | -)
 				SYMBOL_CHECK(SYMBOL::PLUS);
 			}
 			else {
 				SYMBOL_CHECK(SYMBOL::MINU);
 			}
-			RECUR_CHECK(__step_length);							// <步长>
+			RECUR_CHECK(__step_length, RECUR_DEFAULT);							// <步长>
 			SYMBOL_CHECK(SYMBOL::RPARENT);					// )
-			RECUR_CHECK(__statement);							// <语句>
+			RECUR_CHECK(__statement, RECUR_DEFAULT);							// <语句>
 		}
 		else {
 			throw ParseException(ParseExceptionType::UnknownBranch, string("loop statement"));
@@ -964,8 +985,9 @@ PARSE_RETURN GrammaticalParser::__loop_statement(PARSE_HEAD head)
 */
 PARSE_RETURN GrammaticalParser::__step_length(PARSE_HEAD head) {
 	FLAG_ENTER("<步长>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
-		RECUR_CHECK(__unsigned_integer);
+		RECUR_CHECK(__unsigned_integer, RECUR_DEFAULT);
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
@@ -981,11 +1003,12 @@ PARSE_RETURN GrammaticalParser::__step_length(PARSE_HEAD head) {
 */
 PARSE_RETURN GrammaticalParser::__function_call_return(PARSE_HEAD head) {
 	FLAG_ENTER("<有返回值函数调用语句>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 
 	try {
-		RECUR_CHECK(__idenfr);
+		RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::LPARENT);
-		RECUR_CHECK(__value_parameter_list);
+		RECUR_CHECK(__value_parameter_list, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 	}
 	catch (ParseException& e) {
@@ -1003,11 +1026,12 @@ PARSE_RETURN GrammaticalParser::__function_call_return(PARSE_HEAD head) {
 */
 PARSE_RETURN GrammaticalParser::__function_call_void(PARSE_HEAD head) {
 	FLAG_ENTER("<无返回值函数调用语句>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 
 	try {
-		RECUR_CHECK(__idenfr);
+		RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::LPARENT);
-		RECUR_CHECK(__value_parameter_list);
+		RECUR_CHECK(__value_parameter_list, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 	}
 	catch (ParseException& e) {
@@ -1030,6 +1054,7 @@ PARSE_RETURN GrammaticalParser::__function_call_void(PARSE_HEAD head) {
 PARSE_RETURN GrammaticalParser::__value_parameter_list(PARSE_HEAD head)
 {
 	FLAG_ENTER("<值参数表>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 
 	try {
 		SYMBOL first_list[] = { SYMBOL::IDENFR, SYMBOL::LPARENT,
@@ -1038,10 +1063,10 @@ PARSE_RETURN GrammaticalParser::__value_parameter_list(PARSE_HEAD head)
 
 		// <表达式>
 		if (_peek()->equal(first_list, 6)) {
-			RECUR_CHECK(__expression);
+			RECUR_CHECK(__expression, RECUR_DEFAULT);
 			while (_peek()->equal(SYMBOL::COMMA)) {
 				SYMBOL_CHECK(SYMBOL::COMMA);
-				RECUR_CHECK(__expression);
+				RECUR_CHECK(__expression, RECUR_DEFAULT);
 			}
 		}
 		else {
@@ -1068,6 +1093,7 @@ PARSE_RETURN GrammaticalParser::__value_parameter_list(PARSE_HEAD head)
 */
 PARSE_RETURN GrammaticalParser::__statement_list(PARSE_HEAD head) {
 	FLAG_ENTER("<语句列>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 
 	try {
 		SYMBOL list[] = {
@@ -1082,7 +1108,7 @@ PARSE_RETURN GrammaticalParser::__statement_list(PARSE_HEAD head) {
 			SYMBOL::SEMICN,
 			SYMBOL::RETURNTK };
 		while (_peek()->equal(list, 10)) {
-			RECUR_CHECK(__statement);
+			RECUR_CHECK(__statement, RECUR_DEFAULT);
 		}
 	}
 	catch (ParseException& e) {
@@ -1099,14 +1125,15 @@ PARSE_RETURN GrammaticalParser::__statement_list(PARSE_HEAD head) {
 */
 PARSE_RETURN GrammaticalParser::__read_statement(PARSE_HEAD head) {
 	FLAG_ENTER("<读语句>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 
 	try {
 		SYMBOL_CHECK(SYMBOL::SCANFTK);
 		SYMBOL_CHECK(SYMBOL::LPARENT);
-		RECUR_CHECK(__idenfr);
+		RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 		while (_peek()->equal(SYMBOL::COMMA)) {
 			SYMBOL_CHECK(SYMBOL::COMMA);
-			RECUR_CHECK(__idenfr);
+			RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 		}
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 	}
@@ -1129,6 +1156,7 @@ PARSE_RETURN GrammaticalParser::__read_statement(PARSE_HEAD head) {
 */
 PARSE_RETURN GrammaticalParser::__write_statement(PARSE_HEAD head) {
 	FLAG_ENTER("<写语句>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 
 	try {
 		SYMBOL exp_first[] =
@@ -1140,15 +1168,15 @@ PARSE_RETURN GrammaticalParser::__write_statement(PARSE_HEAD head) {
 
 		// printf '(' ＜字符串＞,＜表达式＞ ')'| printf '('＜字符串＞ ')'
 		if (_peek()->equal(SYMBOL::STRCON)) {
-			RECUR_CHECK(__string);
+			RECUR_CHECK(__string, RECUR_DEFAULT);
 			if (_peek()->equal(SYMBOL::COMMA)) {
 				SYMBOL_CHECK(SYMBOL::COMMA);
-				RECUR_CHECK(__expression);
+				RECUR_CHECK(__expression, RECUR_DEFAULT);
 			}
 		}
 		// printf '('＜表达式＞')'
 		else if (_peek()->equal(exp_first, 6)) {
-			RECUR_CHECK(__expression);
+			RECUR_CHECK(__expression, RECUR_DEFAULT);
 		}
 		else {
 			throw ParseException(ParseExceptionType::UnknownBranch, string("<write statement>"));
@@ -1171,11 +1199,12 @@ PARSE_RETURN GrammaticalParser::__write_statement(PARSE_HEAD head) {
 */
 PARSE_RETURN GrammaticalParser::__return_statement(PARSE_HEAD head) {
 	FLAG_ENTER("<返回语句>", head.level);
+	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		SYMBOL_CHECK(SYMBOL::RETURNTK);
 		if (_peek()->equal(LPARENT)) {
 			SYMBOL_CHECK(SYMBOL::LPARENT);
-			RECUR_CHECK(__expression);
+			RECUR_CHECK(__expression, RECUR_DEFAULT);
 			SYMBOL_CHECK(SYMBOL::RPARENT);
 		}
 	}

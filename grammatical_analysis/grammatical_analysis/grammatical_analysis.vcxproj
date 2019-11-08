@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="debug.h" />
+    <ClInclude Include="error.h" />
     <ClInclude Include="ParseException.h" />
     <ClInclude Include="GrammaticalParser.h" />
     <ClInclude Include="SymbolTable.h" />

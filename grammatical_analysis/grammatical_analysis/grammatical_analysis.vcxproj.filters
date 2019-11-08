@@ -60,6 +60,9 @@
     <ClInclude Include="ParseException.h">
       <Filter>Header Files\class</Filter>
     </ClInclude>
+    <ClInclude Include="error.h">
+      <Filter>Header Files\global</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

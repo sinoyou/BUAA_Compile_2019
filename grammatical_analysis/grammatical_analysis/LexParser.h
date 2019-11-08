@@ -15,6 +15,6 @@ private:
 	int _getsym();		
 	void _error(const char * s);
 public:
-	LexParser(FileReader& reader, vector<tuple<int, string>> error_list);
+	LexParser(FileReader& reader, vector<tuple<int, string>>& error_list);
 	const vector<Token>& parse();				// 核心外部函数，生成词法解析后的list容器
 };
