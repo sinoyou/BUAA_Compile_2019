@@ -1,5 +1,6 @@
 #include "LexParser.h"
 #include "utils.h"
+#include "error.h"
 
 using namespace std;
 
@@ -171,4 +172,5 @@ int LexParser::_getsym() {
 
 void LexParser::_error(const char * s) {
 	printf("We Face an Error When Parsing %s.\n", s);
+	error_output_list.push_back(tuple<int, string>(current_line, string("a")));
 }

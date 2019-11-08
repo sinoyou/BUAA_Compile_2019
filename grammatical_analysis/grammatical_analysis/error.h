@@ -1,0 +1,23 @@
+#ifndef __ERROR_H__
+#define __ERROR_H__
+
+// Ã¶¾Ù±äÁ¿
+enum ErrorType {
+	LexError,
+	Redefine,
+	Undefine,
+	FuncParamNumUnmatch,
+	FuncParamTypeUnmatch,
+	ConditionError,
+	VoidWithReturn,
+	ReturnError,
+	ArrayIndexWrong,
+	ConstModify,
+	MissSemicn,
+	MissRightParent,
+	MissRightBrack,
+	MissWhile,
+	ConstDefWrong
+};
+
+#endif // !1

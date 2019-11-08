@@ -10,25 +10,6 @@
 
 using namespace std;
 
-// 枚举变量
-enum ErrorType {
-	LexError,
-	Redefine,
-	Undefine,
-	FuncParamNumUnmatch,
-	FuncParamTypeUnmatch,
-	ConditionError,
-	VoidWithReturn,
-	ReturnError,
-	ArrayIndexWrong,
-	ConstModify,
-	MissSemicn,
-	MissRightParent,
-	MissRightBrack,
-	MissWhile,
-	ConstDefWrong
-};
-
 // 结构体 头和尾
 struct PARSE_HEAD {
 	int level;

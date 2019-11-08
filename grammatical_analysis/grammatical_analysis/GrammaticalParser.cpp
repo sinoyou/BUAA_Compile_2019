@@ -286,7 +286,7 @@ PARSE_RETURN GrammaticalParser::__const_def(PARSE_HEAD head)
 		if (_peek()->equal(SYMBOL::INTTK)) {
 			SYMBOL_CHECK(SYMBOL::INTTK);
 			RECUR_CHECK(__idenfr);					// <标识符>
-			SYMBOL_CHECK(SYMBOL::ASSIGN);		// 赋值符号
+			SYMBOL_CHECK(SYMBOL::ASSIGN);			// 赋值符号
 			RECUR_CHECK(__integer);					// <整数>
 			while (_peek()->equal(SYMBOL::COMMA)) {
 				SYMBOL_CHECK(SYMBOL::COMMA);
@@ -298,7 +298,7 @@ PARSE_RETURN GrammaticalParser::__const_def(PARSE_HEAD head)
 		else if (_peek()->equal(SYMBOL::CHARTK)) {
 			SYMBOL_CHECK(SYMBOL::CHARTK);
 			RECUR_CHECK(__idenfr);					// <标识符>
-			SYMBOL_CHECK(SYMBOL::ASSIGN);		// 赋值符号
+			SYMBOL_CHECK(SYMBOL::ASSIGN);			// 赋值符号
 			RECUR_CHECK(__char);						// <符号数>
 			while (_peek()->equal(SYMBOL::COMMA)) {
 				SYMBOL_CHECK(SYMBOL::COMMA);
