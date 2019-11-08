@@ -1,25 +1,25 @@
-
+ï»¿
 #include "SymbolTable.h"
 #include "debug.h"
 
 /*
- * ¼ì²éµ±Ç°¿éµÄÊÓÓòÏÂÄ³¸ö±äÁ¿ÃûÊÇ·ñÒÑ¾­´æÔÚ
- * ¼ì²é·¶Î§£ºµ±Ç°¿é¼°ÆäÇ°¼ÌµÄ£¨±¾º¯ÊıÃû¡¢±äÁ¿\³£Á¿Ãû¡¢×Óº¯ÊıÃû£©
+ * æ£€æŸ¥å½“å‰å—çš„è§†åŸŸä¸‹æŸä¸ªå˜é‡åæ˜¯å¦å·²ç»å­˜åœ¨
+ * æ£€æŸ¥èŒƒå›´ï¼šå½“å‰å—åŠå…¶å‰ç»§çš„ï¼ˆæœ¬å‡½æ•°åã€å˜é‡\å¸¸é‡åã€å­å‡½æ•°åï¼‰
 */
 void* find_indefr(Block* block, string name)
 {
 	while (block != NULL) {
-		// ¿é×ÔÉíÓòÃûÊÇ·ñÖØ¸´
+		// å—è‡ªèº«åŸŸåæ˜¯å¦é‡å¤
 		if (block->func_head.name == name)
 			return &(block->func_head);
-		// ¿éÄÚ±äÁ¿/³£Á¿ÊÇ·ñÖØ¸´
+		// å—å†…å˜é‡/å¸¸é‡æ˜¯å¦é‡å¤
 		vector<ParamRecord>::iterator it = block->records.begin();
 		while (it != block->records.end()) {
 			if (it->name == name)
 				return &(*it);
 			it++;
 		}
-		// ¿éÄÚ¿éÃûÊÇ·ñÖØ¸´
+		// å—å†…å—åæ˜¯å¦é‡å¤
 		vector<Block*>::iterator it1 = block->nexts.begin();
 		while (it1 != block->nexts.end()) {
 			if ((*it1)->func_head.name == name)
@@ -32,12 +32,12 @@ void* find_indefr(Block* block, string name)
 }
 
 /**
- * Ïòµ±Ç°¿éÖĞ²åÈëÒ»Ìõ¼ÇÂ¼
+ * å‘å½“å‰å—ä¸­æ’å…¥ä¸€æ¡è®°å½•
 */
 void insert_one_record(Block* block, ParamRecord record)
 {
 	void* p = find_indefr(block, record.name);
-	// ¼ì²é£¬±ÜÃâÖØ¸´²åÈë
+	// æ£€æŸ¥ï¼Œé¿å…é‡å¤æ’å…¥
 	if (p == NULL) {
 		block->records.push_back(record);
 	}
@@ -47,7 +47,7 @@ void insert_one_record(Block* block, ParamRecord record)
 }
 
 /**
- * ¸üĞÂµ±Ç°¿éÖĞµÄº¯ÊıÍ·
+ * æ›´æ–°å½“å‰å—ä¸­çš„å‡½æ•°å¤´
 */
 void update_function_head(Block* block, FuncHead head) {
 	void* p = find_indefr(block, head.name);

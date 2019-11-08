@@ -1,7 +1,7 @@
-#include "GrammaticalParser.h"
+ï»¿#include "GrammaticalParser.h"
 #include "debug.h"
 
-// ¼ì²éÒ»¸öÖÕ½á·û
+// æ£€æŸ¥ä¸€ä¸ªç»ˆç»“ç¬¦
 void GrammaticalParser::symbol_check(SYMBOL symbol, int level) {
 	if (!_peek()->equal(symbol)) {
 		if (!_peek()->equal(SYMBOL::UNKNOWN)) {
@@ -32,7 +32,7 @@ void GrammaticalParser::symbol_check(SYMBOL symbol, int level) {
 	}
 }
 
-// ¼ì²é¶à¸öÖÕ½á·û
+// æ£€æŸ¥å¤šä¸ªç»ˆç»“ç¬¦
 void GrammaticalParser::multi_symbol_check(SYMBOL symbols[], int len, int level) {
 	_next();
 	int cnt = 0;
