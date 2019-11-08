@@ -658,6 +658,8 @@ PARSE_RETURN GrammaticalParser::__function_void(PARSE_HEAD head)
 	PARSE_HEAD RECUR_def; RECUR_def.level = head.level + 1; RECUR_def.is_def = true;
 	PARSE_HEAD RECUR_params = RECUR_DEFAULT; RECUR_params.is_def = true; RECUR_params.func_head = &func_head;
 
+	symbol_table.add_one_block();												// 进入当前块
+
 	try {
 		SYMBOL_CHECK(SYMBOL::VOIDTK);
 		string type = "void";
@@ -786,6 +788,7 @@ PARSE_RETURN GrammaticalParser::__main_function(PARSE_HEAD head)
 {
 	FLAG_ENTER("<主函数>", head.level);
 	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
+	symbol_table.add_one_block();												// 进入当前块
 	FuncHead func_head = FuncHead{"main","void"};
 	update_function_head(symbol_table.get_present_block(), func_head);
 	try {
