@@ -36,7 +36,14 @@ void run() {
 
 	/* Grammatical Parse :  Recursive Output + Error Output */
 	// recursive output
-	gram_parser.parse();
+	
+	try {
+		gram_parser.parse();
+	}
+	catch (exception& e) {
+		// ignore
+	}
+
 	ofstream gram;
 	gram.open("output.txt", ios::out | ios::trunc);
 	vector<string>::iterator itr1 = output_list.begin();
