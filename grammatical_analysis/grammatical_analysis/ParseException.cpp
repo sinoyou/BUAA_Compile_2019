@@ -4,7 +4,7 @@
  * Initial Function
 **/
 ParseException::ParseException(ParseExceptionType errorType, string des){
-	__super::exception("Parse Exception");
+	// __super::exception("Parse Exception");
 	this->errorType = errorType;
 	this->des = des;
 }
