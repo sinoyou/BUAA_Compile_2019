@@ -627,12 +627,13 @@ PARSE_RETURN GrammaticalParser::__function_return(PARSE_HEAD head) {
 		SYMBOL_CHECK(SYMBOL::LBRACE);
 		bool has_return = false;
 		__compound_statement(RECUR_DEFAULT, &has_return);
+
+		// RECUR_CHECK(__compound_statement, RECUR_DEFAULT);
+		SYMBOL_CHECK(SYMBOL::RBRACE);
 		// unit4-error h
 		if (!has_return) {
 			_register_error(token->line, ErrorType::ReturnError);
 		}
-		// RECUR_CHECK(__compound_statement, RECUR_DEFAULT);
-		SYMBOL_CHECK(SYMBOL::RBRACE);
 
 		func_call_return_idenfr.push_back(save.token);
 	}
@@ -681,9 +682,6 @@ PARSE_RETURN GrammaticalParser::__function_void(PARSE_HEAD head)
 
 		bool has_return = false;
 		__compound_statement(RECUR_DEFAULT, &has_return);
-		if (has_return) {
-			_register_error(token->line, ErrorType::VoidWithReturn);
-		}
 
 		SYMBOL_CHECK(SYMBOL::RBRACE);
 
@@ -801,9 +799,6 @@ PARSE_RETURN GrammaticalParser::__main_function(PARSE_HEAD head)
 		bool has_return = false;
 		// RECUR_CHECK(__compound_statement, RECUR_DEFAULT);			// <复合语句>
 		__compound_statement(RECUR_DEFAULT, &has_return);
-		if (has_return) {
-			_register_error(token->line, ErrorType::VoidWithReturn);
-		}
 		SYMBOL_CHECK(SYMBOL::RBRACE);				// }
 	}
 	catch (ParseException& e) {
@@ -1504,6 +1499,9 @@ PARSE_RETURN GrammaticalParser::__return_statement(PARSE_HEAD head, bool * has_r
 			}
 			else if (block->func_head.returnType == "char" && !char_detector) {
 				_register_error(token->line, ErrorType::ReturnError);
+			}
+			else if (block->func_head.returnType == "void") {
+				_register_error(token->line, ErrorType::VoidWithReturn);
 			}
 			SYMBOL_CHECK(SYMBOL::RPARENT);
 			*has_return = true;

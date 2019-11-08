@@ -1,8 +1,17 @@
 int a(){
    const int a = 5;
    a=1;
-   return;
 }
+
+void x()
+{
+    int x;
+    x = 100;
+    return (x);
+    x = 10000;
+    x = 1;
+}
+
 void main()
 {
     return (0);
