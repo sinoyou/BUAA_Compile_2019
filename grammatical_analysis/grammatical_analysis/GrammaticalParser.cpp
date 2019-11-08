@@ -913,7 +913,7 @@ PARSE_RETURN GrammaticalParser::__factor(PARSE_HEAD head, bool *is_char) {
 			// SYMBOL_CHECK(SYMBOL::IDENFR);
 			RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 			// 在符号表中查找变量类型
-			void* p = find_indefr(symbol_table.get_present_block(), token->token);
+			ParamRecord* p = find_param(symbol_table.get_present_block(), token->token);
 			if (p != NULL) {
 				ParamRecord* param_p = (ParamRecord*)p;
 				if (param_p->type == "char" && is_char != NULL) {
@@ -936,7 +936,7 @@ PARSE_RETURN GrammaticalParser::__factor(PARSE_HEAD head, bool *is_char) {
 			string name = _peek()->token;
 			RECUR_CHECK(__function_call_return, RECUR_DEFAULT);
 			// 在符号表中查找函数类型
-			void* p = find_indefr(symbol_table.get_present_block(), name);
+			FuncHead* p = find_func(symbol_table.get_present_block(), name);
 			if (p != NULL) {
 				FuncHead* func_p = (FuncHead*)p;
 				if (func_p->returnType == "char" && is_char != NULL) {
@@ -1056,7 +1056,7 @@ PARSE_RETURN GrammaticalParser::__assign_statment(PARSE_HEAD head) {
 	try {
 		RECUR_CHECK(__idenfr, RECUR_DEFAULT);
 		// SYMBOL_CHECK(SYMBOL::IDENFR);
-		void* p = find_indefr(symbol_table.get_present_block(), token->token);
+		ParamRecord* p = find_param(symbol_table.get_present_block(), token->token);
 		if (p!=NULL) {
 			ParamRecord* param_p = (ParamRecord*)p;
 			if (param_p->isConst) {
@@ -1258,7 +1258,7 @@ PARSE_RETURN GrammaticalParser::__function_call_return(PARSE_HEAD head) {
 
 	try {
 		RECUR_CHECK(__idenfr, RECUR_DEFAULT);
-		void* p = find_indefr(symbol_table.get_present_block(),token->token);
+		FuncHead* p = find_func(symbol_table.get_present_block(),token->token);
 		// 如果没有的话，直接忽略这句话
 		if (p == NULL) {
 			while (!_peek()->equal(SYMBOL::SEMICN))
@@ -1291,7 +1291,7 @@ PARSE_RETURN GrammaticalParser::__function_call_void(PARSE_HEAD head) {
 
 	try {
 		RECUR_CHECK(__idenfr, RECUR_DEFAULT);
-		void* p = find_indefr(symbol_table.get_present_block(), token->token);
+		FuncHead* p = find_func(symbol_table.get_present_block(), token->token);
 		if (p == NULL) {
 			while (!_peek()->equal(SYMBOL::SEMICN))
 				_next();

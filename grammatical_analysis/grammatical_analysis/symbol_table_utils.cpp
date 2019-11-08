@@ -7,10 +7,22 @@
 */
 void* find_indefr(Block* block, string name)
 {
+	void* p1 = find_param(block, name);
+	void* p2 = find_func(block, name);
+	if (p1) {
+		return p1;
+	}
+	else if (p2) {
+		return p2;
+	}
+	else {
+		return NULL;
+	}
+}
+
+ParamRecord* find_param(Block* block, string name)
+{
 	while (block != NULL) {
-		// 块自身域名是否重复
-		if (block->func_head.name == name)
-			return &(block->func_head);
 		// 块内变量/常量是否重复
 		vector<ParamRecord>::iterator it = block->records.begin();
 		while (it != block->records.end()) {
@@ -18,6 +30,16 @@ void* find_indefr(Block* block, string name)
 				return &(*it);
 			it++;
 		}
+		block = block->pre;
+	}
+	return NULL;
+}
+
+FuncHead* find_func(Block* block, string name) {
+	while (block != NULL) {
+		// 块自身域名是否重复
+		if (block->func_head.name == name)
+			return &(block->func_head);
 		// 块内块名是否重复
 		vector<Block*>::iterator it1 = block->nexts.begin();
 		while (it1 != block->nexts.end()) {
