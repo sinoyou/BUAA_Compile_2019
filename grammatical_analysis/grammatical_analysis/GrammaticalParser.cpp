@@ -605,7 +605,6 @@ PARSE_RETURN GrammaticalParser::__function_return(PARSE_HEAD head) {
 
 	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	PARSE_HEAD RECUR_def; RECUR_def.level = head.level + 1; RECUR_def.is_def = true;
-	PARSE_HEAD RECUR_params = RECUR_DEFAULT; RECUR_params.is_def = true; RECUR_params.func_head = &func_head;
 
 	symbol_table.add_one_block();												// 进入当前块
 
@@ -619,6 +618,7 @@ PARSE_RETURN GrammaticalParser::__function_return(PARSE_HEAD head) {
 
 		Token save = *token;
 
+		PARSE_HEAD RECUR_params = RECUR_DEFAULT; RECUR_params.is_def = true; RECUR_params.func_head = &(symbol_table.get_present_block()->func_head);
 		SYMBOL_CHECK(SYMBOL::LPARENT);
 		RECUR_CHECK(__parameter_list, RECUR_params);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
@@ -658,7 +658,6 @@ PARSE_RETURN GrammaticalParser::__function_void(PARSE_HEAD head)
 
 	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	PARSE_HEAD RECUR_def; RECUR_def.level = head.level + 1; RECUR_def.is_def = true;
-	PARSE_HEAD RECUR_params = RECUR_DEFAULT; RECUR_params.is_def = true; RECUR_params.func_head = &func_head;
 
 	symbol_table.add_one_block();												// 进入当前块
 
@@ -673,6 +672,7 @@ PARSE_RETURN GrammaticalParser::__function_void(PARSE_HEAD head)
 
 		Token save = *token;
 
+		PARSE_HEAD RECUR_params = RECUR_DEFAULT; RECUR_params.is_def = true; RECUR_params.func_head = &(symbol_table.get_present_block()->func_head);
 		SYMBOL_CHECK(SYMBOL::LPARENT);
 		RECUR_CHECK(__parameter_list, RECUR_params);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
@@ -1010,7 +1010,11 @@ PARSE_RETURN GrammaticalParser::__statement(PARSE_HEAD head, bool * has_return)
 			}
 			if (x == 1) { RECUR_CHECK(__function_call_return, RECUR_DEFAULT) }
 			else if (x == -1) { RECUR_CHECK(__function_call_void, RECUR_DEFAULT); }
-			else { FLAG_FAIL; }	// 在类型为函数名的标识符中没有找到对应的。
+			else { 
+				_register_error(token->line, ErrorType::Undefine);
+				while (!_peek()->equal(SYMBOL::SEMICN))
+					_next();
+			}	// 在类型为函数名的标识符中没有找到对应的。
 			SYMBOL_CHECK(SYMBOL::SEMICN);
 		}
 		else if (_peek()->equal(SYMBOL::IDENFR) && !_peek(2)->equal(SYMBOL::LPARENT))

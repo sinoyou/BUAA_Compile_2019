@@ -40,7 +40,7 @@ void GrammaticalParser::multi_symbol_check(SYMBOL symbols[], int len, int level)
 		if (token->equal(symbols[i])) {
 			cnt += 1;
 			_save(token);
-			PARSE_PRINT(level, token->token, token->token);
+			PARSE_PRINT(level, token->token, symbol_dict[token->symbol]);
 		}
 	}
 	if (cnt == 0) {
