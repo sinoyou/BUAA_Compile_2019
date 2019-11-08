@@ -57,6 +57,7 @@ public:
 void* find_indefr(Block* block, string name);
 void insert_one_record(Block* block, ParamRecord record);
 void update_function_head(Block* block, FuncHead head);
+void* find_indefr_current(Block* block, string name);
 
 
 

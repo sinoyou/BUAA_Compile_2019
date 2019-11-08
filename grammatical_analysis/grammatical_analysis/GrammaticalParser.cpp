@@ -442,7 +442,8 @@ PARSE_RETURN GrammaticalParser::__idenfr(PARSE_HEAD head) {
 		// unit4error - b 
 		// unit4error - c
 		void* p = find_indefr(symbol_table.get_present_block(), token->token);
-		if (head.is_def && p != NULL) {
+		void* p1 = find_indefr_current(symbol_table.get_present_block(), token->token);
+		if (head.is_def && p1 != NULL) {
 			_register_error(token->line, ErrorType::Redefine);
 		}
 		if (!head.is_def && p == NULL) {
