@@ -36,6 +36,7 @@
     <ClCompile Include="ParseException.cpp" />
     <ClCompile Include="GrammaticalParser.cpp" />
     <ClCompile Include="SymbolTable.cpp" />
+    <ClCompile Include="symbol_table_utils.cpp" />
     <ClCompile Include="Token.cpp" />
     <ClCompile Include="LexParser.cpp" />
     <ClCompile Include="main.cpp" />

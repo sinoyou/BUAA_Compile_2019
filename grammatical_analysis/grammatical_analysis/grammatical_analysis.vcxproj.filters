@@ -98,5 +98,8 @@
     <ClCompile Include="ParseException.cpp">
       <Filter>Source Files\class</Filter>
     </ClCompile>
+    <ClCompile Include="symbol_table_utils.cpp">
+      <Filter>Source Files\class\symbol_table</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -7,17 +7,18 @@ SymbolTable::SymbolTable() {
 	root = NULL;
 	present = NULL;
 
-	add_one_block("__program_global__");
+	add_one_block();
 	root = present;
 }
 
 /*
  * 插入一个块, 并将present指针置位。 
  **/
-void SymbolTable::add_one_block(string name) {
+void SymbolTable::add_one_block() {
 	Block* temp = new Block();
-	temp->func_head.name = name;
 	temp->pre = present;
+	if(present)
+		present->nexts.push_back(temp);
 	present = temp;
 }
 
@@ -29,7 +30,7 @@ void SymbolTable::exit_present_block() {
 }
 
 // 返回当前块的引用
-Block& SymbolTable::get_present_block() {
-	return (*present);
+Block* SymbolTable::get_present_block() {
+	return present;
 }
 

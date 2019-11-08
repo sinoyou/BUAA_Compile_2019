@@ -46,7 +46,8 @@ enum SYMBOL
 	RBRACK,
 	LBRACE,
 	RBRACE,
-	EOT
+	EOT,
+	IGNORE
 };
 
 # endif // __SYMBOL_H__

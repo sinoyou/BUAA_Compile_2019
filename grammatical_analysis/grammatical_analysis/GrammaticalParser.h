@@ -8,17 +8,18 @@
 #include "debug.h"
 #include "ParseException.h"
 #include "error.h"
+#include "SymbolTable.h"
 
 using namespace std;
 
 // 结构体 头和尾
 struct PARSE_HEAD {
 	int level;
+	bool is_def;
+	FuncHead* func_head;
 };
 struct PARSE_RETURN {
 	int state;
-	int a;
-	int b;
 };
 
 // 宏定义
@@ -33,7 +34,7 @@ int __level__ = level;											\
 
  #define FLAG_FAIL \
 {										\
-	string s = string("ERROR WHEN PARSING ") + token->token;	\
+	string s = string("ERROR WHEN PARSING ") + _peek()->token;	\
 	DEBUG_PRINT(s.c_str());				\
 	_recover();							\
 }
@@ -54,12 +55,13 @@ int __level__ = level;											\
 class GrammaticalParser
 {
 public:
-	GrammaticalParser(vector<Token>& token_list,vector<string>& output, vector<tuple<int, string>>& error_output);
+	GrammaticalParser(vector<Token>& token_list, vector<string>& output, vector<tuple<int, string>>& error_output);
 	void parse();						// 解析器暂时没有返回
 private:
 	// Current 当前系列
 	int ptoken;							// 遍历token列表的索引
 	Token * token;						// 当前索引ptoken下的token
+	SymbolTable symbol_table;			// 符号表
 
 	vector<Token> & token_list;			// token的列表
 	vector<int> ptoken_record;			// ptoken的备份空间
@@ -114,23 +116,23 @@ private:
 	PARSE_RETURN __type_idenfr(PARSE_HEAD head);
 	PARSE_RETURN __function_return(PARSE_HEAD head);
 	PARSE_RETURN __function_void(PARSE_HEAD head);
-	PARSE_RETURN __compound_statement(PARSE_HEAD head);
+	PARSE_RETURN __compound_statement(PARSE_HEAD head,bool* has_return);
 	PARSE_RETURN __parameter_list(PARSE_HEAD head);
 	PARSE_RETURN __main_function(PARSE_HEAD head);
-	PARSE_RETURN __expression(PARSE_HEAD head);
-	PARSE_RETURN __item(PARSE_HEAD head);
-	PARSE_RETURN __factor(PARSE_HEAD head);
-	PARSE_RETURN __statement(PARSE_HEAD head);
+	PARSE_RETURN __expression(PARSE_HEAD head, bool * is_char);
+	PARSE_RETURN __item(PARSE_HEAD head, bool *is_char);
+	PARSE_RETURN __factor(PARSE_HEAD head, bool *is_char);
+	PARSE_RETURN __statement(PARSE_HEAD head, bool* has_return);
 	PARSE_RETURN __assign_statment(PARSE_HEAD head);
-	PARSE_RETURN __condition_statement(PARSE_HEAD head);
+	PARSE_RETURN __condition_statement(PARSE_HEAD head, bool *has_return);
 	PARSE_RETURN __condition(PARSE_HEAD head);
-	PARSE_RETURN __loop_statement(PARSE_HEAD head);
+	PARSE_RETURN __loop_statement(PARSE_HEAD head, bool *has_return);
 	PARSE_RETURN __step_length(PARSE_HEAD head);
 	PARSE_RETURN __function_call_return(PARSE_HEAD head);
 	PARSE_RETURN __function_call_void(PARSE_HEAD head);
-	PARSE_RETURN __value_parameter_list(PARSE_HEAD head);
-	PARSE_RETURN __statement_list(PARSE_HEAD head);
+	PARSE_RETURN __value_parameter_list(PARSE_HEAD head, vector<string>* params);
+	PARSE_RETURN __statement_list(PARSE_HEAD head, bool* has_return);
 	PARSE_RETURN __read_statement(PARSE_HEAD head);
 	PARSE_RETURN __write_statement(PARSE_HEAD head);
-	PARSE_RETURN __return_statement(PARSE_HEAD head);
+	PARSE_RETURN __return_statement(PARSE_HEAD head, bool* has_return);
 };

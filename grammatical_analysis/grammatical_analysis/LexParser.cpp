@@ -11,7 +11,7 @@ LexParser::LexParser(FileReader& reader, vector<tuple<int,string>>& error_list)
 
 const vector<Token>& LexParser::parse() {
 	while (_getsym() >= 0) {
-		if(symbol != SYMBOL::UNKNOWN)
+		if(symbol != SYMBOL::IGNORE)
 			token_list.push_back(Token(symbol, reader.getToken(), current_line));
 		/* 默认：当前解析程序为下一步解析设定好指针  */
 		reader.getchar();
@@ -146,6 +146,12 @@ int LexParser::_getsym() {
 			else
 				_error("CHARCON");
 		}
+		else {
+			reader.catToken();
+			reader.getchar();
+			symbol = SYMBOL::UNKNOWN;
+			_error("CHARCON");
+		}
 	}
 	/* 字符串 */
 	else if (reader.isDouQuotation()) {
@@ -166,7 +172,7 @@ int LexParser::_getsym() {
 		return -1;
 	}
 	else {
-		symbol = SYMBOL::UNKNOWN;
+		symbol = SYMBOL::IGNORE;
 		_error("UNKNOWN");
 	}
 	return 0;

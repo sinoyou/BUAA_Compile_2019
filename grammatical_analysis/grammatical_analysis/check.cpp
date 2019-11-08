@@ -3,11 +3,30 @@
 
 // 检查一个终结符
 void GrammaticalParser::symbol_check(SYMBOL symbol, int level) {
-	_next();
-	if (!token->equal(symbol)) {
-		throw ParseException(ParseExceptionType::WrongToken, token->token);
+	if (!_peek()->equal(symbol)) {
+		if (!_peek()->equal(SYMBOL::UNKNOWN)) {
+			// unit4-error-k
+			// unit4-error-l
+			// unit4-error-m
+			if (symbol == SYMBOL::SEMICN) {
+				_register_error(token->line, ErrorType::MissSemicn);
+			}
+			else if (symbol == SYMBOL::RPARENT)
+			{
+				_register_error(token->line, ErrorType::MissRightParent);
+			}
+			else if (symbol == SYMBOL::RBRACK) {
+				_register_error(token->line, ErrorType::MissRightBrack);
+			}
+			else
+				throw ParseException(ParseExceptionType::WrongToken, token->token);
+		}
+		else {
+			_next();
+		}
 	}
 	else {
+		_next();
 		_save(token);					
 		PARSE_PRINT(level, token->token, symbol_dict[token->symbol]);	
 	}

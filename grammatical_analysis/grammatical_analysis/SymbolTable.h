@@ -6,7 +6,7 @@ using namespace std;
 #ifndef __SYMBOL_TABLE_H__
 #define __SYMBOL_TABLE_H__
 
-// 符号表中的项类型统计
+// =========== 符号表中的项类型统计 =============
 /*
  1. int|char型变量或数组。交由ParamRecord管理。
  2. FuncHead函数头。与每个块意义对应着。
@@ -16,6 +16,7 @@ struct ParamRecord {
 	string name;					
 	string type;					// int, char
 	bool isConst;					// true / false
+	bool isArray;					// true / false
 };
 
 struct FuncHead {
@@ -46,10 +47,18 @@ public:
 	// methods
 	SymbolTable();									// build and initial
 
-	void add_one_block(string name);				// 基于当前节点层级，新增一个块
+	void add_one_block();							// 基于当前节点层级，新增一个块
 	void exit_present_block();						// 离开当前节点层级，返回上一个块
-	Block& get_present_block();						// 返回当前节点结构体的引用，for - 查询与更新
+	Block* get_present_block();						// 返回当前节点结构体的引用，for - 查询与更新
 };
+
+
+// ========== 符号表的辅助操作 ==========
+void* find_indefr(Block* block, string name);
+void insert_one_record(Block* block, ParamRecord record);
+void update_function_head(Block* block, FuncHead head);
+
+
 
 #endif // !__SYMBOL_TABLE_H__
 

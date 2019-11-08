@@ -1,64 +1,25 @@
-const int saber = +0, berserker = -10086, lancer = 23333, NMSL = 666;
-const char archer = 'a', caster = 'b';
-
-int int_array[64], global_int;
-char char_array[128], global_char;
-
-void wdnmd()
-{
-	printf("Fuck The World,%d\n", 17373522 + 2333);
-	return;
+const int const1 = 1, const2 = -100;
+const char const3 = 'c';
+int change1;
+int change1;
+int xjxjxj[100];
+char change3;
+int gets1(int var1,int var2){
+   change1 = var1 + var4 ;
+   xjxjxj[const3] = 100;
+   xjxjxj[1] = 100;
+   return (change1);
+   return (const3);
+   
+   do{
+	change1 = 1;
+   }(change1!=0)
 }
-
-int nmsl(int ni_ma) 
-{
-	printf("NM$L,la si zhen di liu pi %d\n", ni_ma * NMSL);
-	return (ni_ma * NMSL * NMSL);
-}
-
-void sb(int dllm, char cnm)
-{
-	printf("dllm %d\n", dllm * cnm);
-}
-
-int saber_msl()
-{
-	return (((saber * NMSL) + 2333 - (666 * berserker)) * archer);
-}
-
-void main()
-{
-	const int nima = 99;
-	const char die = 'S';
-	int fck_int_arr[233], hanpi;
-	char liupi, guasong[1024];
-	int i;
-
-	if (nmsl(nima))
-	{
-		for (i = 0; i < 10; i = i + 1) {
-			printf("nima lei le~\n");
-		}
-		do
-		{
-			printf("nima zou le\n");
-		} while (nmsl(nima)<=0);
-
-	} 
-	else
-	{
-		printf("nima bu de bu si\n");
-		return;
-	}
-	i = 1;
-	while (i)
-	{
-		printf("nima dao di si le me?\n");
-		i = 0;
-	}
-	sb(1,'a');
-	hanpi = saber_msl();
-	printf("%d\n",hanpi);
-	printf(666);
-	return;
+void main(){
+   change1 = 10;
+   printf("Hello World");
+   printf(gets1(10, 20, 10));
+   printf(gets1(10, const3));
+	if('c') change1 = 10;
+	if(('c')) change1 = 10;
 }

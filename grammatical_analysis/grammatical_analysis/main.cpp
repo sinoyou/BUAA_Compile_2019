@@ -35,6 +35,7 @@ void run() {
 	//fclose(f);
 
 	/* Grammatical Parse :  Recursive Output + Error Output */
+	// recursive output
 	gram_parser.parse();
 	ofstream gram;
 	gram.open("output.txt", ios::out | ios::trunc);
@@ -44,6 +45,18 @@ void run() {
 		itr1++;
 	}
 	gram.close();
+
+	// error output
+	ofstream error_out;
+	error_out.open("error.txt", ios::out | ios::trunc);
+	vector<tuple<int, string>>::iterator error_it = error_output_list.begin();
+	while (error_it != error_output_list.end()) {
+		tuple<int, string> t = *error_it;
+		error_out << get<0>(t) << " " << get<1>(t) << endl;
+		error_it += 1;
+	}
+	error_out.close();
+
 }
 
 int main()
