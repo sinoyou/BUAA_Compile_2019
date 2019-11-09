@@ -533,7 +533,7 @@ PARSE_RETURN GrammaticalParser::__var_def(PARSE_HEAD head)
 	PARSE_HEAD RECUR_def; RECUR_def.level = head.level + 1; RECUR_def.is_def = true;
 	try {
 		RECUR_CHECK(__type_idenfr, RECUR_DEFAULT);
-		string type = (token->symbol == SYMBOL::CHARCON) ? "char" : "int";
+		string type = (token->symbol == SYMBOL::CHARTK) ? "char" : "int";
 		
 		RECUR_CHECK(__idenfr, RECUR_def);
 		string idenfr_name = token->token;
@@ -609,7 +609,7 @@ PARSE_RETURN GrammaticalParser::__function_return(PARSE_HEAD head) {
 	symbol_table.add_one_block();												// 进入当前块
 
 	try {
-		string func_type = (_peek()->symbol == SYMBOL::CHARCON) ? "char" : "int";
+		string func_type = (_peek()->symbol == SYMBOL::CHARTK) ? "char" : "int";
 		RECUR_CHECK(__declar_head, RECUR_def);
 		string func_name = token->token;
 		func_head.name = func_name;
@@ -749,7 +749,7 @@ PARSE_RETURN GrammaticalParser::__parameter_list(PARSE_HEAD head)
 		if (_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) {
 			RECUR_CHECK(__type_idenfr, RECUR_DEFAULT);
 			// 插入类型表示
-			string type = (token->symbol == SYMBOL::CHARCON) ? "char" : "int";
+			string type = (token->symbol == SYMBOL::CHARTK) ? "char" : "int";
 			func_head->paramsList.push_back(type);
 			RECUR_CHECK(__idenfr, RECUR_def);
 			// 插入符号表中
@@ -761,7 +761,7 @@ PARSE_RETURN GrammaticalParser::__parameter_list(PARSE_HEAD head)
 				SYMBOL_CHECK(SYMBOL::COMMA);
 				RECUR_CHECK(__type_idenfr, RECUR_DEFAULT);
 				// 插入类型表示
-				string type = (token->symbol == SYMBOL::CHARCON) ? "char" : "int";
+				string type = (token->symbol == SYMBOL::CHARTK) ? "char" : "int";
 				func_head->paramsList.push_back(type);
 				RECUR_CHECK(__idenfr, RECUR_def);
 				string name = token->token;
