@@ -1496,6 +1496,7 @@ PARSE_RETURN GrammaticalParser::__return_statement(PARSE_HEAD head, bool * has_r
 	try {
 		SYMBOL_CHECK(SYMBOL::RETURNTK);
 		Block* block = symbol_table.get_present_block();
+		*has_return = true;
 		if (_peek()->equal(LPARENT)) {
 			SYMBOL_CHECK(SYMBOL::LPARENT);
 			// RECUR_CHECK(__expression, RECUR_DEFAULT);
@@ -1512,7 +1513,6 @@ PARSE_RETURN GrammaticalParser::__return_statement(PARSE_HEAD head, bool * has_r
 				_register_error(token->line, ErrorType::VoidWithReturn);
 			}
 			SYMBOL_CHECK(SYMBOL::RPARENT);
-			*has_return = true;
 		}
 		else {
 			if (block->func_head.returnType == "int" || block->func_head.returnType == "char")
