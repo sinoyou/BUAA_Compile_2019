@@ -1011,7 +1011,7 @@ PARSE_RETURN GrammaticalParser::__statement(PARSE_HEAD head, bool * has_return)
 			if (x == 1) { RECUR_CHECK(__function_call_return, RECUR_DEFAULT) }
 			else if (x == -1) { RECUR_CHECK(__function_call_void, RECUR_DEFAULT); }
 			else { 
-				_register_error(token->line, ErrorType::Undefine);
+				_register_error(_peek()->line, ErrorType::Undefine);
 				while (!_peek()->equal(SYMBOL::SEMICN))
 					_next();
 			}	// 在类型为函数名的标识符中没有找到对应的。

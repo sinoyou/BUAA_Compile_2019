@@ -20,6 +20,9 @@ void run() {
 	FileReader reader("testfile.txt");
 	LexParser lexParser(reader, error_output_list);
 	vector<Token> token_list = lexParser.parse();
+	for (vector<Token>::iterator it = token_list.begin(); it != token_list.end(); it++) {
+		cout << it->line << " " << it->token << " " << symbol_dict[it->symbol] << endl;
+	}
 
 	/* Grammatical Parse + error process */
 	vector<string> output_list;
