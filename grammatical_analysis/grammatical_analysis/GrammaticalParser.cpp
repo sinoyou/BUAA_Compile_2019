@@ -305,7 +305,8 @@ PARSE_RETURN GrammaticalParser::__const_def(PARSE_HEAD head)
 				}
 			}
 			catch (ParseException& e) {
-				_register_error(token->line, ErrorType::ConstDefWrong);
+				_register_error(_peek()->line, ErrorType::ConstDefWrong);
+				_next();
 			}
 			// 正确无误后再输入表中
 			insert_one_record(symbol_table.get_present_block(),
@@ -326,7 +327,8 @@ PARSE_RETURN GrammaticalParser::__const_def(PARSE_HEAD head)
 					}
 				}
 				catch (ParseException& e) {
-					_register_error(token->line, ErrorType::ConstDefWrong);
+					_register_error(_peek()->line, ErrorType::ConstDefWrong);
+					_next();
 				}
 				// 正确无误后再输入表中
 				insert_one_record(symbol_table.get_present_block(),
@@ -349,7 +351,8 @@ PARSE_RETURN GrammaticalParser::__const_def(PARSE_HEAD head)
 				}
 			}
 			catch (ParseException& e) {
-				_register_error(token->line, ErrorType::ConstDefWrong);
+				_register_error(_peek()->line, ErrorType::ConstDefWrong);
+				_next();
 			}
 			// 正确无误后再输入表中
 			insert_one_record(symbol_table.get_present_block(),
@@ -370,7 +373,8 @@ PARSE_RETURN GrammaticalParser::__const_def(PARSE_HEAD head)
 					}
 				}
 				catch (ParseException& e) {
-					_register_error(token->line, ErrorType::ConstDefWrong);
+					_register_error(_peek()->line, ErrorType::ConstDefWrong);
+					_next();
 				}
 				// 正确无误后再输入表中
 				insert_one_record(symbol_table.get_present_block(),
