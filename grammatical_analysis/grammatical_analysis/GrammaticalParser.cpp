@@ -618,7 +618,9 @@ PARSE_RETURN GrammaticalParser::__function_return(PARSE_HEAD head) {
 
 		Token save = *token;
 
-		PARSE_HEAD RECUR_params = RECUR_DEFAULT; RECUR_params.is_def = true; RECUR_params.func_head = &(symbol_table.get_present_block()->func_head);
+		PARSE_HEAD RECUR_params = RECUR_DEFAULT; 
+		RECUR_params.is_def = true; 
+		RECUR_params.func_head = &(symbol_table.get_present_block()->func_head);
 		SYMBOL_CHECK(SYMBOL::LPARENT);
 		RECUR_CHECK(__parameter_list, RECUR_params);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
@@ -672,7 +674,9 @@ PARSE_RETURN GrammaticalParser::__function_void(PARSE_HEAD head)
 
 		Token save = *token;
 
-		PARSE_HEAD RECUR_params = RECUR_DEFAULT; RECUR_params.is_def = true; RECUR_params.func_head = &(symbol_table.get_present_block()->func_head);
+		PARSE_HEAD RECUR_params = RECUR_DEFAULT; 
+		RECUR_params.is_def = true; 
+		RECUR_params.func_head = &(symbol_table.get_present_block()->func_head);
 		SYMBOL_CHECK(SYMBOL::LPARENT);
 		RECUR_CHECK(__parameter_list, RECUR_params);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
@@ -1491,13 +1495,13 @@ PARSE_RETURN GrammaticalParser::__return_statement(PARSE_HEAD head, bool * has_r
 	PARSE_HEAD RECUR_DEFAULT = PARSE_HEAD{ head.level + 1 };
 	try {
 		SYMBOL_CHECK(SYMBOL::RETURNTK);
+		Block* block = symbol_table.get_present_block();
 		if (_peek()->equal(LPARENT)) {
 			SYMBOL_CHECK(SYMBOL::LPARENT);
 			// RECUR_CHECK(__expression, RECUR_DEFAULT);
 			bool char_detector = false;
 			__expression(RECUR_DEFAULT, &char_detector);
 			// unit4-error-h
-			Block* block = symbol_table.get_present_block();
 			if (block->func_head.returnType == "int" && char_detector) {
 				_register_error(token->line, ErrorType::ReturnError);
 			}
@@ -1509,6 +1513,12 @@ PARSE_RETURN GrammaticalParser::__return_statement(PARSE_HEAD head, bool * has_r
 			}
 			SYMBOL_CHECK(SYMBOL::RPARENT);
 			*has_return = true;
+		}
+		else {
+			if (block->func_head.returnType == "int" || block->func_head.returnType == "char")
+			{
+				_register_error(token->line, ErrorType::ReturnError);
+			}
 		}
 	}
 	catch (ParseException& e) {
