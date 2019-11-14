@@ -12,15 +12,7 @@
 
 using namespace std;
 
-// 结构体 头和尾
-struct PARSE_HEAD {
-	int level;
-	bool is_def;
-	FuncHead* func_head;
-};
-struct PARSE_RETURN {
-	int state;
-};
+// 结构体 头和尾：由于各递归下降无法进行统一，故已经弃用统一的结构体作为函数的参数和返回值。
 
 // 宏定义
 /* 所有带下划线的只能在宏定义中使用 */
@@ -47,7 +39,6 @@ int __level__ = level;											\
 		_save(__name_save__);			\
 }
 
-#define RECUR_CHECK(func, head) func(head);
 #define SYMBOL_CHECK(symbol) symbol_check(symbol, __level__);
 #define MULTI_SYMBOL_CHECK(symbols, len) multi_symbol_check(symbols, len, __level__);
 
@@ -96,43 +87,43 @@ private:
 	void multi_symbol_check(SYMBOL symbols[],int len, int level) ; 			// 检查多个终结符
 
 	/* 规则函数：递归下降调用 */
-	PARSE_RETURN __add_operator(PARSE_HEAD head);
-	PARSE_RETURN __mult_operator(PARSE_HEAD head);
-	PARSE_RETURN __rel_operator(PARSE_HEAD head);
-	PARSE_RETURN __letter(PARSE_HEAD head);
-	PARSE_RETURN __number(PARSE_HEAD head);
-	PARSE_RETURN __non_zero_number(PARSE_HEAD head);
-	PARSE_RETURN __char(PARSE_HEAD head);
-	PARSE_RETURN __string(PARSE_HEAD head);
-	PARSE_RETURN __program(PARSE_HEAD head);
-	PARSE_RETURN __const_description(PARSE_HEAD head);
-	PARSE_RETURN __const_def(PARSE_HEAD head);
-	PARSE_RETURN __unsigned_integer(PARSE_HEAD head);
-	PARSE_RETURN __integer(PARSE_HEAD head);
-	PARSE_RETURN __idenfr(PARSE_HEAD head);
-	PARSE_RETURN __declar_head(PARSE_HEAD head);
-	PARSE_RETURN __var_description(PARSE_HEAD head);
-	PARSE_RETURN __var_def(PARSE_HEAD head);
-	PARSE_RETURN __type_idenfr(PARSE_HEAD head);
-	PARSE_RETURN __function_return(PARSE_HEAD head);
-	PARSE_RETURN __function_void(PARSE_HEAD head);
-	PARSE_RETURN __compound_statement(PARSE_HEAD head,bool* has_return);
-	PARSE_RETURN __parameter_list(PARSE_HEAD head);
-	PARSE_RETURN __main_function(PARSE_HEAD head);
-	PARSE_RETURN __expression(PARSE_HEAD head, bool * is_char);
-	PARSE_RETURN __item(PARSE_HEAD head, bool *is_char);
-	PARSE_RETURN __factor(PARSE_HEAD head, bool *is_char);
-	PARSE_RETURN __statement(PARSE_HEAD head, bool* has_return);
-	PARSE_RETURN __assign_statment(PARSE_HEAD head);
-	PARSE_RETURN __condition_statement(PARSE_HEAD head, bool *has_return);
-	PARSE_RETURN __condition(PARSE_HEAD head);
-	PARSE_RETURN __loop_statement(PARSE_HEAD head, bool *has_return);
-	PARSE_RETURN __step_length(PARSE_HEAD head);
-	PARSE_RETURN __function_call_return(PARSE_HEAD head);
-	PARSE_RETURN __function_call_void(PARSE_HEAD head);
-	PARSE_RETURN __value_parameter_list(PARSE_HEAD head, vector<string>* params);
-	PARSE_RETURN __statement_list(PARSE_HEAD head, bool* has_return);
-	PARSE_RETURN __read_statement(PARSE_HEAD head);
-	PARSE_RETURN __write_statement(PARSE_HEAD head);
-	PARSE_RETURN __return_statement(PARSE_HEAD head, bool* has_return);
+	void __add_operator(int level);
+	void __mult_operator(int level);
+	void __rel_operator(int level);
+	void __letter(int level);
+	void __number(int level);
+	void __non_zero_number(int level);
+	void __char(int level);
+	void __string(int level);
+	void __program(int level);
+	void __const_description(int level);
+	void __const_def(int level);
+	void __unsigned_integer(int level);
+	void __integer(int level);
+	void __idenfr(int level, bool is_def);
+	void __declar_head(int level, bool is_def);
+	void __var_description(int level);
+	void __var_def(int level);
+	void __type_idenfr(int level);
+	void __function_return(int level);
+	void __function_void(int level);
+	void __compound_statement(int level,bool* has_return);
+	void __parameter_list(int level, FuncHead* func_head);
+	void __main_function(int level);
+	void __expression(int level, bool * is_char);
+	void __item(int level, bool *is_char);
+	void __factor(int level, bool *is_char);
+	void __statement(int level, bool* has_return);
+	void __assign_statment(int level);
+	void __condition_statement(int level, bool *has_return);
+	void __condition(int level);
+	void __loop_statement(int level, bool *has_return);
+	void __step_length(int level);
+	void __function_call_return(int level);
+	void __function_call_void(int level);
+	void __value_parameter_list(int level, vector<string>* params);
+	void __statement_list(int level, bool* has_return);
+	void __read_statement(int level);
+	void __write_statement(int level);
+	void __return_statement(int level, bool* has_return);
 };
