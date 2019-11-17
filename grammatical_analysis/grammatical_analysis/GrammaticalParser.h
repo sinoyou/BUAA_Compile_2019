@@ -59,8 +59,8 @@ private:
 
 	/* 文法解析辅助工具 */
 	// 单凭文法无法解析两者的差异
-	vector<string> func_call_return_idenfr;
-	vector<string> func_call_void_idenfr;
+	// vector<string> func_call_return_idenfr;
+	// vector<string> func_call_void_idenfr;
 	
 	/* Unit3 输出支持 */
 	vector<string> & output_list;		// 输出的列表
@@ -93,22 +93,22 @@ private:
 	void __letter(int level);
 	void __number(int level);
 	void __non_zero_number(int level);
-	void __char(int level);
+	char __char(int level);
 	void __string(int level);
 	void __program(int level);
 	void __const_description(int level);
 	void __const_def(int level);
-	void __unsigned_integer(int level);
-	void __integer(int level);
-	void __idenfr(int level, bool is_def);
-	void __declar_head(int level, bool is_def);
+	int __unsigned_integer(int level);
+	int __integer(int level);
+	string __idenfr(int level, bool is_def);
+	void __declar_head(int level, BasicType * return_type, string * func_name);
 	void __var_description(int level);
 	void __var_def(int level);
-	void __type_idenfr(int level);
+	BasicType __type_idenfr(int level);
 	void __function_return(int level);
 	void __function_void(int level);
 	void __compound_statement(int level,bool* has_return);
-	void __parameter_list(int level, FuncHead* func_head);
+	void __parameter_list(int level, vector<SymbolItem*>* para_list);
 	void __main_function(int level);
 	void __expression(int level, bool * is_char);
 	void __item(int level, bool *is_char);
@@ -121,7 +121,7 @@ private:
 	void __step_length(int level);
 	void __function_call_return(int level);
 	void __function_call_void(int level);
-	void __value_parameter_list(int level, vector<string>* params);
+	void __value_parameter_list(int level, vector<SymbolItem*>* params);
 	void __statement_list(int level, bool* has_return);
 	void __read_statement(int level);
 	void __write_statement(int level);

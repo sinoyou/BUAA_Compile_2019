@@ -1,42 +1,12 @@
+ï»¿#ifndef __SYMBOL_TABLE_H__
+#define __SYMBOL_TABLE_H__
 #include <string>
 #include <vector>
+#include <map>
+#include "SymbolItem.h"
+#include "Block.h"
 
 using namespace std;
-
-#ifndef __SYMBOL_TABLE_H__
-#define __SYMBOL_TABLE_H__
-
-// =========== ·ûºÅ±íÖĞµÄÏîÀàĞÍÍ³¼Æ =============
-/*
- 1. int|charĞÍ±äÁ¿»òÊı×é¡£½»ÓÉParamRecord¹ÜÀí¡£
- 2. FuncHeadº¯ÊıÍ·¡£ÓëÃ¿¸ö¿éÒâÒå¶ÔÓ¦×Å¡£
- */
-
-struct ParamRecord {
-	string name;					
-	string type;					// int, char
-	bool isConst;					// true / false
-	bool isArray;					// true / false
-};
-
-struct FuncHead {
-	string name;
-	string returnType;				// int, char, void
-	vector<string> paramsList;		
-};
-
-/* ·ûºÅ±í½á¹¹Ê÷µÄ½áµã£¬º¬ÓĞÇ°×ºÖ¸Õë¡£ */
-class Block {
-public:
-	// Ê÷ĞÎ½á¹¹Ö§³Ö
-	Block* pre;	
-	vector<Block*> nexts;
-
-	// ÊôĞÔ±êÇ©
-	FuncHead func_head;
-	vector<ParamRecord> records;
-};
-
 class SymbolTable
 {
 public:
@@ -47,19 +17,23 @@ public:
 	// methods
 	SymbolTable();									// build and initial
 
-	void add_one_block();							// »ùÓÚµ±Ç°½Úµã²ã¼¶£¬ĞÂÔöÒ»¸ö¿é
-	void exit_present_block();						// Àë¿ªµ±Ç°½Úµã²ã¼¶£¬·µ»ØÉÏÒ»¸ö¿é
-	Block* get_present_block();						// ·µ»Øµ±Ç°½Úµã½á¹¹ÌåµÄÒıÓÃ£¬for - ²éÑ¯Óë¸üĞÂ
+	void add_one_block();							// åŸºäºå½“å‰èŠ‚ç‚¹å±‚çº§ï¼Œæ–°å¢ä¸€ä¸ªå—
+	void exit_present_block();						// ç¦»å¼€å½“å‰èŠ‚ç‚¹å±‚çº§ï¼Œè¿”å›ä¸Šä¸€ä¸ªå—
+	Block* get_present_block();						// è¿”å›å½“å‰èŠ‚ç‚¹ç»“æ„ä½“çš„å¼•ç”¨ï¼Œfor - æŸ¥è¯¢ä¸æ›´æ–°
 };
 
 
-// ========== ·ûºÅ±íµÄ¸¨Öú²Ù×÷ ==========
+// ========== ç¬¦å·è¡¨çš„è¾…åŠ©æ“ä½œ ==========
 void* find_indefr(Block* block, string name);
-void insert_one_record(Block* block, ParamRecord record);
-void update_function_head(Block* block, FuncHead head);
+void insert_one_record(Block* block, SymbolItem* record);
+void update_function_head(Block* block, SymbolItem* head);
 void* find_indefr_current(Block* block, string name);
-ParamRecord* find_param(Block* block, string name);
-FuncHead* find_func(Block* block, string name);
+SymbolItem* find_param(Block* block, string name, bool recur);
+SymbolItem* find_func(Block* block, string name, bool recur);
+
+/* ä¸­é—´ä»£ç ç”Ÿæˆè¾…åŠ©å·¥å…· */
+SymbolItem *get_label(Block* block, string comment);
+SymbolItem *get_temp(Block* block);
 
 
 

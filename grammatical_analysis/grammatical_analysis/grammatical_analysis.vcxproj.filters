@@ -28,6 +28,9 @@
     <Filter Include="Source Files\class\symbol_table">
       <UniqueIdentifier>{f7f0a894-bb3d-4647-beb6-788569314eec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\class\symbol_table">
+      <UniqueIdentifier>{c706f5a7-212a-45d6-bae4-4956215e021f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Token.h">
@@ -54,14 +57,20 @@
     <ClInclude Include="debug.h">
       <Filter>Header Files\class</Filter>
     </ClInclude>
-    <ClInclude Include="SymbolTable.h">
-      <Filter>Header Files\class</Filter>
-    </ClInclude>
     <ClInclude Include="ParseException.h">
       <Filter>Header Files\class</Filter>
     </ClInclude>
     <ClInclude Include="error.h">
       <Filter>Header Files\global</Filter>
+    </ClInclude>
+    <ClInclude Include="SymbolTable.h">
+      <Filter>Header Files\class\symbol_table</Filter>
+    </ClInclude>
+    <ClInclude Include="SymbolItem.h">
+      <Filter>Header Files\class\symbol_table</Filter>
+    </ClInclude>
+    <ClInclude Include="Block.h">
+      <Filter>Header Files\class\symbol_table</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +108,12 @@
       <Filter>Source Files\class</Filter>
     </ClCompile>
     <ClCompile Include="symbol_table_utils.cpp">
+      <Filter>Source Files\class\symbol_table</Filter>
+    </ClCompile>
+    <ClCompile Include="SymbolItem.cpp">
+      <Filter>Source Files\class\symbol_table</Filter>
+    </ClCompile>
+    <ClCompile Include="Block.cpp">
       <Filter>Source Files\class\symbol_table</Filter>
     </ClCompile>
   </ItemGroup>
