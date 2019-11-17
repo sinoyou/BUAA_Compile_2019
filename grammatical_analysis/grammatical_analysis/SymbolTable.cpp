@@ -1,18 +1,15 @@
-#include "SymbolTable.h"
+ï»¿#include "SymbolTable.h"
 
 /*
- * ³õÊ¼»¯Ò»¸ö·ûºÅ±í£¬²¢ÖÃÎ»Ò»¸öÈ«¾ÖµÄglobal¿é¡£
+ * åˆå§‹åŒ–ä¸€ä¸ªç¬¦å·è¡¨ï¼Œå¹¶ç½®ä½ä¸€ä¸ªå…¨å±€çš„globalå—ã€‚
  **/
 SymbolTable::SymbolTable() {
 	root = NULL;
 	present = NULL;
-
-	add_one_block();
-	root = present;
 }
 
 /*
- * ²åÈëÒ»¸ö¿é, ²¢½«presentÖ¸ÕëÖÃÎ»¡£ 
+ * æ’å…¥ä¸€ä¸ªå—, å¹¶å°†presentæŒ‡é’ˆç½®ä½ã€‚ 
  **/
 void SymbolTable::add_one_block() {
 	Block* temp = new Block();
@@ -20,16 +17,18 @@ void SymbolTable::add_one_block() {
 	if(present != NULL)
 		present->nexts.push_back(temp);
 	present = temp;
+	if (root == NULL)
+		root = present;
 }
 
 /*
- * Àë¿ªµ±Ç°¿é£¬·µ»ØÉÏÒ»²ã¡£
+ * ç¦»å¼€å½“å‰å—ï¼Œè¿”å›ä¸Šä¸€å±‚ã€‚
  **/
 void SymbolTable::exit_present_block() {
 	present = present->pre;
 }
 
-// ·µ»Øµ±Ç°¿éµÄÒıÓÃ
+// è¿”å›å½“å‰å—çš„å¼•ç”¨
 Block* SymbolTable::get_present_block() {
 	return present;
 }

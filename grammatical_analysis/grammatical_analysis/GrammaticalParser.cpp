@@ -209,6 +209,10 @@ void GrammaticalParser::__string(int level) {
 void GrammaticalParser::__program(int level)
 {
 	FLAG_ENTER("<程序>", level);
+	symbol_table.add_one_block();												// 进入当前块
+	SymbolFactory::create_function(symbol_table.get_present_block(),
+		"__global__",
+		BasicType::_void, vector<SymbolItem*>());
 	try {
 		// <常量说明>
 		if (_peek()->equal(SYMBOL::CONSTTK)) {
@@ -242,7 +246,7 @@ void GrammaticalParser::__program(int level)
 		throw e;
 	}
 	FLAG_PASS;
-	
+	symbol_table.exit_present_block();												// 离开当前块
 }
 
 /**
@@ -799,7 +803,7 @@ void GrammaticalParser::__factor(int level, bool *is_char) {
 			// SYMBOL_CHECK(SYMBOL::IDENFR);
 			__idenfr(level + 1, false);
 			// 在符号表中查找变量类型
-			SymbolItem* p = find_param(symbol_table.get_present_block(), token->token, true);
+			SymbolItem* p = find_const_var(symbol_table.get_present_block(), token->token, true);
 			if (p != NULL) {
 				if (p->var_type == BasicType::_char && is_char != NULL) {
 					*is_char = true;
@@ -928,7 +932,7 @@ void GrammaticalParser::__assign_statment(int level) {
 	
 	try {
 		__idenfr(level + 1 ,false);
-		SymbolItem* p = find_param(symbol_table.get_present_block(), token->token, true);
+		SymbolItem* p = find_const_var(symbol_table.get_present_block(), token->token, true);
 		if (p!=NULL) {
 			if (p->type == SymbolItemType::_const) {
 				_register_error(token->line, ErrorType::ConstModify);
@@ -1387,5 +1391,4 @@ void GrammaticalParser::__return_statement(int level, bool * has_return) {
 		throw e;
 	}
 	FLAG_PASS;
-	
 }

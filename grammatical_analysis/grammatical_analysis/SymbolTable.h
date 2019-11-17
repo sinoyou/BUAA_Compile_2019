@@ -28,7 +28,7 @@ void* find_indefr(Block* block, string name);
 void insert_one_record(Block* block, SymbolItem* record);
 void update_function_head(Block* block, SymbolItem* head);
 void* find_indefr_current(Block* block, string name);
-SymbolItem* find_param(Block* block, string name, bool recur);
+SymbolItem* find_const_var(Block* block, string name, bool recur);
 SymbolItem* find_func(Block* block, string name, bool recur);
 #endif // !__SYMBOL_TABLE_H__
 

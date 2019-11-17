@@ -7,7 +7,7 @@
 */
 void* find_indefr(Block* block, string name)
 {
-	void* p1 = find_param(block, name, true);
+	void* p1 = find_const_var(block, name, true);
 	void* p2 = find_func(block, name, true);
 	if (p1) {
 		return p1;
@@ -25,7 +25,7 @@ void* find_indefr(Block* block, string name)
 */
 void* find_indefr_current(Block* block, string name)
 {
-	void* p1 = find_param(block, name, false);
+	void* p1 = find_const_var(block, name, false);
 	void* p2 = find_func(block, name, false);
 	if (p1) {
 		return p1;
@@ -36,7 +36,7 @@ void* find_indefr_current(Block* block, string name)
 	return NULL;
 }
 
-SymbolItem* find_param(Block* block, string name, bool recur=true)
+SymbolItem* find_const_var(Block* block, string name, bool recur=true)
 {	
 	while (block != NULL) {
 		// 1 const
