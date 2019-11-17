@@ -30,12 +30,5 @@ void update_function_head(Block* block, SymbolItem* head);
 void* find_indefr_current(Block* block, string name);
 SymbolItem* find_param(Block* block, string name, bool recur);
 SymbolItem* find_func(Block* block, string name, bool recur);
-
-/* 中间代码生成辅助工具 */
-SymbolItem *get_label(Block* block, string comment);
-SymbolItem *get_temp(Block* block);
-
-
-
 #endif // !__SYMBOL_TABLE_H__
 

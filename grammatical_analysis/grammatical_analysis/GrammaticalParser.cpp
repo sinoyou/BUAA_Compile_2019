@@ -316,8 +316,7 @@ void GrammaticalParser::__const_def(int level)
 						_register_error(token->line, ErrorType::ConstDefWrong);
 					}
 					// 正确无误后再输入表中
-					SymbolItem* item = new SymbolItem(name, SymbolItemType::_const, type, const_value);
-					insert_one_record(symbol_table.get_present_block(), item);
+					SymbolFactory::create_const(symbol_table.get_present_block(), name, type, const_value);
 				}
 				catch (ParseException& e) {
 					_register_error(_peek()->line, ErrorType::ConstDefWrong);
@@ -498,8 +497,7 @@ void GrammaticalParser::__var_def(int level)
 				SYMBOL_CHECK(SYMBOL::RBRACK);
 				is_array = true;
 			}
-			SymbolItem* t = new SymbolItem(idenfr_name, SymbolItemType::_variable, type, is_array);
-			insert_one_record(symbol_table.get_present_block(), t);
+			SymbolFactory::create_variable(symbol_table.get_present_block(), idenfr_name, type, is_array);
 		} while (_peek()->equal(SYMBOL::COMMA));
 	}
 	catch (ParseException& e) {
@@ -544,19 +542,15 @@ void GrammaticalParser::__function_return(int level) {
 	try {
 		BasicType return_type;
 		string func_name;
-		vector<SymbolItem*>* para_list = new vector<SymbolItem*>();
+		vector<SymbolItem*> para_list;
 
 		__declar_head(level + 1, &return_type, &func_name);
 
 		SYMBOL_CHECK(SYMBOL::LPARENT);
-		__parameter_list(level + 1, para_list);
+		__parameter_list(level + 1, &para_list);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
-		// 函数头声明完毕，可以更新函数的SymbolItem部件了, 并将函数中的参数插入到SymbolTable中
-		SymbolItem* func_head = new SymbolItem(func_name, SymbolItemType::function, return_type, *para_list);
-		for (auto it = para_list->begin(); it != para_list->end(); it++) {
-			insert_one_record(symbol_table.get_present_block(), *it);
-		}
-		update_function_head(symbol_table.get_present_block(), func_head);
+		// 函数头声明完毕，可以更新函数的SymbolItem部件了.
+		SymbolFactory::create_function(symbol_table.get_present_block(), func_name, return_type, para_list);
 		
 		SYMBOL_CHECK(SYMBOL::LBRACE);
 		bool has_return = false;
@@ -589,20 +583,17 @@ void GrammaticalParser::__function_void(int level) {
 	try {
 		BasicType return_type = BasicType::_void;
 		string func_name;
-		vector<SymbolItem*>* para_list = new vector<SymbolItem*>();
+		vector<SymbolItem*> para_list;
 
 		SYMBOL_CHECK(SYMBOL::VOIDTK);
 		func_name = __idenfr(level + 1, true);
 
 		SYMBOL_CHECK(SYMBOL::LPARENT);
-		__parameter_list(level + 1, para_list);
+		__parameter_list(level + 1, &para_list);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
-		// 函数头声明完毕，可以更新函数的SymbolItem部件了, 并将函数中的参数插入到SymbolTable中
-		SymbolItem* func_head = new SymbolItem(func_name, SymbolItemType::function, return_type, *para_list);
-		for (auto it = para_list->begin(); it != para_list->end(); it++) {
-			insert_one_record(symbol_table.get_present_block(), *it);
-		}
-		update_function_head(symbol_table.get_present_block(), func_head);
+		// 函数头声明完毕，可以更新函数的SymbolItem部件了.
+		SymbolFactory::create_function(symbol_table.get_present_block(), func_name, return_type, para_list);
+
 
 		SYMBOL_CHECK(SYMBOL::LBRACE);
 		bool has_return = false;
@@ -610,10 +601,6 @@ void GrammaticalParser::__function_void(int level) {
 
 		// RECUR_CHECK(__compound_statement, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::RBRACE);
-		// unit4-error h
-		if (!has_return) {
-			_register_error(token->line, ErrorType::ReturnError);
-		}
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
@@ -672,7 +659,7 @@ void GrammaticalParser::__parameter_list(int level, vector<SymbolItem*>* para_li
 				BasicType type = __type_idenfr(level + 1);
 				string name = __idenfr(level + 1, true);
 				// 插入类型表示
-				SymbolItem* para = new SymbolItem(name, SymbolItemType::_variable,type,false);
+				SymbolItem* para = SymbolFactory::create_variable(symbol_table.get_present_block(),name, type, false);
 				para_list->push_back(para);
 			} while (_peek()->equal(SYMBOL::COMMA));
 		}
@@ -697,8 +684,7 @@ void GrammaticalParser::__main_function(int level)
 {
 	FLAG_ENTER("<主函数>", level);
 	symbol_table.add_one_block();												// 进入当前块
-	SymbolItem* item = new SymbolItem("main", SymbolItemType::function, BasicType::_void, vector<SymbolItem*>());
-	update_function_head(symbol_table.get_present_block(), item);
+	SymbolFactory::create_function(symbol_table.get_present_block(), "main", BasicType::_void, vector<SymbolItem*>());
 	try {
 		SYMBOL_CHECK(SYMBOL::VOIDTK);				// void
 		SYMBOL_CHECK(SYMBOL::MAINTK);				// main
@@ -1178,7 +1164,6 @@ void GrammaticalParser::__function_call_void(int level) {
 
 			SYMBOL_CHECK(SYMBOL::LPARENT);
 			__value_parameter_list(level + 1, &(p->paramsList));
-			// RECUR_CHECK(__value_parameter_list, RECUR_DEFAULT);
 			SYMBOL_CHECK(SYMBOL::RPARENT);
 		}
 	}

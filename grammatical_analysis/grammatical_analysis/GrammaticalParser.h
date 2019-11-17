@@ -9,6 +9,7 @@
 #include "ParseException.h"
 #include "error.h"
 #include "SymbolTable.h"
+#include "SymbolFactory.h"
 
 using namespace std;
 
