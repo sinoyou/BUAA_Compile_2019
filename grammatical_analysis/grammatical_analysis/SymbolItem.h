@@ -34,8 +34,8 @@ public:
 	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, int const_value):
 		block(block), name(name), type(type), var_type(var_type), const_value(const_value){}
 	// create as var
-	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, bool is_array) :
-		block(block), name(name), type(type), var_type(var_type), isArray(is_array){}
+	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, int size, bool is_array) :
+		block(block), name(name), type(type), var_type(var_type), array_size(size), isArray(is_array){}
 	// create as label
 	SymbolItem(Block* block, string name, SymbolItemType type):
 		block(block), name(name), type(type){}
@@ -64,6 +64,7 @@ public:
 	int const_value;
 	// ±‰¡ø - special
 	bool isArray;
+	int array_size;
 
 	// ±Í«© - special
 	// None

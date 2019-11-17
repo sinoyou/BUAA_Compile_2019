@@ -29,8 +29,8 @@ SymbolItem* SymbolFactory::create_const(Block* block, string name, BasicType typ
 /*
  * 创建并向符号表中的指定块插入一个SymbolItem（变量型）
 */
-SymbolItem* SymbolFactory::create_variable(Block* block, string name, BasicType type, bool is_array) {
-	SymbolItem* p = new SymbolItem(block, name, SymbolItemType::_variable, type, is_array);
+SymbolItem* SymbolFactory::create_variable(Block* block, string name, BasicType type, int size, bool isArray) {
+	SymbolItem* p = new SymbolItem(block, name, SymbolItemType::_variable, type, size, isArray);
 	insert_one_record(block, p);
 	return p;
 }

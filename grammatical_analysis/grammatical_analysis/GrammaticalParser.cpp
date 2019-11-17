@@ -498,14 +498,15 @@ void GrammaticalParser::__var_def(int level)
 			string idenfr_name = __idenfr(level + 1, true);
 			bool is_array = false;
 			// '[' <无符号整数> ']'
+			int size = 1;
 			if (_peek()->equal(SYMBOL::LBRACK)) {
 				SYMBOL_CHECK(SYMBOL::LBRACK);
-				__unsigned_integer(level + 1);
+				size = __unsigned_integer(level + 1);
 				SYMBOL_CHECK(SYMBOL::RBRACK);
 				is_array = true;
 			}
 			SymbolItem* temp = 
-				SymbolFactory::create_variable(block, idenfr_name, type, is_array);
+				SymbolFactory::create_variable(block, idenfr_name, type, size, is_array);
 			GetVarDeclarQuater(temp);
 		} while (_peek()->equal(SYMBOL::COMMA));
 	}
@@ -678,7 +679,7 @@ void GrammaticalParser::__parameter_list(int level, vector<SymbolItem*>* para_li
 				BasicType type = __type_idenfr(level + 1);
 				string name = __idenfr(level + 1, true);
 				// 插入类型表示
-				SymbolItem* para = SymbolFactory::create_variable(symbol_table.get_present_block(),name, type, false);
+				SymbolItem* para = SymbolFactory::create_variable(symbol_table.get_present_block(),name, type, 1, false);
 				para_list->push_back(para);
 			} while (_peek()->equal(SYMBOL::COMMA));
 		}
