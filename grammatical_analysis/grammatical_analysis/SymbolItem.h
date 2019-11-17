@@ -20,22 +20,34 @@ enum SymbolItemType
 enum BasicType {
 	_char,
 	_int,
-	_void
+	_void,
+	_string
 };
 
 /* 符号表项的统一结构 */
 class SymbolItem {
 public:
 	// create as function
-	SymbolItem(Block* block, string name, SymbolItemType type, BasicType return_type, vector<SymbolItem*> paramsList);
+	SymbolItem(Block* block, string name, SymbolItemType type, BasicType return_type, vector<SymbolItem*> paramsList):
+		block(block), name(name), type(type), return_type(return_type), paramsList(paramsList){}
 	// create as const
-	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, int const_value);
+	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, int const_value):
+		block(block), name(name), type(type), var_type(var_type), const_value(const_value){}
 	// create as var
-	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, bool is_array);
+	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, bool is_array) :
+		block(block), name(name), type(type), var_type(var_type), isArray(is_array){}
 	// create as label
-	SymbolItem(Block* block, string name, SymbolItemType type);
-	// create as temp-var
-	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type);
+	SymbolItem(Block* block, string name, SymbolItemType type):
+		block(block), name(name), type(type){}
+	// create as temp-var - normal
+	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type) :
+		block(block), name(name), type(type), var_type(var_type){}
+	// create as temp-var - const
+	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, bool temp_const, int value):
+		block(block), name(name), type(type), var_type(var_type), temp_const(temp_const), temp_const_value(value){}
+	// create as temp-var - string
+	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, bool temp_const, string strcon):
+		block(block), name(name), type(type), var_type(var_type), temp_const(temp_const), temp_strcon(strcon){}
 
 
 	string name;
@@ -57,7 +69,9 @@ public:
 	// None
 
 	// 临时变量 - special
-	// None
+	bool temp_const = false;
+	string temp_strcon;
+	int temp_const_value;
 
 };
 

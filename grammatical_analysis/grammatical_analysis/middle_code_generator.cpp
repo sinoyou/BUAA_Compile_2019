@@ -83,6 +83,14 @@ Quaternary* GetFuncDeclarQuater(SymbolItem* result) {
 	return p;
 }
 
+// FuncParaDeclar
+Quaternary* GetFuncParaDeclarQuater(SymbolItem* result) {
+	assert_v(result);
+	Quaternary* p = new Quaternary(QuaterType::FuncParaDeclar, NULL, NULL, result);
+	QuaterList.push_back(p);
+	return p;
+}
+
 // FuncParaPush
 Quaternary* GetFuncParaPushQuater(SymbolItem* A) {
 	assert_vct(A);
@@ -110,7 +118,7 @@ Quaternary* GetAssignRetQuater(SymbolItem* result) {
 // FuncRet
 Quaternary* GetFuncRetQuater(SymbolItem* A) {
 	if (A != NULL) 
-		assert_vt(A);
+		assert_vct(A);
 	Quaternary* p = new Quaternary(QuaterType::FuncRet, A, NULL, NULL);
 	QuaterList.push_back(p);
 	return p;
@@ -162,6 +170,16 @@ Quaternary* GetAssignQuater(SymbolItem* A, SymbolItem* Result) {
 	assert_vct(A);
 	assert_vt(Result);
 	Quaternary* p = new Quaternary(QuaterType::Assign, A, NULL, Result);
+	QuaterList.push_back(p);
+	return p;
+}
+
+// Assign Array
+Quaternary* GetAssignArrayQuater(SymbolItem* A, SymbolItem* B,SymbolItem* Result) {
+	assert_vct(A);		// value
+	assert_vct(B);		// index
+	assert_v(Result);	// idenfr
+	Quaternary* p = new Quaternary(QuaterType::AssignArray, A, B, Result);
 	QuaterList.push_back(p);
 	return p;
 }
@@ -235,17 +253,19 @@ Quaternary* GetGotoQuater(SymbolItem* A) {
 }
 
 // Bnz
-Quaternary* GetBnzQuater(SymbolItem* A) {
-	assert_l(A);
-	Quaternary* p = new Quaternary(QuaterType::Bnz, A, NULL, NULL);
+Quaternary* GetBnzQuater(SymbolItem* label, SymbolItem* condition) {
+	assert_l(label);
+	assert_vct(condition);
+	Quaternary* p = new Quaternary(QuaterType::Bnz, label, condition, NULL);
 	QuaterList.push_back(p);
 	return p;
 }
 
 // Bz
-Quaternary* GetBzQuater(SymbolItem* A) {
-	assert_l(A);
-	Quaternary* p = new Quaternary(QuaterType::Bz, A, NULL, NULL);
+Quaternary* GetBzQuater(SymbolItem* label, SymbolItem* condition) {
+	assert_l(label);
+	assert_vct(condition);
+	Quaternary* p = new Quaternary(QuaterType::Bz, label, condition, NULL);
 	QuaterList.push_back(p);
 	return p;
 }
@@ -254,6 +274,32 @@ Quaternary* GetBzQuater(SymbolItem* A) {
 Quaternary* GetSetLabelQuater(SymbolItem* A) {
 	assert_l(A);
 	Quaternary* p = new Quaternary(QuaterType::SetLabel, A, NULL, NULL);
+	QuaterList.push_back(p);
+	return p;
+}
+
+// ArrayQuery
+Quaternary* GetArrayQueryQuater(SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	assert_v(A);
+	assert_vct(B);
+	assert_vt(Result);
+	Quaternary* p = new Quaternary(QuaterType::ArrayQuery, A, B, Result);
+	QuaterList.push_back(p);
+	return p;
+}
+
+// Scan
+Quaternary* GetScanQuater(SymbolItem* Result) {
+	assert_v(Result);
+	Quaternary* p = new Quaternary(QuaterType::Scan, NULL, NULL, Result);
+	QuaterList.push_back(p);
+	return p;
+}
+
+// Print
+Quaternary* GetPrintQuater(SymbolItem* A) {
+	assert_vct(A);
+	Quaternary* p = new Quaternary(QuaterType::Print, A, NULL, NULL);
 	QuaterList.push_back(p);
 	return p;
 }

@@ -24,6 +24,8 @@
     <ClInclude Include="error.h" />
     <ClInclude Include="ParseException.h" />
     <ClInclude Include="GrammaticalParser.h" />
+    <ClInclude Include="Quaternary.h" />
+    <ClInclude Include="SymbolFactory.h" />
     <ClInclude Include="SymbolItem.h" />
     <ClInclude Include="SymbolTable.h" />
     <ClInclude Include="Token.h" />
@@ -36,8 +38,11 @@
   <ItemGroup>
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="check.cpp" />
+    <ClCompile Include="middle_code_generator.cpp" />
+    <ClCompile Include="middle_code_printer.cpp" />
     <ClCompile Include="ParseException.cpp" />
     <ClCompile Include="GrammaticalParser.cpp" />
+    <ClCompile Include="SymbolFactory.cpp" />
     <ClCompile Include="SymbolItem.cpp" />
     <ClCompile Include="SymbolTable.cpp" />
     <ClCompile Include="symbol_table_utils.cpp" />

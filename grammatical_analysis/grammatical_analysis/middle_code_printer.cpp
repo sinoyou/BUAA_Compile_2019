@@ -1,0 +1,30 @@
+#include "Quaternary.h"
+
+void PutQuaterHandler(vector<string>* PutList, vector<Quaternary>* QuaterList);
+string PutVarDeclarQuater(Quaternary* Q);
+string PutConstDeclarQuater(Quaternary* Q);
+string PutFuncDeclarQuater(Quaternary* Q);
+string PutFuncParaDeclarQuater(Quaternary* Q);
+string PutFuncParaPushQuater(Quaternary* Q);
+string PutFuncCallQuater(Quaternary* Q);
+string PutAssignRetQuater(Quaternary* Q);
+string PutFuncRetQuater(Quaternary* Q);
+string PutAddQuater(Quaternary* Q);
+string PutSubQuater(Quaternary* Q);
+string PutMultQuater(Quaternary* Q);
+string PutDivQuater(Quaternary* Q);
+string PutAssignQuater(Quaternary* Q);
+string PutAssignArrayQuater(Quaternary* Q);
+string PutEqlCmpQuater(Quaternary* Q);
+string PutNeqCmpQuater(Quaternary* Q);
+string PutGtCmpQuater(Quaternary* Q);
+string PutGeqCmpQuater(Quaternary* Q);
+string PutLtCmpQuater(Quaternary* Q);
+string PutLeqCmpQuater(Quaternary* Q);
+string PutGotoQuater(Quaternary* Q);
+string PutBnzQuater(Quaternary* Q);
+string PutBzQuater(Quaternary* Q);
+string PutSetLabelQuater(Quaternary* Q);
+string PutArrayQueryQuater(Quaternary* Q);
+string PutScanQuater(Quaternary* Q);
+string PutPrintQuater(Quaternary* Q);

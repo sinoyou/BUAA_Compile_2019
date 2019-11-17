@@ -10,6 +10,7 @@
 #include "error.h"
 #include "SymbolTable.h"
 #include "SymbolFactory.h"
+#include "Quaternary.h"
 
 using namespace std;
 
@@ -95,7 +96,7 @@ private:
 	void __number(int level);
 	void __non_zero_number(int level);
 	char __char(int level);
-	void __string(int level);
+	string __string(int level);
 	void __program(int level);
 	void __const_description(int level);
 	void __const_def(int level);
@@ -111,16 +112,16 @@ private:
 	void __compound_statement(int level,bool* has_return);
 	void __parameter_list(int level, vector<SymbolItem*>* para_list);
 	void __main_function(int level);
-	void __expression(int level, bool * is_char);
-	void __item(int level, bool *is_char);
-	void __factor(int level, bool *is_char);
+	SymbolItem* __expression(int level, bool * is_char);
+	SymbolItem* __item(int level, bool *is_char);
+	SymbolItem* __factor(int level, bool *is_char);
 	void __statement(int level, bool* has_return);
 	void __assign_statment(int level);
 	void __condition_statement(int level, bool *has_return);
-	void __condition(int level);
+	SymbolItem* __condition(int level);
 	void __loop_statement(int level, bool *has_return);
-	void __step_length(int level);
-	void __function_call_return(int level);
+	int __step_length(int level);
+	SymbolItem* __function_call_return(int level);
 	void __function_call_void(int level);
 	void __value_parameter_list(int level, vector<SymbolItem*>* params);
 	void __statement_list(int level, bool* has_return);

@@ -31,6 +31,12 @@
     <Filter Include="Header Files\class\symbol_table">
       <UniqueIdentifier>{c706f5a7-212a-45d6-bae4-4956215e021f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\class\middle_code">
+      <UniqueIdentifier>{69911021-a632-4452-b33f-5d55dd761b17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\class\middle_code">
+      <UniqueIdentifier>{59825c5f-db43-4c57-9d63-4fa795d10a4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Token.h">
@@ -71,6 +77,12 @@
     </ClInclude>
     <ClInclude Include="Block.h">
       <Filter>Header Files\class\symbol_table</Filter>
+    </ClInclude>
+    <ClInclude Include="SymbolFactory.h">
+      <Filter>Header Files\class\symbol_table</Filter>
+    </ClInclude>
+    <ClInclude Include="Quaternary.h">
+      <Filter>Header Files\class\middle_code</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +127,15 @@
     </ClCompile>
     <ClCompile Include="Block.cpp">
       <Filter>Source Files\class\symbol_table</Filter>
+    </ClCompile>
+    <ClCompile Include="SymbolFactory.cpp">
+      <Filter>Source Files\class\symbol_table</Filter>
+    </ClCompile>
+    <ClCompile Include="middle_code_generator.cpp">
+      <Filter>Source Files\class\middle_code</Filter>
+    </ClCompile>
+    <ClCompile Include="middle_code_printer.cpp">
+      <Filter>Source Files\class\middle_code</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

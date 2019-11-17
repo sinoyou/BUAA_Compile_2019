@@ -182,7 +182,7 @@ char GrammaticalParser::__char(int level) {
  * FIRST: "
  * !: 词法分析时由于已经忽略了双引号"并判断了字符，因此该规则匹配不完全严格.
 */
-void GrammaticalParser::__string(int level) {
+string GrammaticalParser::__string(int level) {
 	FLAG_ENTER("<字符串>", level);
 	try {
 		SYMBOL_CHECK(SYMBOL::STRCON);
@@ -192,7 +192,7 @@ void GrammaticalParser::__string(int level) {
 		throw e;
 	}
 	FLAG_PASS;
-	
+	return token->token;
 }
 
 /**
@@ -287,6 +287,8 @@ void GrammaticalParser::__const_description(int level)
 void GrammaticalParser::__const_def(int level)
 {
 	FLAG_ENTER("<常量定义>", level);
+	Block* block = symbol_table.get_present_block();
+
 	try {
 		if (_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) {
 			BasicType type;
@@ -303,7 +305,7 @@ void GrammaticalParser::__const_def(int level)
 
 			int cnt = 0;
 			do {
-				if (cnt++ > 0)
+				if (cnt ++ > 0)
 					SYMBOL_CHECK(SYMBOL::COMMA);
 				name = __idenfr(level + 1, true);
 				SYMBOL_CHECK(SYMBOL::ASSIGN);
@@ -320,7 +322,9 @@ void GrammaticalParser::__const_def(int level)
 						_register_error(token->line, ErrorType::ConstDefWrong);
 					}
 					// 正确无误后再输入表中
-					SymbolFactory::create_const(symbol_table.get_present_block(), name, type, const_value);
+					SymbolItem* temp = 
+						SymbolFactory::create_const(block, name, type, const_value);
+					GetConstDeclarQuater(temp);
 				}
 				catch (ParseException& e) {
 					_register_error(_peek()->line, ErrorType::ConstDefWrong);
@@ -483,10 +487,9 @@ void GrammaticalParser::__var_description(int level)
 void GrammaticalParser::__var_def(int level)
 {
 	FLAG_ENTER("<变量定义>", level);
+	Block* block = symbol_table.get_present_block();
 	try {
-		__type_idenfr(level + 1);
-		BasicType type = (token->symbol == SYMBOL::CHARTK) ? BasicType::_char : BasicType::_int;
-		
+		BasicType type = __type_idenfr(level + 1);
 		int cnt = 0;
 		// {} 
 		do {
@@ -501,7 +504,9 @@ void GrammaticalParser::__var_def(int level)
 				SYMBOL_CHECK(SYMBOL::RBRACK);
 				is_array = true;
 			}
-			SymbolFactory::create_variable(symbol_table.get_present_block(), idenfr_name, type, is_array);
+			SymbolItem* temp = 
+				SymbolFactory::create_variable(block, idenfr_name, type, is_array);
+			GetVarDeclarQuater(temp);
 		} while (_peek()->equal(SYMBOL::COMMA));
 	}
 	catch (ParseException& e) {
@@ -554,7 +559,12 @@ void GrammaticalParser::__function_return(int level) {
 		__parameter_list(level + 1, &para_list);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 		// 函数头声明完毕，可以更新函数的SymbolItem部件了.
-		SymbolFactory::create_function(symbol_table.get_present_block(), func_name, return_type, para_list);
+		SymbolItem* func_head = 
+			SymbolFactory::create_function(symbol_table.get_present_block(), func_name, return_type, para_list);
+		GetFuncDeclarQuater(func_head);
+		for (auto it = para_list.begin(); it != para_list.end(); it++) {
+			GetFuncParaDeclarQuater(*it);
+		}
 		
 		SYMBOL_CHECK(SYMBOL::LBRACE);
 		bool has_return = false;
@@ -596,12 +606,17 @@ void GrammaticalParser::__function_void(int level) {
 		__parameter_list(level + 1, &para_list);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 		// 函数头声明完毕，可以更新函数的SymbolItem部件了.
-		SymbolFactory::create_function(symbol_table.get_present_block(), func_name, return_type, para_list);
-
+		SymbolItem * func_head = 
+			SymbolFactory::create_function(symbol_table.get_present_block(), func_name, return_type, para_list);
+		GetFuncDeclarQuater(func_head);
+		for (auto it = para_list.begin(); it != para_list.end(); it++) {
+			GetFuncParaDeclarQuater(*it);
+		}
 
 		SYMBOL_CHECK(SYMBOL::LBRACE);
 		bool has_return = false;
 		__compound_statement(level + 1, &has_return);
+		GetFuncRetQuater(NULL);							// 无返回值函数强行增加一个return
 
 		// RECUR_CHECK(__compound_statement, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::RBRACE);
@@ -717,9 +732,12 @@ void GrammaticalParser::__main_function(int level)
  * FOLLOW(<表达式>) = {RBRACK, RPARENT, GRE,GEQ,LSS,LEQ,NEQ,EQL, COMMA} + {SEMICN}(<赋值语句新增>)
  * FIRST<加法运算符> 与 FOLLOW<表达式> 没有交集, 因此无回溯.
 */
-void GrammaticalParser::__expression(int level, bool *is_char) {
+SymbolItem* GrammaticalParser::__expression(int level, bool *is_char) {
 	FLAG_ENTER("<表达式>", level);
 	int cnt = 0;
+	bool neg = false;
+	SymbolItem* first_item;
+	Block* block = symbol_table.get_present_block();
 	try {
 		// match +/- if have
 		if (_peek()->equal(SYMBOL::PLUS)) {
@@ -727,29 +745,41 @@ void GrammaticalParser::__expression(int level, bool *is_char) {
 		}
 		else if (_peek()->equal(SYMBOL::MINU)) {
 			SYMBOL_CHECK(SYMBOL::MINU);
+			neg = true;
 		}
 
-		// RECUR_CHECK(__item, RECUR_DEFAULT);								// <项>
 		bool temp = false;
-		__item(level + 1, &temp);
+		first_item = __item(level + 1, &temp);
 		cnt++;
 		while (_peek()->equal(SYMBOL::PLUS) || _peek()->equal(SYMBOL::MINU)) {
+			Token* op = _peek();
 			__add_operator(level + 1);
-			// RECUR_CHECK(__item, RECUR_DEFAULT);
-			bool tempx = false;
-			__item(level + 1, &temp);
+			SymbolItem* second_item = __item(level + 1, NULL);
 			cnt++;
+
+			// 根据操作符的差异，生成不同的中间式 - begin
+			SymbolItem* temp_item = SymbolFactory::create_temp(block, BasicType::_int);
+			if (op->equal(SYMBOL::PLUS)) 
+				GetAddQuater(first_item, second_item, temp_item);
+			else 
+				GetSubQuater(first_item, second_item, temp_item);
+			first_item = temp_item;
+			// end
 		}
 		// 表达式只有一个项且这个项是char，那么表达式就是char型
 		if (cnt == 1 && temp && is_char != NULL)
 			* is_char = true;
+		// 取负操作
+		if (neg) {
+			GetSubQuater(NULL, first_item, first_item);
+		}
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
 		throw e;
 	}
 	FLAG_PASS;
-	
+	return first_item;
 }
 
 
@@ -761,20 +791,28 @@ void GrammaticalParser::__expression(int level, bool *is_char) {
  * FOLLOW(<项>) = {RBRACK, RPARENT, GRE,GEQ,LSS,LEQ,NEQ,EQL, COMMA, SEMICN} + {PLUS, MINU}
  * FIRST 与 FOLLOW 交集，故不存在回溯
 */
-void GrammaticalParser::__item(int level, bool *is_char) {
+SymbolItem* GrammaticalParser::__item(int level, bool *is_char) {
 	FLAG_ENTER("<项>", level);
 	int cnt = 0;
+	Block* block = symbol_table.get_present_block();
+	SymbolItem* first_factor;
 	try {
 		bool temp = false;
-		__factor(level + 1, &temp);
+		first_factor = __factor(level + 1, &temp);
 		cnt++;
-		// RECUR_CHECK(__factor, RECUR_DEFAULT);
 		while (_peek()->equal(SYMBOL::MULT) || _peek()->equal(SYMBOL::DIV)) {
+			Token* op = _peek();
 			__mult_operator(level + 1);
-			bool tempx = false;
-			// RECUR_CHECK(__factor, RECUR_DEFAULT);
-			__factor(level + 1, &tempx);
+			SymbolItem* secord_factor = __factor(level + 1, NULL);
 			cnt++;
+
+			// 根据操作符，生成相应中间代码
+			SymbolItem* temp = SymbolFactory::create_temp(block, BasicType::_int);
+			if (op->equal(SYMBOL::MULT))
+				GetMultQuater(first_factor, secord_factor, temp);
+			else
+				GetDivQuater(first_factor, secord_factor, temp);
+			first_factor = temp;
 		}
 		// 若果只有一个因子并且因子为char，则为char
 		if (cnt == 1 && temp && is_char) {
@@ -786,7 +824,7 @@ void GrammaticalParser::__item(int level, bool *is_char) {
 		throw e;
 	}
 	FLAG_PASS;
-	
+	return first_factor;
 }
 
 /**
@@ -795,12 +833,13 @@ void GrammaticalParser::__item(int level, bool *is_char) {
  * !: 因子的前两种选择不满足FIRST集合不相交的原则，改写为<标识符>[ '[' <表达式> ']' ]，
  *    并且FIRST([...]) = {LBRACK} 与 FOLLOW{<因子>} = {MULT, DIV} + FOLLOW(<项>)没有交集
 */
-void GrammaticalParser::__factor(int level, bool *is_char) {
+SymbolItem* GrammaticalParser::__factor(int level, bool *is_char) {
 	FLAG_ENTER("<因子>", level);
+	Block* block = symbol_table.get_present_block();
+	SymbolItem* factor;
 	try {
 		// <标识符> [ '[' <表达式> ']' ] 
 		if (_peek()->equal(SYMBOL::IDENFR) && !_peek(2)->equal(SYMBOL::LPARENT)) {
-			// SYMBOL_CHECK(SYMBOL::IDENFR);
 			__idenfr(level + 1, false);
 			// 在符号表中查找变量类型
 			SymbolItem* p = find_const_var(symbol_table.get_present_block(), token->token, true);
@@ -809,45 +848,59 @@ void GrammaticalParser::__factor(int level, bool *is_char) {
 					*is_char = true;
 				}
 			}
+			// 数组类型
 			if (_peek()->equal(SYMBOL::LBRACK)) {
 				bool char_detector = false;
 				SYMBOL_CHECK(SYMBOL::LBRACK);
-				__expression(level + 1, &char_detector);
+				SymbolItem* index = __expression(level + 1, &char_detector);
 				// unit4-error-i
 				if (char_detector) {
 					_register_error(token->line, ErrorType::ArrayIndexWrong);
 				}
 				SYMBOL_CHECK(SYMBOL::RBRACK);
+				factor = SymbolFactory::create_temp(block, p->var_type);
+				GetArrayQueryQuater(p, index, factor);
+			}
+			// 非数组类型
+			else {
+				factor = p;
 			}
 		}
 		// ＜有返回值函数调用语句＞  
 		else if (_peek()->equal(SYMBOL::IDENFR) && _peek(2)->equal(SYMBOL::LPARENT)) {
 			string name = _peek()->token;
-			__function_call_return(level + 1);
 			// 在符号表中查找函数类型
+			BasicType type = BasicType::_int;
 			SymbolItem* p = find_func(symbol_table.get_present_block(), name, true);
 			if (p != NULL) {
 				if (p->return_type == BasicType::_char && is_char != NULL) {
 					*is_char = true;
+					type = BasicType::_char;
 				}
 			}
+			factor = __function_call_return(level + 1);
 		}
 		// '(' <表达式> ')'
 		else if (_peek()->equal(SYMBOL::LPARENT)) {
+			// 由于表达式周围存在()括号，因此char必须强行转换为int.
 			SYMBOL_CHECK(SYMBOL::LPARENT);
-			__expression(level + 1, NULL);
+			SymbolItem* temp = __expression(level + 1, NULL);
+			factor = SymbolFactory::create_temp(block, BasicType::_int);
+			GetAssignQuater(temp, factor);
 			SYMBOL_CHECK(SYMBOL::RPARENT);
 		}
 		// <整数>
 		else if (_peek()->equal(SYMBOL::PLUS) || _peek()->equal(SYMBOL::MINU) || _peek()->equal(SYMBOL::INTCON)) {
-			__integer(level + 1);
+			int value = __integer(level + 1);
+			factor = SymbolFactory::create_temp_const(block, BasicType::_int, value);
 		}
 		// <字符>
 		else if (_peek()->equal(SYMBOL::CHARCON)) {
-			__char(level + 1);
+			char c = __char(level + 1);
 			if (is_char) {
 				*is_char = true;
 			}
+			factor = SymbolFactory::create_temp_const(block, BasicType::_char, c);
 		}
 		else {
 			throw ParseException(ParseExceptionType::UnknownBranch, string("<factor>"));
@@ -858,7 +911,7 @@ void GrammaticalParser::__factor(int level, bool *is_char) {
 		throw e;
 	}
 	FLAG_PASS;
-	
+	return factor;
 }
 
 /**
@@ -929,20 +982,21 @@ void GrammaticalParser::__statement(int level, bool * has_return)
 */
 void GrammaticalParser::__assign_statment(int level) {
 	FLAG_ENTER("<赋值语句>", level);
+	Block* block = symbol_table.get_present_block();
 	
 	try {
-		__idenfr(level + 1 ,false);
-		SymbolItem* p = find_const_var(symbol_table.get_present_block(), token->token, true);
+		string name = __idenfr(level + 1 ,false);
+		SymbolItem* p = find_const_var(symbol_table.get_present_block(), name, true);
 		if (p!=NULL) {
 			if (p->type == SymbolItemType::_const) {
 				_register_error(token->line, ErrorType::ConstModify);
 			}
 		}
+		SymbolItem* index = NULL;
 		if (_peek()->equal(SYMBOL::LBRACK)) {
 			SYMBOL_CHECK(SYMBOL::LBRACK);
 			bool char_detector = false;
-			// RECUR_CHECK(__expression, RECUR_DEFAULT);
-			__expression(level + 1, &char_detector);
+			index = __expression(level + 1, &char_detector);
 			// unit4-error-i
 			if (char_detector) {
 				_register_error(token->line, ErrorType::ArrayIndexWrong);
@@ -950,7 +1004,11 @@ void GrammaticalParser::__assign_statment(int level) {
 			SYMBOL_CHECK(SYMBOL::RBRACK);
 		}
 		SYMBOL_CHECK(SYMBOL::ASSIGN);					// ASSIGN: = ,  EQL: ==
-		__expression(level + 1, NULL);
+		SymbolItem* exp = __expression(level + 1, NULL);
+		if (index)
+			GetAssignArrayQuater(exp, index, p);
+		else
+			GetAssignQuater(exp, p);
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
@@ -971,21 +1029,28 @@ void GrammaticalParser::__assign_statment(int level) {
 */
 void GrammaticalParser::__condition_statement(int level, bool* has_return) {
 	FLAG_ENTER("<条件语句>", level);
+	Block* block = symbol_table.get_present_block();
+	SymbolItem* else_label = SymbolFactory::create_label(block, "else");
+	SymbolItem* if_end_label = SymbolFactory::create_label(block, "endif");
 
 	try {
 		SYMBOL_CHECK(SYMBOL::IFTK);
 		SYMBOL_CHECK(SYMBOL::LPARENT);
-		__condition(level + 1);
+		SymbolItem* condition = __condition(level + 1);
+		GetBzQuater(else_label, condition);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 
-		// RECUR_CHECK(__statement, RECUR_DEFAULT);
 		__statement(level + 1, has_return);
+
+		GetGotoQuater(if_end_label);
+		GetSetLabelQuater(else_label);
 
 		if (_peek()->equal(SYMBOL::ELSETK)) {
 			SYMBOL_CHECK(SYMBOL::ELSETK);
-			// RECUR_CHECK(__statement, RECUR_DEFAULT);
 			__statement(level + 1, has_return);
 		}
+
+		GetSetLabelQuater(if_end_label);
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
@@ -1003,22 +1068,45 @@ void GrammaticalParser::__condition_statement(int level, bool* has_return) {
  * FOLLOW<条件> = {SIMICN, RPARENT}, 与FIRST(<关系运算符> <表达式>)无交集
  * FIRST(<关系运算符> <表达式>) = {GRE, GEQ, LSS, LEQ, NEQ, EQL}
 */
-void GrammaticalParser::__condition(int level) {
+SymbolItem* GrammaticalParser::__condition(int level) {
 	FLAG_ENTER("<条件>", level);
-
+	Block* block = symbol_table.get_present_block();
+	SymbolItem* condition;
 	try {
 		bool char_detector = false;
-		__expression(level + 1, &char_detector);
-		// RECUR_CHECK(__expression, RECUR_DEFAULT);
+		SymbolItem * exp1 = __expression(level + 1, &char_detector);
+		SymbolItem* exp2 = NULL;
 
+		Token* t = NULL;
 		if (_peek()->equal(SYMBOL::GRE) || _peek()->equal(SYMBOL::GEQ) || _peek()->equal(SYMBOL::LSS) ||
 			_peek()->equal(SYMBOL::LEQ) || _peek()->equal(SYMBOL::NEQ) || _peek()->equal(SYMBOL::EQL)) {
-			__rel_operator(level + 1);									// <关系运算符>
-			__expression(level + 1, &char_detector);					// <表达式>
+			t = _peek();
+			__rel_operator(level + 1);														// <关系运算符>
+			exp2 = __expression(level + 1, &char_detector);					// <表达式>
 		}
 		// uni4-error-f
 		if (char_detector) {
 			_register_error(token->line, ErrorType::ConditionError);
+		}
+
+		// 生成中间代码
+		if (t == NULL) {
+			condition = exp1;
+		}
+		else {
+			condition = SymbolFactory::create_temp(block, BasicType::_int);
+			if (t->equal(SYMBOL::GRE))
+				GetGtCmpQuater(exp1, exp2, condition);
+			else if (t->equal(SYMBOL::GEQ))
+				GetGeqCmpQuater(exp1, exp2, condition);
+			else if (t->equal(SYMBOL::LSS))
+				GetLtCmpQuater(exp1, exp2, condition);
+			else if (t->equal(SYMBOL::LEQ))
+				GetLeqCmpQuater(exp1, exp2, condition);
+			else if (t->equal(SYMBOL::NEQ))
+				GetNeqCmpQuater(exp1, exp2, condition);
+			else if (t->equal(SYMBOL::EQL))
+				GetEqlCmpQuater(exp1, exp2, condition);
 		}
 	}
 	catch (ParseException& e) {
@@ -1027,7 +1115,7 @@ void GrammaticalParser::__condition(int level) {
 	}
 
 	FLAG_PASS;
-	
+	return condition;
 }
 
 /**
@@ -1040,20 +1128,28 @@ void GrammaticalParser::__condition(int level) {
 void GrammaticalParser::__loop_statement(int level, bool* has_return)
 {
 	FLAG_ENTER("<循环语句>", level);
+	Block* block = symbol_table.get_present_block();
 	try {
 		// while while '('＜条件＞')'＜语句＞
 		if (_peek()->equal(SYMBOL::WHILETK)) {
-			SYMBOL_CHECK(SYMBOL::WHILETK);					// while
-			SYMBOL_CHECK(SYMBOL::LPARENT);					// (
-			__condition(level + 1);							// <条件>
-			SYMBOL_CHECK(SYMBOL::RPARENT);					// ）
-			// RECUR_CHECK(__statement, RECUR_DEFAULT);							// <语句>
+			SymbolItem* head = SymbolFactory::create_label(block, "while_head");
+			SymbolItem* tail = SymbolFactory::create_label(block, "while_end");
+			SYMBOL_CHECK(SYMBOL::WHILETK);											// while
+			SYMBOL_CHECK(SYMBOL::LPARENT);											// (
+			GetSetLabelQuater(head);
+			SymbolItem* condition = __condition(level + 1);							// <条件>
+			GetBzQuater(tail, condition);
+			SYMBOL_CHECK(SYMBOL::RPARENT);											// ）
 			__statement(level +1 , has_return);
+			GetGotoQuater(head);
+			GetSetLabelQuater(tail);
 		}
 		// do while do＜语句＞while '('＜条件＞')'
 		else if (_peek()->equal(SYMBOL::DOTK)) {
-			SYMBOL_CHECK(SYMBOL::DOTK);					// do
-			// RECUR_CHECK(__statement, RECUR_DEFAULT);							// <语句>
+			SymbolItem* head = SymbolFactory::create_label(block, "dowhile_head");
+			SymbolItem* tail = SymbolFactory::create_label(block, "dowhile_end");
+			GetSetLabelQuater(head);
+			SYMBOL_CHECK(SYMBOL::DOTK);							// do
 			__statement(level + 1, has_return);
 			try {
 				SYMBOL_CHECK(SYMBOL::WHILETK);					// <while>
@@ -1062,33 +1158,71 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 				_register_error(token->line, ErrorType::MissWhile);
 			}
 
-			SYMBOL_CHECK(SYMBOL::LPARENT);					// (
-			__condition(level + 1);									// <条件>
-			SYMBOL_CHECK(SYMBOL::RPARENT);					// )
+			SYMBOL_CHECK(SYMBOL::LPARENT);								// (
+			SymbolItem* condition  = __condition(level + 1);			// <条件>
+			SYMBOL_CHECK(SYMBOL::RPARENT);								// )
+			GetBnzQuater(head, condition);
+			GetSetLabelQuater(tail);
 		}
 		// for: for'('＜标识符＞＝＜表达式＞;＜条件＞;＜标识符＞＝＜标识符＞(+|-)＜步长＞')'＜语句＞
 		else if (_peek()->equal(SYMBOL::FORTK)) {
+			SymbolItem* initial = SymbolFactory::create_label(block, "for_initial");
+			SymbolItem* judge = SymbolFactory::create_label(block, "for_judge");
+			SymbolItem* update = SymbolFactory::create_label(block, "for_update");
+			SymbolItem* head = SymbolFactory::create_label(block, "for_body_head");
+			SymbolItem* tail = SymbolFactory::create_label(block, "for_body_tail");
+			
+			// 初始化部分
 			SYMBOL_CHECK(SYMBOL::FORTK);					// for
 			SYMBOL_CHECK(SYMBOL::LPARENT);					// (
-			__idenfr(level + 1, false);											// <标识符>
+			GetSetLabelQuater(initial);
+			string name = __idenfr(level + 1, false);		// <标识符>
+			SymbolItem* var = find_const_var(block, name, true);
 			SYMBOL_CHECK(SYMBOL::ASSIGN);					// =
-			__expression(level + 1, NULL);										// <表达式>
+			SymbolItem* exp = __expression(level + 1, NULL);// <表达式>
+			GetAssignQuater(exp, var);
 			SYMBOL_CHECK(SYMBOL::SEMICN);					// ;
-			__condition(level + 1);												// <条件>
+			
+			// 判断部分
+			GetSetLabelQuater(judge);
+			SymbolItem * condition = __condition(level + 1);					// <条件>
 			SYMBOL_CHECK(SYMBOL::SEMICN);					// ;
-			__idenfr(level + 1, false);											// <标识符>
+			GetBzQuater(tail, condition);
+			GetBnzQuater(head, condition);
+			
+			// 更新部分
+			GetSetLabelQuater(update);
+			name = __idenfr(level + 1, false);		// <标识符>
+			SymbolItem* a = find_const_var(block, name, true);
 			SYMBOL_CHECK(SYMBOL::ASSIGN);					// =
-			__idenfr(level + 1, false);											// <标识符>
-			if (_peek()->equal(SYMBOL::PLUS)) {					// (+ | -)
+			name = __idenfr(level + 1, false);		// <标识符>
+			SymbolItem* b = find_const_var(block, name, true);
+			Token* t = _peek();
+			if (_peek()->equal(SYMBOL::PLUS)) {				// (+ | -)
 				SYMBOL_CHECK(SYMBOL::PLUS);
 			}
 			else {
 				SYMBOL_CHECK(SYMBOL::MINU);
 			}
-			__step_length(level + 1);											// <步长>
+			int value = __step_length(level + 1);											// <步长>
+			SymbolItem* step_len = SymbolFactory::create_temp_const(block, BasicType::_int, value);
+			if (t->equal(SYMBOL::PLUS))
+			{
+				GetAddQuater(b, step_len, b);
+				GetAssignQuater(b, a);
+			}
+			else {
+				GetSubQuater(b, step_len, b);
+				GetAssignQuater(b, a);
+			}
 			SYMBOL_CHECK(SYMBOL::RPARENT);					// )
-			// RECUR_CHECK(__statement, RECUR_DEFAULT);							// <语句>
+			GetGotoQuater(judge);
+			
+			// 主干部分
+			GetSetLabelQuater(head);
 			__statement(level + 1, has_return);
+			GetGotoQuater(update);
+			GetSetLabelQuater(tail);
 		}
 		else {
 			throw ParseException(ParseExceptionType::UnknownBranch, string("loop statement"));
@@ -1105,29 +1239,31 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 /**
  * ＜步长＞::= ＜无符号整数＞
 */
-void GrammaticalParser::__step_length(int level) {
+int GrammaticalParser::__step_length(int level) {
 	FLAG_ENTER("<步长>", level);
+	int value;
 	try {
-		__unsigned_integer(level + 1);
+		value =  __unsigned_integer(level + 1);
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
 		throw e;
 	}
 	FLAG_PASS;
-	
+	return value;
 }
 
 /**
  * ＜有返回值函数调用语句＞ ::= ＜标识符＞'('＜值参数表＞')'
  * FISRT(＜有返回值函数调用语句＞) = {<标识符>}
 */
-void GrammaticalParser::__function_call_return(int level) {
+SymbolItem* GrammaticalParser::__function_call_return(int level) {
 	FLAG_ENTER("<有返回值函数调用语句>", level);
-
+	Block* block = symbol_table.get_present_block();
+	SymbolItem* ret=NULL;
 	try {
-		__idenfr(level + 1, false);
-		SymbolItem* p = find_func(symbol_table.get_present_block(),token->token, true);
+		string name = __idenfr(level + 1, false);
+		SymbolItem* p = find_func(symbol_table.get_present_block(),name, true);
 		// 如果没有的话，直接忽略这句话
 		if (p == NULL) {
 			while (!_peek()->equal(SYMBOL::SEMICN))
@@ -1135,10 +1271,11 @@ void GrammaticalParser::__function_call_return(int level) {
 		}
 		else {
 			SYMBOL_CHECK(SYMBOL::LPARENT);
-
 			__value_parameter_list(level+1 , &(p->paramsList));
-			// RECUR_CHECK(__value_parameter_list, RECUR_DEFAULT);
 			SYMBOL_CHECK(SYMBOL::RPARENT);
+			GetFuncCallQuater(p);
+			ret = SymbolFactory::create_temp(block, p->return_type);
+			GetAssignRetQuater(ret);
 		}
 	}
 	catch (ParseException& e) {
@@ -1147,7 +1284,7 @@ void GrammaticalParser::__function_call_return(int level) {
 	}
 
 	FLAG_PASS;
-	
+	return ret;
 }
 
 /**
@@ -1158,17 +1295,17 @@ void GrammaticalParser::__function_call_void(int level) {
 	FLAG_ENTER("<无返回值函数调用语句>", level);
 
 	try {
-		__idenfr(level + 1, false);
-		SymbolItem* p = find_func(symbol_table.get_present_block(), token->token, true);
+		string name = __idenfr(level + 1, false);
+		SymbolItem* p = find_func(symbol_table.get_present_block(), name, true);
 		if (p == NULL) {
 			while (!_peek()->equal(SYMBOL::SEMICN))
 				_next();
 		}
 		else {
-
 			SYMBOL_CHECK(SYMBOL::LPARENT);
 			__value_parameter_list(level + 1, &(p->paramsList));
 			SYMBOL_CHECK(SYMBOL::RPARENT);
+			GetFuncCallQuater(p);
 		}
 	}
 	catch (ParseException& e) {
@@ -1202,18 +1339,15 @@ void GrammaticalParser::__value_parameter_list(int level, vector<SymbolItem*>* p
 		bool char_detector = false;
 		vector<string> temp;
 		if (_peek()->equal(first_list, 6)) {
-			// RECUR_CHECK(__expression, RECUR_DEFAULT);
-			__expression(level + 1, &char_detector);
-			temp.push_back((char_detector ? "char" : "int"));
-			cnt += 1;
-			while (_peek()->equal(SYMBOL::COMMA)) {
-				SYMBOL_CHECK(SYMBOL::COMMA);
-				// RECUR_CHECK(__expression, RECUR_DEFAULT);
+			do
+			{
+				if(cnt ++ > 0)
+					SYMBOL_CHECK(SYMBOL::COMMA);
 				char_detector = false;
-				__expression(level + 1, &char_detector);
+				SymbolItem* exp = __expression(level + 1, &char_detector);
+				GetFuncParaPushQuater(exp);
 				temp.push_back((char_detector ? "char" : "int"));
-				cnt += 1;
-			}
+			} while (_peek()->equal(SYMBOL::COMMA));
 		}
 		else {
 			// <空> : ignore
@@ -1285,15 +1419,20 @@ void GrammaticalParser::__statement_list(int level, bool * has_return) {
 */
 void GrammaticalParser::__read_statement(int level) {
 	FLAG_ENTER("<读语句>", level);
+	Block* block = symbol_table.get_present_block();
 
 	try {
 		SYMBOL_CHECK(SYMBOL::SCANFTK);
 		SYMBOL_CHECK(SYMBOL::LPARENT);
-		__idenfr(level + 1, false);
-		while (_peek()->equal(SYMBOL::COMMA)) {
-			SYMBOL_CHECK(SYMBOL::COMMA);
-			__idenfr(level + 1, false);
-		}
+		int cnt = 0;
+		do
+		{
+			if(cnt ++ > 0)
+				SYMBOL_CHECK(SYMBOL::COMMA);
+			string name = __idenfr(level + 1, false);
+			SymbolItem* temp = find_const_var(block, name, true);
+			GetScanQuater(temp);
+		} while (_peek()->equal(SYMBOL::COMMA));
 		SYMBOL_CHECK(SYMBOL::RPARENT);
 	}
 	catch (ParseException& e) {
@@ -1302,7 +1441,6 @@ void GrammaticalParser::__read_statement(int level) {
 	}
 
 	FLAG_PASS;
-	
 }
 
 /**
@@ -1315,7 +1453,8 @@ void GrammaticalParser::__read_statement(int level) {
 */
 void GrammaticalParser::__write_statement(int level) {
 	FLAG_ENTER("<写语句>", level);
-
+	Block* block = symbol_table.get_present_block();
+	SymbolItem* newline = SymbolFactory::create_temp_const(block, BasicType::_char, '\n');
 	try {
 		SYMBOL exp_first[] =
 		{ SYMBOL::IDENFR, SYMBOL::LPARENT, SYMBOL::PLUS, SYMBOL::MINU,
@@ -1326,20 +1465,25 @@ void GrammaticalParser::__write_statement(int level) {
 
 		// printf '(' ＜字符串＞,＜表达式＞ ')'| printf '('＜字符串＞ ')'
 		if (_peek()->equal(SYMBOL::STRCON)) {
-			__string(level + 1);
+			string strcon = __string(level + 1);
+			SymbolItem* strcon_temp = SymbolFactory::create_temp_string(block, strcon);
+			GetPrintQuater(strcon_temp);
 			if (_peek()->equal(SYMBOL::COMMA)) {
 				SYMBOL_CHECK(SYMBOL::COMMA);
-				__expression(level + 1, NULL);
+				SymbolItem* exp = __expression(level + 1, NULL);
+				GetPrintQuater(exp);
 			}
 		}
 		// printf '('＜表达式＞')'
 		else if (_peek()->equal(exp_first, 6)) {
-			__expression(level + 1, NULL);
+			SymbolItem * exp = __expression(level + 1, NULL);
+			GetPrintQuater(exp);
 		}
 		else {
 			throw ParseException(ParseExceptionType::UnknownBranch, string("<write statement>"));
 		}
 		SYMBOL_CHECK(SYMBOL::RPARENT);
+		GetPrintQuater(newline);
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
@@ -1366,7 +1510,7 @@ void GrammaticalParser::__return_statement(int level, bool * has_return) {
 			SYMBOL_CHECK(SYMBOL::LPARENT);
 			// RECUR_CHECK(__expression, RECUR_DEFAULT);
 			bool char_detector = false;
-			__expression(level + 1, &char_detector);
+			SymbolItem* exp = __expression(level + 1, &char_detector);
 			// unit4-error-h
 			if (block->func_head->return_type == BasicType::_int && char_detector) {
 				_register_error(token->line, ErrorType::ReturnError);
@@ -1378,12 +1522,14 @@ void GrammaticalParser::__return_statement(int level, bool * has_return) {
 				_register_error(token->line, ErrorType::VoidWithReturn);
 			}
 			SYMBOL_CHECK(SYMBOL::RPARENT);
+			GetFuncRetQuater(exp);
 		}
 		else {
 			if (block->func_head->return_type == BasicType::_int || block->func_head->return_type == BasicType::_char)
 			{
 				_register_error(token->line, ErrorType::ReturnError);
 			}
+			GetFuncRetQuater(NULL);
 		}
 	}
 	catch (ParseException& e) {

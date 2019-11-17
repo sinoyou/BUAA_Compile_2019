@@ -1,3 +1,4 @@
+/*
 #include "SymbolItem.h"
 
 // function item
@@ -33,6 +34,7 @@ SymbolItem::SymbolItem(Block* block, string name, SymbolItemType type) {
 	this->name = name;
 	this->type = type;
 }
+
 // create as temp-var
 SymbolItem::SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type) {
 	this->block = block;
@@ -40,3 +42,5 @@ SymbolItem::SymbolItem(Block* block, string name, SymbolItemType type, BasicType
 	this->type = type;
 	this->var_type = var_type;
 }
+
+*/

@@ -8,6 +8,7 @@
 #include <tuple>
 #include <fstream>
 #include "ParseException.h"
+#include "Quaternary.h"
 
 // Global Variable and Pointer
 FileReader* reader;
@@ -24,10 +25,6 @@ void run() {
 		cout << it->line << " " << it->token << " " << symbol_dict[it->symbol] << endl;
 	}
 
-	/* Grammatical Parse + error process */
-	vector<string> output_list;
-	GrammaticalParser gram_parser(token_list, output_list, error_output_list);
-
 	/* Lexical : Course Evaluation Output */
 	//f = fopen("output.txt", "w");
 	//vector<Token>::iterator itr = token_list.begin();
@@ -40,13 +37,11 @@ void run() {
 	/* Grammatical Parse :  Recursive Output + Error Output */
 	// recursive output
 	
-	try {
-		gram_parser.parse();
-	}
-	catch (exception& e) {
-		// ignore
-	}
+	vector<string> output_list;
+	GrammaticalParser gram_parser(token_list, output_list, error_output_list);
+	gram_parser.parse();
 
+	// grammtical parse output
 	ofstream gram;
 	gram.open("output.txt", ios::out | ios::trunc);
 	vector<string>::iterator itr1 = output_list.begin();
@@ -67,6 +62,7 @@ void run() {
 	}
 	error_out.close();
 
+	cout << QuaterList.size() << endl;
 }
 
 int main()
