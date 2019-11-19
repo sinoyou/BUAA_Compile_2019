@@ -13,7 +13,9 @@ enum SymbolItemType
 	function,					// 函数头
 	_const,						// 显式声明的常量与变量
 	_variable,					// 显示声明变量
-	temp,						// 中间码中的临时变量
+	temp_normal,				// 中间码中的临时变量(正常版本)
+	temp_const,					// 中间码中的临时变量(常量类)
+	temp_strcon,				// 中间码中的临时变量(字符串)
 	label						// 跳转标签
 };
 
@@ -29,25 +31,29 @@ class SymbolItem {
 public:
 	// create as function
 	SymbolItem(Block* block, string name, SymbolItemType type, BasicType return_type, vector<SymbolItem*> paramsList):
-		block(block), name(name), type(type), return_type(return_type), paramsList(paramsList){}
-	// create as const
+		block(block), name(name), type(type), basic_type(return_type), paramsList(paramsList){}
+	// create as const, create as temp-const
 	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, int const_value):
-		block(block), name(name), type(type), var_type(var_type), const_value(const_value){}
+		block(block), name(name), type(type), basic_type(var_type), value(const_value){}
 	// create as var
 	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, int size, bool is_array) :
-		block(block), name(name), type(type), var_type(var_type), array_size(size), isArray(is_array){}
+		block(block), name(name), type(type), basic_type(var_type), array_size(size), isArray(is_array){}
 	// create as label
 	SymbolItem(Block* block, string name, SymbolItemType type):
 		block(block), name(name), type(type){}
-	// create as temp-var - normal
+	// create as temp - normal
 	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type) :
-		block(block), name(name), type(type), var_type(var_type){}
-	// create as temp-var - const
-	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, bool temp_const, int value):
-		block(block), name(name), type(type), var_type(var_type), temp_const(temp_const), temp_const_value(value){}
-	// create as temp-var - string
-	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, bool temp_const, string strcon):
-		block(block), name(name), type(type), var_type(var_type), temp_const(temp_const), temp_strcon(strcon){}
+		block(block), name(name), type(type), basic_type(var_type){}
+	// create as temp - const
+	// SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type,  int value):
+	// 	block(block), name(name), type(type), basic_type(var_type), value(value){}
+	// create as temp - string
+	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, string strcon):
+		block(block), name(name), type(type), basic_type(var_type), strcon(strcon){}
+	
+	// 生成输出字符表示
+	string getname(bool simplify = true);
+	string get_basictype();
 
 
 	string name;
@@ -55,25 +61,33 @@ public:
 	Block* block;
 
 	// 函数头 - speical
-	BasicType return_type;
 	vector<SymbolItem*> paramsList;
 
-	// 常量 and 变量 and 临时变量 - public
-	BasicType var_type;
+	// 常量 and 变量 and 临时变量 and  函数 - public
+	BasicType basic_type;
 	// 常量 - special
-	int const_value;
+	int value;
 	// 变量 - special
 	bool isArray;
 	int array_size;
 
 	// 标签 - special
-	// None
 
 	// 临时变量 - special
-	bool temp_const = false;
-	string temp_strcon;
-	int temp_const_value;
+	string strcon;
 
+	/*				function	  var        const           label           temp-normal           temp-const           temp-string */
+	/*
+	name			   Y		   Y		   Y			   Y				  Y					  Y						   Y
+	type			function	variable     const           label              temp                 temp                     temp
+	block			   Y		   Y		   Y			   Y				  Y					  Y						   Y              
+	params_list        Y		   X		   X			   X				  X					  X						   X
+	basic_type		 v/i/c        i/c		  i/c			   X				 i/c				 i/c					  str
+	value			   X		   X		   Y			   X				  X					  Y						   X
+	isArray			   X		   Y		   X			   X				  X					  X						   X
+	array_size	       X		   Y		   X			   X				  X					  X						   X
+	strcon			   X		   X		   X			   X				  X					  X						   Y
+	*/
 };
 
 #endif // !__SYMBOL_ITEM_H__

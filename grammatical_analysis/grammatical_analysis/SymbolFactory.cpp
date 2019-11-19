@@ -75,7 +75,7 @@ SymbolItem* SymbolFactory::create_temp(Block* block, BasicType var_type) {
 	string target = alloc_free_temp_name(block);
 
 	// 生成临时变量
-	SymbolItem* p = new SymbolItem(block, block_name + "_" + target, SymbolItemType::temp, var_type);
+	SymbolItem* p = new SymbolItem(block, target + "@" + block_name, SymbolItemType::temp_normal, var_type);
 	insert_one_record(block, p);
 	return p;
 }
@@ -87,7 +87,7 @@ SymbolItem* SymbolFactory::create_temp_const(Block* block, BasicType var_type, i
 	string block_name = block->func_head->name;
 	string target = alloc_free_temp_name(block);
 	// 生成临时变量
-	SymbolItem* p = new SymbolItem(block, block_name + "_" + target, SymbolItemType::temp, var_type, true, value);
+	SymbolItem* p = new SymbolItem(block, block_name + "_" + target, SymbolItemType::temp_const, var_type, value);
 	insert_one_record(block, p);
 	return p;
 }
@@ -99,7 +99,7 @@ SymbolItem* SymbolFactory::create_temp_string(Block* block, string strcon) {
 	string block_name = block->func_head->name;
 	string target = alloc_free_temp_name(block);
 	// 生成临时变量
-	SymbolItem* p = new SymbolItem(block, block_name + "_" + target, SymbolItemType::temp, BasicType::_string, true, strcon);
+	SymbolItem* p = new SymbolItem(block, block_name + "_" + target, SymbolItemType::temp_strcon, BasicType::_string, strcon);
 	insert_one_record(block, p);
 	return p;
 }
