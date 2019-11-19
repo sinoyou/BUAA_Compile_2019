@@ -9,6 +9,7 @@
 #include <fstream>
 #include "ParseException.h"
 #include "Quaternary.h"
+#include "mips_generator.h"
 
 // Global Variable and Pointer
 FileReader* reader;
@@ -22,17 +23,8 @@ void run() {
 	LexParser lexParser(reader, error_output_list);
 	vector<Token> token_list = lexParser.parse();
 	for (vector<Token>::iterator it = token_list.begin(); it != token_list.end(); it++) {
-		cout << it->line << " " << it->token << " " << symbol_dict[it->symbol] << endl;
+		// cout << it->line << " " << it->token << " " << symbol_dict[it->symbol] << endl;
 	}
-
-	/* Lexical : Course Evaluation Output */
-	//f = fopen("output.txt", "w");
-	//vector<Token>::iterator itr = token_list.begin();
-	//while (itr!= token_list.end()) {
-	//	print_token(f,itr->symbol, itr->token);
-	//	itr++;
-	//}
-	//fclose(f);
 
 	/* Grammatical Parse :  Recursive Output + Error Output */
 	// recursive output
@@ -63,6 +55,25 @@ void run() {
 	error_out.close();
 
 	cout << QuaterList.size() << endl;
+
+	// quaternary output
+	ofstream quater_out;
+	quater_out.open("middle.txt", ios::out | ios::trunc);
+	vector<string> quater_out_list = PrintQuater(&QuaterList);
+	for (auto it = quater_out_list.begin(); it != quater_out_list.end(); it++) {
+		quater_out << *it << endl;
+	}
+	quater_out.close();
+
+	// object out
+	ofstream mips_out;
+	mips_out.open("mips.txt", ios::out | ios::trunc);
+	MipsGenerator object_gen(QuaterList);
+	vector<string> mips = object_gen.simple_dump();
+	for (auto it = mips.begin(); it != mips.end(); it++) {
+		mips_out << *it << endl;
+	}
+	mips_out.close();
 }
 
 int main()
