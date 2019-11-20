@@ -1,6 +1,7 @@
 #include "SymbolItem.h"
 #include "Block.h"
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -12,7 +13,7 @@ string SymbolItem::getname(bool simplify) {
 		return name;
 	// case 1 : 整型常量
 	if ((this->type == _const || this->type == temp_const) && this->basic_type == BasicType::_int) {
-		_itoa_s(this->value, buf, 10);
+		itoa(this->value, buf, 10);
 		name = string(buf);
 	}
 	// case 2：字符型常量

@@ -1,5 +1,6 @@
 #include "SymbolFactory.h"
 #include <iostream>
+#include <cstdlib>
 
 // utils
 string alloc_free_temp_name(Block* block) {
