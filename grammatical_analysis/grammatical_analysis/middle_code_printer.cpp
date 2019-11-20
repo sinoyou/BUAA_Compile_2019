@@ -66,10 +66,10 @@ string PutVarDeclarQuater(Quaternary* Q) {
 	string type = Q->Result->get_basictype();
 	if (Q->Result->isArray) {
 		int size = Q->Result->array_size;
-		sprintf_s(buf, MAXBUF, "var %s %s[%d]", type.c_str(), name.c_str(), size);
+		sprintf(buf, "var %s %s[%d]", type.c_str(), name.c_str(), size);
 	}
 	else {
-		sprintf_s(buf, MAXBUF, "var %s %s", type.c_str(), name.c_str());
+		sprintf(buf,  "var %s %s", type.c_str(), name.c_str());
 	}
 	return string(buf);
 }
@@ -83,10 +83,10 @@ string PutConstDeclarQuater(Quaternary* Q) {
 	string type = Q->Result->get_basictype();
 	int value = Q->Result->value;
 	if (type == "int") {
-		sprintf_s(buf, MAXBUF, "const int %s = %d", name.c_str(), value);
+		sprintf(buf, "const int %s = %d", name.c_str(), value);
 	}
 	else {
-		sprintf_s(buf, MAXBUF, "const char %s = '%c'", name.c_str(), value);
+		sprintf(buf, "const char %s = '%c'", name.c_str(), value);
 	}
 	return string(buf);
 }
@@ -98,7 +98,7 @@ string PutConstDeclarQuater(Quaternary* Q) {
 string PutFuncDeclarQuater(Quaternary* Q) {
 	string name = Q->Result->getname(false);
 	string type = Q->Result->get_basictype();
-	sprintf_s(buf, MAXBUF, "%s %s()", type.c_str(), name.c_str());
+	sprintf(buf,  "%s %s()", type.c_str(), name.c_str());
 	return string(buf);
 }
 
@@ -109,7 +109,7 @@ string PutFuncDeclarQuater(Quaternary* Q) {
 string PutFuncParaDeclarQuater(Quaternary* Q) {
 	string name = Q->Result->getname(false);
 	string type = Q->Result->get_basictype();
-	sprintf_s(buf, MAXBUF, "para %s %s", type.c_str(), name.c_str());
+	sprintf(buf,  "para %s %s", type.c_str(), name.c_str());
 	return string(buf);
 }
 
@@ -119,7 +119,7 @@ string PutFuncParaDeclarQuater(Quaternary* Q) {
 */
 string PutFuncParaPushQuater(Quaternary* Q) {
 	string name = Q->OpA->getname();
-	sprintf_s(buf, MAXBUF, "push %s", name.c_str());
+	sprintf(buf,  "push %s", name.c_str());
 	return string(buf);
 }
 
@@ -129,7 +129,7 @@ string PutFuncParaPushQuater(Quaternary* Q) {
 */
 string PutFuncCallQuater(Quaternary* Q) {
 	string name = Q->OpA->getname();
-	sprintf_s(buf, MAXBUF, "call %s", name.c_str());
+	sprintf(buf,  "call %s", name.c_str());
 	return string(buf);
 }
 
@@ -139,7 +139,7 @@ string PutFuncCallQuater(Quaternary* Q) {
 */
 string PutAssignRetQuater(Quaternary* Q) {
 	string name = Q->Result->getname();
-	sprintf_s(buf, MAXBUF, "%s = RET", name.c_str());
+	sprintf(buf,  "%s = RET", name.c_str());
 	return string(buf);
 }
 
@@ -151,7 +151,7 @@ string PutFuncRetQuater(Quaternary* Q) {
 	string name = "";
 	if (Q->OpA != NULL)
 		name = Q->OpA->getname();
-	sprintf_s(buf, MAXBUF, "ret %s", name.c_str());
+	sprintf(buf,  "ret %s", name.c_str());
 	return string(buf);
 }
 
@@ -168,7 +168,7 @@ string PutCalQuater(Quaternary* Q) {
 		(type == QuaterType::Sub) ? "-" :
 		(type == QuaterType::Mult) ? "*" :
 		(type == QuaterType::Div) ? "/" : "unknown";
-	sprintf_s(buf, MAXBUF, "%s = %s %s %s", result.c_str(), A.c_str(),CalOp.c_str() ,B.c_str());
+	sprintf(buf,  "%s = %s %s %s", result.c_str(), A.c_str(),CalOp.c_str() ,B.c_str());
 	return string(buf);
 }
 
@@ -179,7 +179,7 @@ string PutCalQuater(Quaternary* Q) {
 string PutAssignQuater(Quaternary* Q) {
 	string A = Q->OpA->getname();
 	string result = Q->Result->getname();
-	sprintf_s(buf, MAXBUF, "%s = %s", result.c_str(), A.c_str());
+	sprintf(buf,  "%s = %s", result.c_str(), A.c_str());
 	return string(buf);
 }
 
@@ -191,7 +191,7 @@ string PutAssignArrayQuater(Quaternary* Q) {
 	string arr = Q->Result->getname();
 	string index = Q->OpB->getname();
 	string value = Q->OpA->getname();
-	sprintf_s(buf, MAXBUF, "%s[%s] = %s", arr.c_str(), index.c_str(), value.c_str());
+	sprintf(buf,  "%s[%s] = %s", arr.c_str(), index.c_str(), value.c_str());
 	return string(buf);
 }
 
@@ -210,7 +210,7 @@ string PutCmpQuater(Quaternary* Q) {
 		(type == QuaterType::GeqCmp) ? ">=" :
 		(type == QuaterType::LtCmp) ? "<" :
 		(type == QuaterType::LeqCmp) ? "<=" : "Unknown";
-	sprintf_s(buf, MAXBUF, "%s = %s %s %s", result.c_str(), A.c_str(), CmpOp.c_str(), B.c_str());
+	sprintf(buf,  "%s = %s %s %s", result.c_str(), A.c_str(), CmpOp.c_str(), B.c_str());
 	return string(buf);
 }
 
@@ -220,7 +220,7 @@ string PutCmpQuater(Quaternary* Q) {
 */
 string PutGotoQuater(Quaternary* Q) {
 	string label = Q->OpA->getname();
-	sprintf_s(buf, MAXBUF, "GOTO %s", label.c_str());
+	sprintf(buf,  "GOTO %s", label.c_str());
 	return string(buf);
 }
 
@@ -231,7 +231,7 @@ string PutGotoQuater(Quaternary* Q) {
 string PutBnzQuater(Quaternary* Q) {
 	string label = Q->OpA->getname();
 	string condition = Q->OpB->getname();
-	sprintf_s(buf, MAXBUF, "BNZ %s %s", label.c_str(), condition.c_str());
+	sprintf(buf,  "BNZ %s %s", label.c_str(), condition.c_str());
 	return string(buf);
 }
 
@@ -242,7 +242,7 @@ string PutBnzQuater(Quaternary* Q) {
 string PutBzQuater(Quaternary* Q) {
 	string label = Q->OpA->getname();
 	string condition = Q->OpB->getname();
-	sprintf_s(buf, MAXBUF, "BZ %s %s", label.c_str(), condition.c_str());
+	sprintf(buf,  "BZ %s %s", label.c_str(), condition.c_str());
 	return string(buf);
 }
 
@@ -252,7 +252,7 @@ string PutBzQuater(Quaternary* Q) {
 */
 string PutSetLabelQuater(Quaternary* Q) {
 	string label = Q->OpA->getname();
-	sprintf_s(buf, MAXBUF, "%s:", label.c_str());
+	sprintf(buf,  "%s:", label.c_str());
 	return string(buf);
 }
 
@@ -264,7 +264,7 @@ string PutArrayQueryQuater(Quaternary* Q) {
 	string arr = Q->OpA->getname();
 	string index = Q->OpB->getname();
 	string result = Q->Result->getname();
-	sprintf_s(buf, MAXBUF, "%s = %s[%s]", result.c_str(), arr.c_str(), index.c_str());
+	sprintf(buf,  "%s = %s[%s]", result.c_str(), arr.c_str(), index.c_str());
 	return string(buf);
 }
 
@@ -274,7 +274,7 @@ string PutArrayQueryQuater(Quaternary* Q) {
 */
 string PutScanQuater(Quaternary* Q) {
 	string idenfr = Q->Result->getname();
-	sprintf_s(buf, MAXBUF, "SCAN %s", idenfr.c_str());
+	sprintf(buf,  "SCAN %s", idenfr.c_str());
 	return string(buf);
 }
 
@@ -284,6 +284,6 @@ string PutScanQuater(Quaternary* Q) {
 */
 string PutPrintQuater(Quaternary* Q) {
 	string name = Q->OpA->getname();
-	sprintf_s(buf, MAXBUF, "PRINT %s", name.c_str());
+	sprintf(buf,  "PRINT %s", name.c_str());
 	return string(buf);
 }
