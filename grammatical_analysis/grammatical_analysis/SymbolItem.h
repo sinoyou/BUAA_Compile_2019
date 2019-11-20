@@ -3,8 +3,9 @@
 
 #include<string>
 #include<vector>
-class Block;
 using namespace std;
+
+class Block;
 
 // =========== 符号表中的项类型统计 =============
 enum SymbolItemType
@@ -55,26 +56,19 @@ public:
 	string getname(bool simplify = true);
 	string get_basictype();
 
-
+	Block* block;
 	string name;
 	SymbolItemType type;
-	Block* block;
 
-	// 函数头 - speical
-	vector<SymbolItem*> paramsList;
-
-	// 常量 and 变量 and 临时变量 and  函数 - public
-	BasicType basic_type;
-	// 常量 - special
+	
+	BasicType basic_type;				// 常量 and 变量 and 临时变量 and  函数 - public
+	vector<SymbolItem*> paramsList;		// 函数头 - speical
 	int value;
-	// 变量 - special
-	bool isArray;
+
 	int array_size;
+	bool isArray;
+	string strcon;						// 字符串
 
-	// 标签 - special
-
-	// 临时变量 - special
-	string strcon;
 
 	/*				function	  var        const           label           temp-normal           temp-const           temp-string */
 	/*

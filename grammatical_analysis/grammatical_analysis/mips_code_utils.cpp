@@ -3,6 +3,7 @@
 #include "debug.h"
 #include <set>
 #include <iostream>
+#include <stdio.h>
 
 #define MAXBUF 200
 

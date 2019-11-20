@@ -52,8 +52,9 @@ public:
 	Quaternary(Block* block, QuaterType type, SymbolItem* A, SymbolItem* B, SymbolItem* Result) :
 		block(block), type(type), OpA(A), OpB(B), Result(Result) {}
 
-	QuaterType type;
 	Block* block;
+
+	QuaterType type;
 	SymbolItem* OpA;
 	SymbolItem* OpB;
 	SymbolItem* Result;

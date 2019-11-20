@@ -1,5 +1,6 @@
 #include "Quaternary.h"
 #include "debug.h"
+#include <stdio.h>
 # define MAXBUF 200
 static char buf[MAXBUF];
 
@@ -24,7 +25,7 @@ string PrintQuaterHandler(Quaternary* q, QuaterType qtype)
 		break;
 	case VarDeclar:sentence = PutVarDeclarQuater(q); break;
 	case ConstDeclar:sentence = PutConstDeclarQuater(q); break;
-	case FuncDeclar:sentence = PutFuncDeclarQuater(q); sentence = sentence; break;
+	case FuncDeclar:sentence = PutFuncDeclarQuater(q); break;
 	case FuncParaDeclar:sentence = PutFuncParaDeclarQuater(q); break;
 	case FuncParaPush:sentence = PutFuncParaPushQuater(q); break;
 	case FuncCall:sentence = PutFuncCallQuater(q); break;
