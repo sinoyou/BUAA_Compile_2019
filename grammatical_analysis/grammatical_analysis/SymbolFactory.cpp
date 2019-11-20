@@ -10,7 +10,7 @@ string alloc_free_temp_name(Block* block) {
 	string target = ori;
 	while (block->temp_map.find(target) != block->temp_map.end()) {
 		cnt++;
-		_itoa_s(cnt, buf, 10);
+		itoa(cnt, buf, 10);
 		target = ori + string(buf);
 	}
 	block->temp_map[target] = 1;				// 找到唯一的名字，占位
@@ -56,7 +56,7 @@ SymbolItem* SymbolFactory::create_label(Block* block, string comment) {
 	char buf[10];
 	while (block->label_map.find(target) != block->label_map.end()) {
 		cnt++;
-		_itoa_s(cnt, buf, 10);
+		itoa(cnt, buf, 10);
 		target = comment + string(buf);
 	}
 	block->label_map[target] = 1;				// 找到唯一标签，占位
