@@ -35,7 +35,7 @@ void MipsGenerator::get_symbol_items() {
  * 2. 字符串常量
 */
 void MipsGenerator::dump_global_memory() {
-	mips_string(&object_code, ".data");
+	mips_string(&object_code, ".data 0x0000");
 	// 遍历全局视角下的变量
 	for (auto it = item_set.begin(); it != item_set.end(); it++) {
 		if ((*it)->type == SymbolItemType::_variable && (*it)->block->pre == NULL) {
@@ -81,7 +81,7 @@ void MipsGenerator::cal_function_stack() {
 
 void MipsGenerator::function_sub_dumps() {
 	mips_string(&object_code, "");
-	mips_string(&object_code,".text");
+	mips_string(&object_code,".text 0x3000");
 	mips_string(&object_code,"jal main");
 	mips_string(&object_code, "li $v0, 10");
 	mips_string(&object_code, "syscall");
