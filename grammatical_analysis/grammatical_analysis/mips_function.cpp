@@ -282,7 +282,7 @@ void MipsFunction::get_addr(SymbolItem* item, bool *local, int* offset, string* 
 	}
 	else {
 		char buf[100];
-		sprintf_s(buf, "[ERROR] No found %s in %s", item->name.c_str(), this->func_head->name.c_str());
+		sprintf(buf, "[ERROR] No found %s in %s", item->name.c_str(), this->func_head->name.c_str());
 		DEBUG_PRINT(buf);
 	}
 }
