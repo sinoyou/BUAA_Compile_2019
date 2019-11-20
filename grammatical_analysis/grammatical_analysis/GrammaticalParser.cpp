@@ -1,8 +1,8 @@
-#include "GrammaticalParser.h"
+ï»¿#include "GrammaticalParser.h"
 #include "utils.h"
 #include "debug.h"
 
-/* ³õÊ¼»¯º¯Êı */
+/* åˆå§‹åŒ–å‡½æ•° */
 GrammaticalParser::GrammaticalParser(
 	vector<Token>& token_list, 
 	vector<string>& output,
@@ -13,12 +13,12 @@ GrammaticalParser::GrammaticalParser(
 	symbol_table = SymbolTable();
 }
 
-/* Èë¿Úº¯Êı */
+/* å…¥å£å‡½æ•° */
 void GrammaticalParser::parse() {
 	__program(1);
 }
 
-/* Ö§³Öº¯Êı */
+/* æ”¯æŒå‡½æ•° */
 void GrammaticalParser::_error(const char* s) {
 	printf("Face an error when parsing grammar %s.\n", s);
 }
@@ -47,37 +47,37 @@ void GrammaticalParser::_next()
 }
 
 void GrammaticalParser::_backup() {
-	// ptoken±¸·İ
+	// ptokenå¤‡ä»½
 	ptoken_record.push_back(ptoken);
 }
 
 void GrammaticalParser::_backdown() {
-	// ptoken ±¸·İÔÚË³ÀûÍê³ÉºóµÄÉ¾³ı
+	// ptoken å¤‡ä»½åœ¨é¡ºåˆ©å®Œæˆåçš„åˆ é™¤
 	ptoken_record.pop_back();
 }
 
 void GrammaticalParser::_recover() {
-	// ptokenÓëtoken»Ö¸´;
+	// ptokenä¸tokenæ¢å¤;
 	ptoken = ptoken_record.back();
 	ptoken_record.pop_back();
 	_update_token();
 }
 
-/**************************** ½âÎöº¯Êı¶¨Òå ******************************/
+/**************************** è§£æå‡½æ•°å®šä¹‰ ******************************/
 /*
- * 1. ²¿·Ö¹ı¼òµ¥µÄÊı×ÖÓë×ÖÄ¸ÀàĞÍÊ¶±ğ±»ºöÂÔ£¬ÒÑ±»´Ê·¨·ÖÎö½â¾ö¡£
- * 2. <×Ö·û>Æ¥Åä²»ÊÇÑÏ¸ñµÄ¡£
- * 3. ÔÚ¶ÔÃ¿Ìõ¹æÔò·ÖÎöÊ±£¬²¿·Ö¼ÆËãÁËFOLLOW¼¯ºÏ£¬µ«FOLLOW¼¯ºÏ²¢²»Ó¦¸ÃÄÉÈë¸Ã¹æÔòµÄ²ßÂÔÑ¡ÔñÖĞ£¬Ö»ÊÇÎªÁËÑéÖ¤¹æÔò²»²úÉú»ØËİÇé¿ö¡£
- * 4. ÌØÀı-³¬Ç°Íµ¿ú£º<³ÌĞò>, <±äÁ¿ËµÃ÷>, <Òò×Ó>, <Óï¾ä>
- * 5. ÌØÀı-²»Í¬¹æÔò£¬ÏàÍ¬½á¹¹£ºĞè½¨Á¢·ûºÅ±íÅĞ¶Ï<ÓĞ·µ»Øº¯Êıµ÷ÓÃÓï¾ä>ºÍ<ÎŞ·µ»Øº¯Êıµ÷ÓÃÓï¾ä>
+ * 1. éƒ¨åˆ†è¿‡ç®€å•çš„æ•°å­—ä¸å­—æ¯ç±»å‹è¯†åˆ«è¢«å¿½ç•¥ï¼Œå·²è¢«è¯æ³•åˆ†æè§£å†³ã€‚
+ * 2. <å­—ç¬¦>åŒ¹é…ä¸æ˜¯ä¸¥æ ¼çš„ã€‚
+ * 3. åœ¨å¯¹æ¯æ¡è§„åˆ™åˆ†ææ—¶ï¼Œéƒ¨åˆ†è®¡ç®—äº†FOLLOWé›†åˆï¼Œä½†FOLLOWé›†åˆå¹¶ä¸åº”è¯¥çº³å…¥è¯¥è§„åˆ™çš„ç­–ç•¥é€‰æ‹©ä¸­ï¼Œåªæ˜¯ä¸ºäº†éªŒè¯è§„åˆ™ä¸äº§ç”Ÿå›æº¯æƒ…å†µã€‚
+ * 4. ç‰¹ä¾‹-è¶…å‰å·çª¥ï¼š<ç¨‹åº>, <å˜é‡è¯´æ˜>, <å› å­>, <è¯­å¥>
+ * 5. ç‰¹ä¾‹-ä¸åŒè§„åˆ™ï¼Œç›¸åŒç»“æ„ï¼šéœ€å»ºç«‹ç¬¦å·è¡¨åˆ¤æ–­<æœ‰è¿”å›å‡½æ•°è°ƒç”¨è¯­å¥>å’Œ<æ— è¿”å›å‡½æ•°è°ƒç”¨è¯­å¥>
  */
 
  /**
-  * £¼¼Ó·¨ÔËËã·û£¾ ::= +£ü-
+  * ï¼œåŠ æ³•è¿ç®—ç¬¦ï¼ ::= +ï½œ-
   * FIRST(+) = {PLUS}, FIRST(-) = {SUB}
   */
 void GrammaticalParser::__add_operator(int level) {
-	FLAG_ENTER("<¼Ó·¨ÔËËã·û>",level);
+	FLAG_ENTER("<åŠ æ³•è¿ç®—ç¬¦>",level);
 	try {
 		SYMBOL candidate[] = { SYMBOL::PLUS,SYMBOL::MINU };
 		MULTI_SYMBOL_CHECK(candidate, 2);
@@ -91,11 +91,11 @@ void GrammaticalParser::__add_operator(int level) {
 }
 
 /**
- * £¼³Ë·¨ÔËËã·û£¾  ::= *£ü/
+ * ï¼œä¹˜æ³•è¿ç®—ç¬¦ï¼  ::= *ï½œ/
  * FIRST(*) = {MULT}, FIRST(/) = {DIV}
  */
 void GrammaticalParser::__mult_operator(int level) {
-	FLAG_ENTER("<³Ë·¨ÔËËã·û>", level);
+	FLAG_ENTER("<ä¹˜æ³•è¿ç®—ç¬¦>", level);
 	try {
 		SYMBOL candidate[] = { SYMBOL::MULT,SYMBOL::DIV };
 		MULTI_SYMBOL_CHECK(candidate, 2);
@@ -109,11 +109,11 @@ void GrammaticalParser::__mult_operator(int level) {
 }
 
 /**
- * £¼¹ØÏµÔËËã·û£¾  ::=  <£ü<=£ü>£ü>=£ü!=£ü==
- * FIRST£º...
+ * ï¼œå…³ç³»è¿ç®—ç¬¦ï¼  ::=  <ï½œ<=ï½œ>ï½œ>=ï½œ!=ï½œ==
+ * FIRSTï¼š...
 */
 void GrammaticalParser::__rel_operator(int level) {
-	FLAG_ENTER("<¹ØÏµÔËËã·û>", level);
+	FLAG_ENTER("<å…³ç³»è¿ç®—ç¬¦>", level);
 	try {
 		SYMBOL list[6] = { SYMBOL::LSS, SYMBOL::LEQ, SYMBOL::GRE, SYMBOL::GEQ, SYMBOL::NEQ, SYMBOL::EQL };
 		MULTI_SYMBOL_CHECK(list, 6);
@@ -127,45 +127,45 @@ void GrammaticalParser::__rel_operator(int level) {
 }
 
 /**
- * £¼×ÖÄ¸£¾::= £ß£üa£ü£®£®£®£üz£üA£ü£®£®£®£üZ
+ * ï¼œå­—æ¯ï¼::= ï¼¿ï½œaï½œï¼ï¼ï¼ï½œzï½œAï½œï¼ï¼ï¼ï½œZ
  * FIRST: ...
 */
 void GrammaticalParser::__letter(int level) {
-	// ´Ê·¨·ÖÎö³ä×ã£¬¸Ã·ÇÖÕ½á·û±»ºöÂÔ
-	FLAG_ENTER("<×ÖÄ¸>", level);
+	// è¯æ³•åˆ†æå……è¶³ï¼Œè¯¥éç»ˆç»“ç¬¦è¢«å¿½ç•¥
+	FLAG_ENTER("<å­—æ¯>", level);
 	FLAG_FAIL;
 	throw ParseException(ParseExceptionType::Unexpected, string("<Char>"));
 }
 
 /**
- * £¼Êı×Ö£¾::= £°£ü£¼·ÇÁãÊı×Ö£¾
+ * ï¼œæ•°å­—ï¼::= ï¼ï½œï¼œéé›¶æ•°å­—ï¼
  * FIRST: ...
 */
 void GrammaticalParser::__number(int level) {
-	// ´Ê·¨·ÖÎö³ä×ã£¬¸Ã·ÇÖÕ½á·û±»ºöÂÔ
-	FLAG_ENTER("<Êı×Ö>", level);
+	// è¯æ³•åˆ†æå……è¶³ï¼Œè¯¥éç»ˆç»“ç¬¦è¢«å¿½ç•¥
+	FLAG_ENTER("<æ•°å­—>", level);
 	FLAG_FAIL;
 	throw ParseException(ParseExceptionType::Unexpected, string("<Number>"));
 }
 
 /**
- * £¼·ÇÁãÊı×Ö£¾::= £±£ü£®£®£®£ü£¹
+ * ï¼œéé›¶æ•°å­—ï¼::= ï¼‘ï½œï¼ï¼ï¼ï½œï¼™
  * FIRST: ...
  */
 void GrammaticalParser::__non_zero_number(int level) {
-	// ´Ê·¨·ÖÎö³ä×ã£¬¸Ã·ÇÖÕ½á·û±»ºöÂÔ
-	FLAG_ENTER("<·ÇÁãÊı×Ö>", level);
+	// è¯æ³•åˆ†æå……è¶³ï¼Œè¯¥éç»ˆç»“ç¬¦è¢«å¿½ç•¥
+	FLAG_ENTER("<éé›¶æ•°å­—>", level);
 	FLAG_FAIL;
 	throw ParseException(ParseExceptionType::Unexpected, string("<Non-Zero Number>"));
 }
 
 /**
- * £¼×Ö·û£¾::=  '£¼¼Ó·¨ÔËËã·û£¾'£ü'£¼³Ë·¨ÔËËã·û£¾'£ü'£¼×ÖÄ¸£¾'£ü'£¼Êı×Ö£¾'
+ * ï¼œå­—ç¬¦ï¼::=  'ï¼œåŠ æ³•è¿ç®—ç¬¦ï¼'ï½œ'ï¼œä¹˜æ³•è¿ç®—ç¬¦ï¼'ï½œ'ï¼œå­—æ¯ï¼'ï½œ'ï¼œæ•°å­—ï¼'
  * FIRST: '
- * !: ´Ê·¨·ÖÎöÊ±ÓÉÓÚÒÑ¾­ºöÂÔÁËµ¥ÒıºÅ'²¢ÅĞ¶ÏÁË×Ö·û£¬Òò´Ë¸Ã¹æÔòÆ¥Åä²»ÍêÈ«ÑÏ¸ñ¡£
+ * !: è¯æ³•åˆ†ææ—¶ç”±äºå·²ç»å¿½ç•¥äº†å•å¼•å·'å¹¶åˆ¤æ–­äº†å­—ç¬¦ï¼Œå› æ­¤è¯¥è§„åˆ™åŒ¹é…ä¸å®Œå…¨ä¸¥æ ¼ã€‚
 */
 char GrammaticalParser::__char(int level) {
-	FLAG_ENTER("<×Ö·û>", level);
+	FLAG_ENTER("<å­—ç¬¦>", level);
 	try {
 		SYMBOL_CHECK(SYMBOL::CHARCON);
 	}
@@ -178,12 +178,12 @@ char GrammaticalParser::__char(int level) {
 }
 
 /**
- * £¼×Ö·û´®£¾::=  "£ûÊ®½øÖÆ±àÂëÎª32,33,35-126µÄASCII×Ö·û£ı"
+ * ï¼œå­—ç¬¦ä¸²ï¼::=  "ï½›åè¿›åˆ¶ç¼–ç ä¸º32,33,35-126çš„ASCIIå­—ç¬¦ï½"
  * FIRST: "
- * !: ´Ê·¨·ÖÎöÊ±ÓÉÓÚÒÑ¾­ºöÂÔÁËË«ÒıºÅ"²¢ÅĞ¶ÏÁË×Ö·û£¬Òò´Ë¸Ã¹æÔòÆ¥Åä²»ÍêÈ«ÑÏ¸ñ.
+ * !: è¯æ³•åˆ†ææ—¶ç”±äºå·²ç»å¿½ç•¥äº†åŒå¼•å·"å¹¶åˆ¤æ–­äº†å­—ç¬¦ï¼Œå› æ­¤è¯¥è§„åˆ™åŒ¹é…ä¸å®Œå…¨ä¸¥æ ¼.
 */
 string GrammaticalParser::__string(int level) {
-	FLAG_ENTER("<×Ö·û´®>", level);
+	FLAG_ENTER("<å­—ç¬¦ä¸²>", level);
 	try {
 		SYMBOL_CHECK(SYMBOL::STRCON);
 	}
@@ -196,37 +196,37 @@ string GrammaticalParser::__string(int level) {
 }
 
 /**
- * £¼³ÌĞò£¾::= £Û£¼³£Á¿ËµÃ÷£¾£İ£Û£¼±äÁ¿ËµÃ÷£¾£İ{£¼ÓĞ·µ»ØÖµº¯Êı¶¨Òå£¾|£¼ÎŞ·µ»ØÖµº¯Êı¶¨Òå£¾}£¼Ö÷º¯Êı£¾
- * FISRT(<³£Á¿ËµÃ÷>) = {CONSTTK}
- * FISRT(<±äÁ¿ËµÃ÷>) = {INTTK, CHARTK}
- * FISRT(<ÓĞ·µ»ØµÄº¯Êı¶¨Òå>) = {INTTK, CHARTK}
- * FISRT(<ÎŞ·µ»ØµÄº¯Êı¶¨Òå>) = {VOIDTK}
- * FISRT(<Ö÷º¯Êı>) = {VOIDTK}
+ * ï¼œç¨‹åºï¼::= ï¼»ï¼œå¸¸é‡è¯´æ˜ï¼ï¼½ï¼»ï¼œå˜é‡è¯´æ˜ï¼ï¼½{ï¼œæœ‰è¿”å›å€¼å‡½æ•°å®šä¹‰ï¼|ï¼œæ— è¿”å›å€¼å‡½æ•°å®šä¹‰ï¼}ï¼œä¸»å‡½æ•°ï¼
+ * FISRT(<å¸¸é‡è¯´æ˜>) = {CONSTTK}
+ * FISRT(<å˜é‡è¯´æ˜>) = {INTTK, CHARTK}
+ * FISRT(<æœ‰è¿”å›çš„å‡½æ•°å®šä¹‰>) = {INTTK, CHARTK}
+ * FISRT(<æ— è¿”å›çš„å‡½æ•°å®šä¹‰>) = {VOIDTK}
+ * FISRT(<ä¸»å‡½æ•°>) = {VOIDTK}
  *
- * !:{INTTK, CHARTK} ³öÏÖÁËFISRT¼¯ºÏµÄ³åÍ»£¬ĞèÒª¸ü¶àµÄÍµ¿ú - Õë¶Ô<±äÁ¿ËµÃ÷>ºÍ<ÓĞº¯ÊıÖµº¯Êı¶¨Òå>
- * !:{VOIDTK} ³öÏÖÁËFIRST¼¯ºÏµÄ³åÍ»£¬ĞèÒª¸ü¶àµÄÍµ¿ú
+ * !:{INTTK, CHARTK} å‡ºç°äº†FISRTé›†åˆçš„å†²çªï¼Œéœ€è¦æ›´å¤šçš„å·çª¥ - é’ˆå¯¹<å˜é‡è¯´æ˜>å’Œ<æœ‰å‡½æ•°å€¼å‡½æ•°å®šä¹‰>
+ * !:{VOIDTK} å‡ºç°äº†FIRSTé›†åˆçš„å†²çªï¼Œéœ€è¦æ›´å¤šçš„å·çª¥
  */
 void GrammaticalParser::__program(int level)
 {
-	FLAG_ENTER("<³ÌĞò>", level);
-	symbol_table.add_one_block();												// ½øÈëµ±Ç°¿é
+	FLAG_ENTER("<ç¨‹åº>", level);
+	symbol_table.add_one_block();												// è¿›å…¥å½“å‰å—
 	Block* block = symbol_table.get_present_block();
 	SymbolItem * global = SymbolFactory::create_function(block,
 		"#",
 		BasicType::_void, vector<SymbolItem*>());
 	try {
-		// <³£Á¿ËµÃ÷>
+		// <å¸¸é‡è¯´æ˜>
 		if (_peek()->equal(SYMBOL::CONSTTK)) {
 			__const_description(level + 1);
 		}
 
-		// <±äÁ¿ËµÃ÷>: ÓÃ·´ÀıÅĞ¶Ï£¬<±äÁ¿ËµÃ÷>ºÍ<ÓĞ·µ»ØÖµµÄº¯Êı¶¨Òå>´ÓºóĞøµÚÈı¸ö×Ö·ûÆğ³öÏÖ²îÒì
+		// <å˜é‡è¯´æ˜>: ç”¨åä¾‹åˆ¤æ–­ï¼Œ<å˜é‡è¯´æ˜>å’Œ<æœ‰è¿”å›å€¼çš„å‡½æ•°å®šä¹‰>ä»åç»­ç¬¬ä¸‰ä¸ªå­—ç¬¦èµ·å‡ºç°å·®å¼‚
 		if ((_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) && !_peek(3)->equal(SYMBOL::LPARENT)) {
 			__var_description(level + 1);
 		}
 
-		// {£¼ÓĞ·µ»ØÖµº¯Êı¶¨Òå£¾ | £¼ÎŞ·µ»ØÖµº¯Êı¶¨Òå£¾}
-		// £¼ÎŞ·µ»ØÖµº¯Êı¶¨Òå£¾ĞèÒªÅÅ³ıvoid main
+		// {ï¼œæœ‰è¿”å›å€¼å‡½æ•°å®šä¹‰ï¼ | ï¼œæ— è¿”å›å€¼å‡½æ•°å®šä¹‰ï¼}
+		// ï¼œæ— è¿”å›å€¼å‡½æ•°å®šä¹‰ï¼éœ€è¦æ’é™¤void main
 		while (
 			(_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) ||
 			(_peek()->equal(SYMBOL::VOIDTK) && !_peek(2)->equal(SYMBOL::MAINTK))
@@ -239,7 +239,7 @@ void GrammaticalParser::__program(int level)
 				__function_void(level + 1);
 			}
 		}
-		// <Ö÷º¯Êı>
+		// <ä¸»å‡½æ•°>
 		__main_function(level + 1);
 	}
 	catch (ParseException& e) {
@@ -247,18 +247,18 @@ void GrammaticalParser::__program(int level)
 		throw e;
 	}
 	FLAG_PASS;
-	symbol_table.exit_present_block();												// Àë¿ªµ±Ç°¿é
+	symbol_table.exit_present_block();												// ç¦»å¼€å½“å‰å—
 }
 
 /**
- * £¼³£Á¿ËµÃ÷£¾ ::=  const£¼³£Á¿¶¨Òå£¾;{ const£¼³£Á¿¶¨Òå£¾;}
- * FISRT(<³£Á¿ËµÃ÷>) = {CONSTTK}
- * FOLLOW(<³£Á¿ËµÃ÷>) = {...}
- * ²»´æÔÚFISRT(< const£¼³£Á¿¶¨Òå£¾;>)ºÍFOLLOW(<³£Á¿ËµÃ÷>)¼¯ºÏ½»²æÇé¿ö¡£
+ * ï¼œå¸¸é‡è¯´æ˜ï¼ ::=  constï¼œå¸¸é‡å®šä¹‰ï¼;{ constï¼œå¸¸é‡å®šä¹‰ï¼;}
+ * FISRT(<å¸¸é‡è¯´æ˜>) = {CONSTTK}
+ * FOLLOW(<å¸¸é‡è¯´æ˜>) = {...}
+ * ä¸å­˜åœ¨FISRT(< constï¼œå¸¸é‡å®šä¹‰ï¼;>)å’ŒFOLLOW(<å¸¸é‡è¯´æ˜>)é›†åˆäº¤å‰æƒ…å†µã€‚
 */
 void GrammaticalParser::__const_description(int level)
 {
-	FLAG_ENTER("<³£Á¿ËµÃ÷>", level);
+	FLAG_ENTER("<å¸¸é‡è¯´æ˜>", level);
 	try {
 		SYMBOL_CHECK(SYMBOL::CONSTTK);
 		__const_def(level + 1);
@@ -280,14 +280,14 @@ void GrammaticalParser::__const_description(int level)
 }
 
 /**
- * £¼³£Á¿¶¨Òå£¾::=int£¼±êÊ¶·û£¾£½£¼ÕûÊı£¾{,£¼±êÊ¶·û£¾£½£¼ÕûÊı£¾} | char£¼±êÊ¶·û£¾£½£¼×Ö·û£¾{,£¼±êÊ¶·û£¾£½£¼×Ö·û£¾}
+ * ï¼œå¸¸é‡å®šä¹‰ï¼::=intï¼œæ ‡è¯†ç¬¦ï¼ï¼ï¼œæ•´æ•°ï¼{,ï¼œæ ‡è¯†ç¬¦ï¼ï¼ï¼œæ•´æ•°ï¼} | charï¼œæ ‡è¯†ç¬¦ï¼ï¼ï¼œå­—ç¬¦ï¼{,ï¼œæ ‡è¯†ç¬¦ï¼ï¼ï¼œå­—ç¬¦ï¼}
  * FIRST(1) = {INTTK}, FIRST(2) = {CHARTK}
- * FOLLOW(<³£Á¿¶¨Òå>) = {SEMICN}
- * ²»´æÔÚFOLLOW(<³£Á¿¶¨Òå>)ÓëFIRST(,£¼±êÊ¶·û£¾£½£¼ÕûÊı£¾| <×Ö·û>) Ïà½»Çé¿ö¡£
+ * FOLLOW(<å¸¸é‡å®šä¹‰>) = {SEMICN}
+ * ä¸å­˜åœ¨FOLLOW(<å¸¸é‡å®šä¹‰>)ä¸FIRST(,ï¼œæ ‡è¯†ç¬¦ï¼ï¼ï¼œæ•´æ•°ï¼| <å­—ç¬¦>) ç›¸äº¤æƒ…å†µã€‚
 */
 void GrammaticalParser::__const_def(int level)
 {
-	FLAG_ENTER("<³£Á¿¶¨Òå>", level);
+	FLAG_ENTER("<å¸¸é‡å®šä¹‰>", level);
 	Block* block = symbol_table.get_present_block();
 
 	try {
@@ -316,13 +316,13 @@ void GrammaticalParser::__const_def(int level)
 						const_value = __integer(level + 1);
 					else
 						const_value = __char(level + 1);
-					// ²ôÔÓÆäËûµÄ¶«Î÷
+					// æºæ‚å…¶ä»–çš„ä¸œè¥¿
 					if (!(_peek()->equal(SYMBOL::COMMA) || (_peek()->equal(SYMBOL::SEMICN)))) {
 						while (!(_peek()->equal(SYMBOL::COMMA) || (_peek()->equal(SYMBOL::SEMICN))))
 							_next();
 						_register_error(token->line, ErrorType::ConstDefWrong);
 					}
-					// ÕıÈ·ÎŞÎóºóÔÙÊäÈë±íÖĞ
+					// æ­£ç¡®æ— è¯¯åå†è¾“å…¥è¡¨ä¸­
 					SymbolItem* temp = 
 						SymbolFactory::create_const(block, name, type, const_value);
 					GetConstDeclarQuater(block, temp);
@@ -346,11 +346,11 @@ void GrammaticalParser::__const_def(int level)
 }
 
 /**
- * £¼ÎŞ·ûºÅÕûÊı£¾  ::= £¼·ÇÁãÊı×Ö£¾£û£¼Êı×Ö£¾£ı| 0
+ * ï¼œæ— ç¬¦å·æ•´æ•°ï¼  ::= ï¼œéé›¶æ•°å­—ï¼ï½›ï¼œæ•°å­—ï¼ï½| 0
  * FIRST: ...
 */
 int GrammaticalParser::__unsigned_integer(int level) {
-	FLAG_ENTER("<ÎŞ·ûºÅÕûÊı>", level);
+	FLAG_ENTER("<æ— ç¬¦å·æ•´æ•°>", level);
 	try {
 		SYMBOL_CHECK(SYMBOL::INTCON);
 	}
@@ -363,12 +363,12 @@ int GrammaticalParser::__unsigned_integer(int level) {
 }
 
 /**
- * £¼ÕûÊı£¾::= £Û£«£ü£­£İ£¼ÎŞ·ûºÅÕûÊı£¾
+ * ï¼œæ•´æ•°ï¼::= ï¼»ï¼‹ï½œï¼ï¼½ï¼œæ— ç¬¦å·æ•´æ•°ï¼
  * FIRST(1) = {PLUS}, FIRST(2) = {MINU}, FIRST(3) = {INTCON}
 */
 int GrammaticalParser::__integer(int level)
 {
-	FLAG_ENTER("<ÕûÊı>", level);
+	FLAG_ENTER("<æ•´æ•°>", level);
 	int number;
 	int neg = 1;
 	try {
@@ -390,11 +390,11 @@ int GrammaticalParser::__integer(int level)
 }
 
 /**
- * £¼±êÊ¶·û£¾::=  £¼×ÖÄ¸£¾£û£¼×ÖÄ¸£¾£ü£¼Êı×Ö£¾£ı
+ * ï¼œæ ‡è¯†ç¬¦ï¼::=  ï¼œå­—æ¯ï¼ï½›ï¼œå­—æ¯ï¼ï½œï¼œæ•°å­—ï¼ï½
  * FIRST: ...
 */
 string GrammaticalParser::__idenfr(int level, bool is_def) {
-	FLAG_ENTER("<±êÊ¶·û>", level);
+	FLAG_ENTER("<æ ‡è¯†ç¬¦>", level);
 	try {
 		SYMBOL_CHECK(SYMBOL::IDENFR);
 		// unit4error - b 
@@ -417,11 +417,11 @@ string GrammaticalParser::__idenfr(int level, bool is_def) {
 }
 
 /**
- * £¼ÉùÃ÷Í·²¿£¾::=  int£¼±êÊ¶·û£¾ | char£¼±êÊ¶·û£¾
+ * ï¼œå£°æ˜å¤´éƒ¨ï¼::=  intï¼œæ ‡è¯†ç¬¦ï¼ | charï¼œæ ‡è¯†ç¬¦ï¼
  * FIRST(1) = {INTTK}, FIRST(2) = {CHARTK}
 */
 void GrammaticalParser::__declar_head(int level, BasicType* return_type, string* func_name) {
-	FLAG_ENTER("<ÉùÃ÷Í·²¿>", level);
+	FLAG_ENTER("<å£°æ˜å¤´éƒ¨>", level);
 	try {
 		if (_peek()->equal(SYMBOL::INTTK))
 		{
@@ -447,9 +447,9 @@ void GrammaticalParser::__declar_head(int level, BasicType* return_type, string*
 }
 
 /**
- * £¼±äÁ¿ËµÃ÷£¾::= £¼±äÁ¿¶¨Òå£¾;{£¼±äÁ¿¶¨Òå£¾;}
- * FIRST(<±äÁ¿ËµÃ÷>) = FISRT(<±äÁ¿¶¨Òå>) = {INTTK, CHARTK}
- * FOLLOW(<±äÁ¿ËµÃ÷>) = FISRT(<ÓĞ·µ»ØÖµº¯Êı¶¨Òå>) + FISRT(<ÎŞ·µ»ØÖµº¯Êı¶¨Òå>) + FIRST(<Ö÷º¯Êı>) + FIRST(<Óï¾äÁĞ>)
+ * ï¼œå˜é‡è¯´æ˜ï¼::= ï¼œå˜é‡å®šä¹‰ï¼;{ï¼œå˜é‡å®šä¹‰ï¼;}
+ * FIRST(<å˜é‡è¯´æ˜>) = FISRT(<å˜é‡å®šä¹‰>) = {INTTK, CHARTK}
+ * FOLLOW(<å˜é‡è¯´æ˜>) = FISRT(<æœ‰è¿”å›å€¼å‡½æ•°å®šä¹‰>) + FISRT(<æ— è¿”å›å€¼å‡½æ•°å®šä¹‰>) + FIRST(<ä¸»å‡½æ•°>) + FIRST(<è¯­å¥åˆ—>)
  * {INTTK, CHARTK} // _peek(3) = ( ?
  * {VOIDTK}		   // _peek() = VOIDTK
  * {VOIDTK}        // _peek() = VOIDTK
@@ -458,13 +458,13 @@ void GrammaticalParser::__declar_head(int level, BasicType* return_type, string*
  */
 void GrammaticalParser::__var_description(int level)
 {
-	FLAG_ENTER("<±äÁ¿ËµÃ÷>", level);
+	FLAG_ENTER("<å˜é‡è¯´æ˜>", level);
 	try {
 		SYMBOL fisrt_list[] = { SYMBOL::INTTK, SYMBOL::CHARTK };
 		__var_def(level + 1);
 		SYMBOL_CHECK(SYMBOL::SEMICN);
 
-		// ÓÃ·´ÀıĞŞÕı½ö²Î¿¼FIRST¼¯ºÏµÄ²»×ã
+		// ç”¨åä¾‹ä¿®æ­£ä»…å‚è€ƒFIRSTé›†åˆçš„ä¸è¶³
 		while (_peek()->equal(fisrt_list, 2) && !_peek(3)->equal(SYMBOL::LPARENT)) {
 			__var_def(level + 1);
 			SYMBOL_CHECK(SYMBOL::SEMICN);
@@ -479,14 +479,14 @@ void GrammaticalParser::__var_description(int level)
 }
 
 /**
- * £¼±äÁ¿¶¨Òå£¾::= £¼ÀàĞÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾'['£¼ÎŞ·ûºÅÕûÊı£¾']'){,(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾'['£¼ÎŞ·ûºÅÕûÊı£¾']' )}
- * FOLLOW(<±äÁ¿¶¨Òå>) = {SEMICN}, FISRT(, <±êÊ¶·û>...) Óë FIRST(<'[' <ÎŞ·ûºÅº¯Êı> ']'>)Ã»ÓĞ½»¼¯.
- * FOLLOW(<±äÁ¿¶¨Òå>) = {SEMICN} Óë FIRST(<, <±êÊ¶·û>>) Ã»ÓĞ½»¼¯
- * * µ¥±äÁ¿ºÍÊı×é±äÁ¿µÄÉùÃ÷²îÒì[]È¡»ò²»È¡À´±íÊ¾
+ * ï¼œå˜é‡å®šä¹‰ï¼::= ï¼œç±»å‹æ ‡è¯†ç¬¦ï¼(ï¼œæ ‡è¯†ç¬¦ï¼|ï¼œæ ‡è¯†ç¬¦ï¼'['ï¼œæ— ç¬¦å·æ•´æ•°ï¼']'){,(ï¼œæ ‡è¯†ç¬¦ï¼|ï¼œæ ‡è¯†ç¬¦ï¼'['ï¼œæ— ç¬¦å·æ•´æ•°ï¼']' )}
+ * FOLLOW(<å˜é‡å®šä¹‰>) = {SEMICN}, FISRT(, <æ ‡è¯†ç¬¦>...) ä¸ FIRST(<'[' <æ— ç¬¦å·å‡½æ•°> ']'>)æ²¡æœ‰äº¤é›†.
+ * FOLLOW(<å˜é‡å®šä¹‰>) = {SEMICN} ä¸ FIRST(<, <æ ‡è¯†ç¬¦>>) æ²¡æœ‰äº¤é›†
+ * * å•å˜é‡å’Œæ•°ç»„å˜é‡çš„å£°æ˜å·®å¼‚[]å–æˆ–ä¸å–æ¥è¡¨ç¤º
 */
 void GrammaticalParser::__var_def(int level)
 {
-	FLAG_ENTER("<±äÁ¿¶¨Òå>", level);
+	FLAG_ENTER("<å˜é‡å®šä¹‰>", level);
 	Block* block = symbol_table.get_present_block();
 	try {
 		BasicType type = __type_idenfr(level + 1);
@@ -497,7 +497,7 @@ void GrammaticalParser::__var_def(int level)
 				SYMBOL_CHECK(SYMBOL::COMMA);
 			string idenfr_name = __idenfr(level + 1, true);
 			bool is_array = false;
-			// '[' <ÎŞ·ûºÅÕûÊı> ']'
+			// '[' <æ— ç¬¦å·æ•´æ•°> ']'
 			int size = 1;
 			if (_peek()->equal(SYMBOL::LBRACK)) {
 				SYMBOL_CHECK(SYMBOL::LBRACK);
@@ -520,10 +520,10 @@ void GrammaticalParser::__var_def(int level)
 
 
 /**
- * £¼ÀàĞÍ±êÊ¶·û£¾::=  int | char
+ * ï¼œç±»å‹æ ‡è¯†ç¬¦ï¼::=  int | char
 */
 BasicType GrammaticalParser::__type_idenfr(int level) {
-	FLAG_ENTER("<ÀàĞÍ±êÊ¶·û>", level);
+	FLAG_ENTER("<ç±»å‹æ ‡è¯†ç¬¦>", level);
 	try {
 		SYMBOL list[] = { SYMBOL::INTTK, SYMBOL::CHARTK };
 		MULTI_SYMBOL_CHECK(list, 2);
@@ -542,11 +542,11 @@ BasicType GrammaticalParser::__type_idenfr(int level) {
 }
 
 /**
- * £¼ÓĞ·µ»ØÖµº¯Êı¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾'('£¼²ÎÊı±í£¾')' '{'£¼¸´ºÏÓï¾ä£¾'}'
+ * ï¼œæœ‰è¿”å›å€¼å‡½æ•°å®šä¹‰ï¼  ::=  ï¼œå£°æ˜å¤´éƒ¨ï¼'('ï¼œå‚æ•°è¡¨ï¼')' '{'ï¼œå¤åˆè¯­å¥ï¼'}'
 */
 void GrammaticalParser::__function_return(int level) {
-	FLAG_ENTER("<ÓĞ·µ»ØÖµº¯Êı¶¨Òå>", level);
-	symbol_table.add_one_block();												// ½øÈëµ±Ç°¿é
+	FLAG_ENTER("<æœ‰è¿”å›å€¼å‡½æ•°å®šä¹‰>", level);
+	symbol_table.add_one_block();												// è¿›å…¥å½“å‰å—
 	Block* block = symbol_table.get_present_block();
 	try {
 		BasicType return_type;
@@ -558,7 +558,7 @@ void GrammaticalParser::__function_return(int level) {
 		SYMBOL_CHECK(SYMBOL::LPARENT);
 		__parameter_list(level + 1, &para_list);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
-		// º¯ÊıÍ·ÉùÃ÷Íê±Ï£¬¿ÉÒÔ¸üĞÂº¯ÊıµÄSymbolItem²¿¼şÁË.
+		// å‡½æ•°å¤´å£°æ˜å®Œæ¯•ï¼Œå¯ä»¥æ›´æ–°å‡½æ•°çš„SymbolIteméƒ¨ä»¶äº†.
 		SymbolItem* func_head = 
 			SymbolFactory::create_function(symbol_table.get_present_block(), func_name, return_type, para_list);
 		GetFuncDeclarQuater(block, func_head);
@@ -583,16 +583,16 @@ void GrammaticalParser::__function_return(int level) {
 	}
 	FLAG_PASS;
 
-	symbol_table.exit_present_block();											// Àë¿ªµ±Ç°¿é
+	symbol_table.exit_present_block();											// ç¦»å¼€å½“å‰å—
 }
 
 /**
- * £¼ÎŞ·µ»ØÖµº¯Êı¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾'('£¼²ÎÊı±í£¾')''{'£¼¸´ºÏÓï¾ä£¾'}'
+ * ï¼œæ— è¿”å›å€¼å‡½æ•°å®šä¹‰ï¼  ::= voidï¼œæ ‡è¯†ç¬¦ï¼'('ï¼œå‚æ•°è¡¨ï¼')''{'ï¼œå¤åˆè¯­å¥ï¼'}'
 */
 void GrammaticalParser::__function_void(int level) {
-	FLAG_ENTER("<ÎŞ·µ»ØÖµº¯Êı¶¨Òå>", level);
+	FLAG_ENTER("<æ— è¿”å›å€¼å‡½æ•°å®šä¹‰>", level);
 
-	symbol_table.add_one_block();												// ½øÈëµ±Ç°¿é
+	symbol_table.add_one_block();												// è¿›å…¥å½“å‰å—
 	Block* block = symbol_table.get_present_block();
 	try {
 		BasicType return_type = BasicType::_void;
@@ -605,7 +605,7 @@ void GrammaticalParser::__function_void(int level) {
 		SYMBOL_CHECK(SYMBOL::LPARENT);
 		__parameter_list(level + 1, &para_list);
 		SYMBOL_CHECK(SYMBOL::RPARENT);
-		// º¯ÊıÍ·ÉùÃ÷Íê±Ï£¬¿ÉÒÔ¸üĞÂº¯ÊıµÄSymbolItem²¿¼şÁË.
+		// å‡½æ•°å¤´å£°æ˜å®Œæ¯•ï¼Œå¯ä»¥æ›´æ–°å‡½æ•°çš„SymbolIteméƒ¨ä»¶äº†.
 		SymbolItem * func_head = 
 			SymbolFactory::create_function(symbol_table.get_present_block(), func_name, return_type, para_list);
 		GetFuncDeclarQuater(block, func_head);
@@ -616,7 +616,7 @@ void GrammaticalParser::__function_void(int level) {
 		SYMBOL_CHECK(SYMBOL::LBRACE);
 		bool has_return = false;
 		__compound_statement(level + 1, &has_return);
-		GetFuncRetQuater(block, NULL);							// ÎŞ·µ»ØÖµº¯ÊıÇ¿ĞĞÔö¼ÓÒ»¸öreturn
+		GetFuncRetQuater(block, NULL);							// æ— è¿”å›å€¼å‡½æ•°å¼ºè¡Œå¢åŠ ä¸€ä¸ªreturn
 
 		// RECUR_CHECK(__compound_statement, RECUR_DEFAULT);
 		SYMBOL_CHECK(SYMBOL::RBRACE);
@@ -627,16 +627,16 @@ void GrammaticalParser::__function_void(int level) {
 	}
 	FLAG_PASS;
 
-	symbol_table.exit_present_block();											// Àë¿ªµ±Ç°¿é
+	symbol_table.exit_present_block();											// ç¦»å¼€å½“å‰å—
 }
 
 /**
- * £¼¸´ºÏÓï¾ä£¾::=£Û£¼³£Á¿ËµÃ÷£¾£İ£Û£¼±äÁ¿ËµÃ÷£¾£İ£¼Óï¾äÁĞ£¾
- * FISRT(<³£Á¿ËµÃ÷>) = {CONSTK}£¬ FIRST(<±äÁ¿ËµÃ÷>) = {FIRST(<±äÁ¿¶¨Òå>)} = {INTTK, CHARTK}
- * FOLLOW(...<[±äÁ¿ËµÃ÷]>) = FISRT(<Óï¾äÁĞ>) Óë FISRT(<±äÁ¿ËµÃ÷>) Ã»ÓĞ½»¼¯
+ * ï¼œå¤åˆè¯­å¥ï¼::=ï¼»ï¼œå¸¸é‡è¯´æ˜ï¼ï¼½ï¼»ï¼œå˜é‡è¯´æ˜ï¼ï¼½ï¼œè¯­å¥åˆ—ï¼
+ * FISRT(<å¸¸é‡è¯´æ˜>) = {CONSTK}ï¼Œ FIRST(<å˜é‡è¯´æ˜>) = {FIRST(<å˜é‡å®šä¹‰>)} = {INTTK, CHARTK}
+ * FOLLOW(...<[å˜é‡è¯´æ˜]>) = FISRT(<è¯­å¥åˆ—>) ä¸ FISRT(<å˜é‡è¯´æ˜>) æ²¡æœ‰äº¤é›†
 */
 void GrammaticalParser::__compound_statement(int level, bool *has_return) {
-	FLAG_ENTER("<¸´ºÏÓï¾ä>", level);
+	FLAG_ENTER("<å¤åˆè¯­å¥>", level);
 	try {
 		SYMBOL first_list[] = { SYMBOL::INTTK, SYMBOL::CHARTK };
 		// [<const des>]
@@ -658,17 +658,17 @@ void GrammaticalParser::__compound_statement(int level, bool *has_return) {
 }
 
 /**
- * £¼²ÎÊı±í£¾::=  £¼ÀàĞÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàĞÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾} | £¼¿Õ£¾
- * ²»´ø»ØËİµÄÎÄ·¨·ÖÎö·½Ê½£º1.Á½ÖÖÑ¡ÔñµÄFIRST¼¯ºÏ²»ÄÜÓĞ½»¼¯¡£ 2.ÖÁ¶àÒ»¸ö¿Õ¡£ 3.µ¼³ö¿ÕµÄÑ¡Ôñ£¬·Ç¿Õµ¼³öÍË³öµÄĞòÁĞÖĞ²»ÄÜº¬ÓĞFOLLOW(<²ÎÊı±í>)
- * FIRST(1) = {INTTK, CHARTK}, FOLLOW(²ÎÊı±í) =  {RPARENT}
- * FOLLOW(<±êÊ¶·û>) = {RPARENT} Óë FIRST(<,<ÀàĞÍ±êÊ¶·û><±êÊ¶·û>>) ÎŞ½»¼¯
+ * ï¼œå‚æ•°è¡¨ï¼::=  ï¼œç±»å‹æ ‡è¯†ç¬¦ï¼ï¼œæ ‡è¯†ç¬¦ï¼{,ï¼œç±»å‹æ ‡è¯†ç¬¦ï¼ï¼œæ ‡è¯†ç¬¦ï¼} | ï¼œç©ºï¼
+ * ä¸å¸¦å›æº¯çš„æ–‡æ³•åˆ†ææ–¹å¼ï¼š1.ä¸¤ç§é€‰æ‹©çš„FIRSTé›†åˆä¸èƒ½æœ‰äº¤é›†ã€‚ 2.è‡³å¤šä¸€ä¸ªç©ºã€‚ 3.å¯¼å‡ºç©ºçš„é€‰æ‹©ï¼Œéç©ºå¯¼å‡ºé€€å‡ºçš„åºåˆ—ä¸­ä¸èƒ½å«æœ‰FOLLOW(<å‚æ•°è¡¨>)
+ * FIRST(1) = {INTTK, CHARTK}, FOLLOW(å‚æ•°è¡¨) =  {RPARENT}
+ * FOLLOW(<æ ‡è¯†ç¬¦>) = {RPARENT} ä¸ FIRST(<,<ç±»å‹æ ‡è¯†ç¬¦><æ ‡è¯†ç¬¦>>) æ— äº¤é›†
 */
 void GrammaticalParser::__parameter_list(int level, vector<SymbolItem*>* para_list)
 {
-	FLAG_ENTER("<²ÎÊı±í>", level);
+	FLAG_ENTER("<å‚æ•°è¡¨>", level);
 
 	try {
-		// ~<¿Õ>
+		// ~<ç©º>
 		if (_peek()->equal(SYMBOL::INTTK) || _peek()->equal(SYMBOL::CHARTK)) {
 			int cnt = 0;
 			do
@@ -677,12 +677,12 @@ void GrammaticalParser::__parameter_list(int level, vector<SymbolItem*>* para_li
 					SYMBOL_CHECK(SYMBOL::COMMA);
 				BasicType type = __type_idenfr(level + 1);
 				string name = __idenfr(level + 1, true);
-				// ²åÈëÀàĞÍ±íÊ¾
+				// æ’å…¥ç±»å‹è¡¨ç¤º
 				SymbolItem* para = SymbolFactory::create_variable(symbol_table.get_present_block(),name, type, 1, false);
 				para_list->push_back(para);
 			} while (_peek()->equal(SYMBOL::COMMA));
 		}
-		// <¿Õ>
+		// <ç©º>
 		else {
 
 		}
@@ -696,13 +696,13 @@ void GrammaticalParser::__parameter_list(int level, vector<SymbolItem*>* para_li
 }
 
 /**
- * £¼Ö÷º¯Êı£¾::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
+ * ï¼œä¸»å‡½æ•°ï¼::= void mainâ€˜(â€™â€˜)â€™ â€˜{â€™ï¼œå¤åˆè¯­å¥ï¼â€˜}â€™
  * FIRST(x): {VOIDTK}
 */
 void GrammaticalParser::__main_function(int level)
 {
-	FLAG_ENTER("<Ö÷º¯Êı>", level);
-	symbol_table.add_one_block();												// ½øÈëµ±Ç°¿é
+	FLAG_ENTER("<ä¸»å‡½æ•°>", level);
+	symbol_table.add_one_block();												// è¿›å…¥å½“å‰å—
 	SymbolItem* main = SymbolFactory::create_function(symbol_table.get_present_block(),
 		"main", BasicType::_void, vector<SymbolItem*>());
 	Block* block = symbol_table.get_present_block();
@@ -728,16 +728,16 @@ void GrammaticalParser::__main_function(int level)
 }
 
 /**
- * £¼±í´ïÊ½£¾::= £Û£«£ü£­£İ£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}   //[+|-]Ö»×÷ÓÃÓÚµÚÒ»¸ö<Ïî>
- * FIRST(<±í´ïÊ½>): {PLUS, MINU, FIRST(Ïî)} = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
- * ±í´ïÊ½½«ÔÊĞí ++5 - 1 µÄÇé¿ö³öÏÖ
+ * ï¼œè¡¨è¾¾å¼ï¼::= ï¼»ï¼‹ï½œï¼ï¼½ï¼œé¡¹ï¼{ï¼œåŠ æ³•è¿ç®—ç¬¦ï¼ï¼œé¡¹ï¼}   //[+|-]åªä½œç”¨äºç¬¬ä¸€ä¸ª<é¡¹>
+ * FIRST(<è¡¨è¾¾å¼>): {PLUS, MINU, FIRST(é¡¹)} = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
+ * è¡¨è¾¾å¼å°†å…è®¸ ++5 - 1 çš„æƒ…å†µå‡ºç°
  *
- * FIRST(<¼Ó·¨ÔËËã·û>) = {PLUS, MINU}
- * FOLLOW(<±í´ïÊ½>) = {RBRACK, RPARENT, GRE,GEQ,LSS,LEQ,NEQ,EQL, COMMA} + {SEMICN}(<¸³ÖµÓï¾äĞÂÔö>)
- * FIRST<¼Ó·¨ÔËËã·û> Óë FOLLOW<±í´ïÊ½> Ã»ÓĞ½»¼¯, Òò´ËÎŞ»ØËİ.
+ * FIRST(<åŠ æ³•è¿ç®—ç¬¦>) = {PLUS, MINU}
+ * FOLLOW(<è¡¨è¾¾å¼>) = {RBRACK, RPARENT, GRE,GEQ,LSS,LEQ,NEQ,EQL, COMMA} + {SEMICN}(<èµ‹å€¼è¯­å¥æ–°å¢>)
+ * FIRST<åŠ æ³•è¿ç®—ç¬¦> ä¸ FOLLOW<è¡¨è¾¾å¼> æ²¡æœ‰äº¤é›†, å› æ­¤æ— å›æº¯.
 */
 SymbolItem* GrammaticalParser::__expression(int level, bool *is_char) {
-	FLAG_ENTER("<±í´ïÊ½>", level);
+	FLAG_ENTER("<è¡¨è¾¾å¼>", level);
 	int cnt = 0;
 	bool neg = false;
 	SymbolItem* first_item;
@@ -761,7 +761,7 @@ SymbolItem* GrammaticalParser::__expression(int level, bool *is_char) {
 			SymbolItem* second_item = __item(level + 1, NULL);
 			cnt++;
 
-			// ¸ù¾İ²Ù×÷·ûµÄ²îÒì£¬Éú³É²»Í¬µÄÖĞ¼äÊ½ - begin
+			// æ ¹æ®æ“ä½œç¬¦çš„å·®å¼‚ï¼Œç”Ÿæˆä¸åŒçš„ä¸­é—´å¼ - begin
 			SymbolItem* temp_item = SymbolFactory::create_temp(block, BasicType::_int);
 			if (op->equal(SYMBOL::PLUS)) 
 				GetAddQuater(block, first_item, second_item, temp_item);
@@ -770,10 +770,10 @@ SymbolItem* GrammaticalParser::__expression(int level, bool *is_char) {
 			first_item = temp_item;
 			// end
 		}
-		// ±í´ïÊ½Ö»ÓĞÒ»¸öÏîÇÒÕâ¸öÏîÊÇchar£¬ÄÇÃ´±í´ïÊ½¾ÍÊÇcharĞÍ
+		// è¡¨è¾¾å¼åªæœ‰ä¸€ä¸ªé¡¹ä¸”è¿™ä¸ªé¡¹æ˜¯charï¼Œé‚£ä¹ˆè¡¨è¾¾å¼å°±æ˜¯charå‹
 		if (cnt == 1 && temp && is_char != NULL)
 			* is_char = true;
-		// È¡¸º²Ù×÷
+		// å–è´Ÿæ“ä½œ
 		if (neg) {
 			GetSubQuater(block, NULL, first_item, first_item);
 		}
@@ -788,15 +788,15 @@ SymbolItem* GrammaticalParser::__expression(int level, bool *is_char) {
 
 
 /**
- * £¼Ïî£¾::= £¼Òò×Ó£¾{£¼³Ë·¨ÔËËã·û£¾£¼Òò×Ó£¾}
- * FIRST(<Ïî>) = FIRST(<Òò×Ó>) = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
+ * ï¼œé¡¹ï¼::= ï¼œå› å­ï¼{ï¼œä¹˜æ³•è¿ç®—ç¬¦ï¼ï¼œå› å­ï¼}
+ * FIRST(<é¡¹>) = FIRST(<å› å­>) = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
 
- * FIRST(<³Ë·¨ÔËËã·û>) = {MULT, DIV}
- * FOLLOW(<Ïî>) = {RBRACK, RPARENT, GRE,GEQ,LSS,LEQ,NEQ,EQL, COMMA, SEMICN} + {PLUS, MINU}
- * FIRST Óë FOLLOW ½»¼¯£¬¹Ê²»´æÔÚ»ØËİ
+ * FIRST(<ä¹˜æ³•è¿ç®—ç¬¦>) = {MULT, DIV}
+ * FOLLOW(<é¡¹>) = {RBRACK, RPARENT, GRE,GEQ,LSS,LEQ,NEQ,EQL, COMMA, SEMICN} + {PLUS, MINU}
+ * FIRST ä¸ FOLLOW äº¤é›†ï¼Œæ•…ä¸å­˜åœ¨å›æº¯
 */
 SymbolItem* GrammaticalParser::__item(int level, bool *is_char) {
-	FLAG_ENTER("<Ïî>", level);
+	FLAG_ENTER("<é¡¹>", level);
 	int cnt = 0;
 	Block* block = symbol_table.get_present_block();
 	SymbolItem* first_factor;
@@ -810,7 +810,7 @@ SymbolItem* GrammaticalParser::__item(int level, bool *is_char) {
 			SymbolItem* secord_factor = __factor(level + 1, NULL);
 			cnt++;
 
-			// ¸ù¾İ²Ù×÷·û£¬Éú³ÉÏàÓ¦ÖĞ¼ä´úÂë
+			// æ ¹æ®æ“ä½œç¬¦ï¼Œç”Ÿæˆç›¸åº”ä¸­é—´ä»£ç 
 			SymbolItem* temp = SymbolFactory::create_temp(block, BasicType::_int);
 			if (op->equal(SYMBOL::MULT))
 				GetMultQuater(block, first_factor, secord_factor, temp);
@@ -818,7 +818,7 @@ SymbolItem* GrammaticalParser::__item(int level, bool *is_char) {
 				GetDivQuater(block, first_factor, secord_factor, temp);
 			first_factor = temp;
 		}
-		// Èô¹ûÖ»ÓĞÒ»¸öÒò×Ó²¢ÇÒÒò×ÓÎªchar£¬ÔòÎªchar
+		// è‹¥æœåªæœ‰ä¸€ä¸ªå› å­å¹¶ä¸”å› å­ä¸ºcharï¼Œåˆ™ä¸ºchar
 		if (cnt == 1 && temp && is_char) {
 			*is_char = true;
 		}
@@ -832,27 +832,27 @@ SymbolItem* GrammaticalParser::__item(int level, bool *is_char) {
 }
 
 /**
- * £¼Òò×Ó£¾::= £¼±êÊ¶·û£¾ £ü £¼±êÊ¶·û£¾'['£¼±í´ïÊ½£¾']' | '('£¼±í´ïÊ½£¾')' £ü £¼ÕûÊı£¾ | £¼×Ö·û£¾£ü£¼ÓĞ·µ»ØÖµº¯Êıµ÷ÓÃÓï¾ä£¾
- * FIRST(<Òò×Ó>) = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
- * !: Òò×ÓµÄÇ°Á½ÖÖÑ¡Ôñ²»Âú×ãFIRST¼¯ºÏ²»Ïà½»µÄÔ­Ôò£¬¸ÄĞ´Îª<±êÊ¶·û>[ '[' <±í´ïÊ½> ']' ]£¬
- *    ²¢ÇÒFIRST([...]) = {LBRACK} Óë FOLLOW{<Òò×Ó>} = {MULT, DIV} + FOLLOW(<Ïî>)Ã»ÓĞ½»¼¯
+ * ï¼œå› å­ï¼::= ï¼œæ ‡è¯†ç¬¦ï¼ ï½œ ï¼œæ ‡è¯†ç¬¦ï¼'['ï¼œè¡¨è¾¾å¼ï¼']' | '('ï¼œè¡¨è¾¾å¼ï¼')' ï½œ ï¼œæ•´æ•°ï¼ | ï¼œå­—ç¬¦ï¼ï½œï¼œæœ‰è¿”å›å€¼å‡½æ•°è°ƒç”¨è¯­å¥ï¼
+ * FIRST(<å› å­>) = {IDENFR} + {IDENFR} + {RPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
+ * !: å› å­çš„å‰ä¸¤ç§é€‰æ‹©ä¸æ»¡è¶³FIRSTé›†åˆä¸ç›¸äº¤çš„åŸåˆ™ï¼Œæ”¹å†™ä¸º<æ ‡è¯†ç¬¦>[ '[' <è¡¨è¾¾å¼> ']' ]ï¼Œ
+ *    å¹¶ä¸”FIRST([...]) = {LBRACK} ä¸ FOLLOW{<å› å­>} = {MULT, DIV} + FOLLOW(<é¡¹>)æ²¡æœ‰äº¤é›†
 */
 SymbolItem* GrammaticalParser::__factor(int level, bool *is_char) {
-	FLAG_ENTER("<Òò×Ó>", level);
+	FLAG_ENTER("<å› å­>", level);
 	Block* block = symbol_table.get_present_block();
 	SymbolItem* factor;
 	try {
-		// <±êÊ¶·û> [ '[' <±í´ïÊ½> ']' ] 
+		// <æ ‡è¯†ç¬¦> [ '[' <è¡¨è¾¾å¼> ']' ] 
 		if (_peek()->equal(SYMBOL::IDENFR) && !_peek(2)->equal(SYMBOL::LPARENT)) {
 			__idenfr(level + 1, false);
-			// ÔÚ·ûºÅ±íÖĞ²éÕÒ±äÁ¿ÀàĞÍ
+			// åœ¨ç¬¦å·è¡¨ä¸­æŸ¥æ‰¾å˜é‡ç±»å‹
 			SymbolItem* p = find_const_var(symbol_table.get_present_block(), token->token, true);
 			if (p != NULL) {
 				if (p->basic_type == BasicType::_char && is_char != NULL) {
 					*is_char = true;
 				}
 			}
-			// Êı×éÀàĞÍ
+			// æ•°ç»„ç±»å‹
 			if (_peek()->equal(SYMBOL::LBRACK)) {
 				bool char_detector = false;
 				SYMBOL_CHECK(SYMBOL::LBRACK);
@@ -865,15 +865,15 @@ SymbolItem* GrammaticalParser::__factor(int level, bool *is_char) {
 				factor = SymbolFactory::create_temp(block, p->basic_type);
 				GetArrayQueryQuater(block, p, index, factor);
 			}
-			// ·ÇÊı×éÀàĞÍ
+			// éæ•°ç»„ç±»å‹
 			else {
 				factor = p;
 			}
 		}
-		// £¼ÓĞ·µ»ØÖµº¯Êıµ÷ÓÃÓï¾ä£¾  
+		// ï¼œæœ‰è¿”å›å€¼å‡½æ•°è°ƒç”¨è¯­å¥ï¼  
 		else if (_peek()->equal(SYMBOL::IDENFR) && _peek(2)->equal(SYMBOL::LPARENT)) {
 			string name = _peek()->token;
-			// ÔÚ·ûºÅ±íÖĞ²éÕÒº¯ÊıÀàĞÍ
+			// åœ¨ç¬¦å·è¡¨ä¸­æŸ¥æ‰¾å‡½æ•°ç±»å‹
 			BasicType type = BasicType::_int;
 			SymbolItem* p = find_func(symbol_table.get_present_block(), name, true);
 			if (p != NULL) {
@@ -884,21 +884,21 @@ SymbolItem* GrammaticalParser::__factor(int level, bool *is_char) {
 			}
 			factor = __function_call_return(level + 1);
 		}
-		// '(' <±í´ïÊ½> ')'
+		// '(' <è¡¨è¾¾å¼> ')'
 		else if (_peek()->equal(SYMBOL::LPARENT)) {
-			// ÓÉÓÚ±í´ïÊ½ÖÜÎ§´æÔÚ()À¨ºÅ£¬Òò´Ëchar±ØĞëÇ¿ĞĞ×ª»»Îªint.
+			// ç”±äºè¡¨è¾¾å¼å‘¨å›´å­˜åœ¨()æ‹¬å·ï¼Œå› æ­¤charå¿…é¡»å¼ºè¡Œè½¬æ¢ä¸ºint.
 			SYMBOL_CHECK(SYMBOL::LPARENT);
 			SymbolItem* temp = __expression(level + 1, NULL);
 			factor = SymbolFactory::create_temp(block, BasicType::_int);
 			GetAssignQuater(block, temp, factor);
 			SYMBOL_CHECK(SYMBOL::RPARENT);
 		}
-		// <ÕûÊı>
+		// <æ•´æ•°>
 		else if (_peek()->equal(SYMBOL::PLUS) || _peek()->equal(SYMBOL::MINU) || _peek()->equal(SYMBOL::INTCON)) {
 			int value = __integer(level + 1);
 			factor = SymbolFactory::create_temp_const(block, BasicType::_int, value);
 		}
-		// <×Ö·û>
+		// <å­—ç¬¦>
 		else if (_peek()->equal(SYMBOL::CHARCON)) {
 			char c = __char(level + 1);
 			if (is_char) {
@@ -919,14 +919,14 @@ SymbolItem* GrammaticalParser::__factor(int level, bool *is_char) {
 }
 
 /**
- * £¼Óï¾ä£¾::= £¼Ìõ¼şÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| '{'£¼Óï¾äÁĞ£¾'}'| £¼ÓĞ·µ»ØÖµº¯Êıµ÷ÓÃÓï¾ä£¾;
-			 |£¼ÎŞ·µ»ØÖµº¯Êıµ÷ÓÃÓï¾ä£¾;£ü£¼¸³ÖµÓï¾ä£¾;£ü£¼¶ÁÓï¾ä£¾;£ü£¼Ğ´Óï¾ä£¾;£ü£¼¿Õ£¾;|£¼·µ»ØÓï¾ä£¾;
+ * ï¼œè¯­å¥ï¼::= ï¼œæ¡ä»¶è¯­å¥ï¼ï½œï¼œå¾ªç¯è¯­å¥ï¼| '{'ï¼œè¯­å¥åˆ—ï¼'}'| ï¼œæœ‰è¿”å›å€¼å‡½æ•°è°ƒç”¨è¯­å¥ï¼;
+			 |ï¼œæ— è¿”å›å€¼å‡½æ•°è°ƒç”¨è¯­å¥ï¼;ï½œï¼œèµ‹å€¼è¯­å¥ï¼;ï½œï¼œè¯»è¯­å¥ï¼;ï½œï¼œå†™è¯­å¥ï¼;ï½œï¼œç©ºï¼;|ï¼œè¿”å›è¯­å¥ï¼;
  * FIRST = IFTK / WHILETK, DOTK, FORTK / LBRACE / IDENFR / IDENFR / IDENFR / SCANFTK / PRINTFTK / SEMICN / RETURNTK
- * !: FISRT(£¼ÓĞ·µ»ØÖµº¯Êıµ÷ÓÃÓï¾ä£¾)ÓëFISRT(<¸³ÖµÓï¾ä>) ÓĞÖØºÏ£¬ĞèÒªÓÃ_peek(2) = (
+ * !: FISRT(ï¼œæœ‰è¿”å›å€¼å‡½æ•°è°ƒç”¨è¯­å¥ï¼)ä¸FISRT(<èµ‹å€¼è¯­å¥>) æœ‰é‡åˆï¼Œéœ€è¦ç”¨_peek(2) = (
 */
 void GrammaticalParser::__statement(int level, bool * has_return)
 {
-	FLAG_ENTER("<Óï¾ä>", level);
+	FLAG_ENTER("<è¯­å¥>", level);
 	try {
 		SYMBOL loop_first[] = { SYMBOL::WHILETK, SYMBOL::FORTK, SYMBOL::DOTK };
 
@@ -943,14 +943,14 @@ void GrammaticalParser::__statement(int level, bool * has_return)
 		{
 			string peek_func_name = _peek()->token;
 			SymbolItem* found = find_func(symbol_table.get_present_block(), peek_func_name, true);
-			// ÓĞ·µ»ØÖµº¯Êıµ÷ÓÃÓëÎŞ·µ»ØÖµº¯Êıµ÷ÓÃĞÎÊ½ÍêÈ«Ò»ÖÂ£¬ĞèÒªÌáÇ°Ê¹ÓÃ·ûºÅ±íÌØÅĞ¡£
+			// æœ‰è¿”å›å€¼å‡½æ•°è°ƒç”¨ä¸æ— è¿”å›å€¼å‡½æ•°è°ƒç”¨å½¢å¼å®Œå…¨ä¸€è‡´ï¼Œéœ€è¦æå‰ä½¿ç”¨ç¬¦å·è¡¨ç‰¹åˆ¤ã€‚
 			if (found != NULL && found->basic_type != BasicType::_void) { __function_call_return(level + 1); }
 			else if (found != NULL && found->basic_type == BasicType::_void) { __function_call_void(level + 1); }
 			else { 
 				_register_error(_peek()->line, ErrorType::Undefine);
 				while (!_peek()->equal(SYMBOL::SEMICN))
 					_next();
-			}	// ÔÚÀàĞÍÎªº¯ÊıÃûµÄ±êÊ¶·ûÖĞÃ»ÓĞÕÒµ½¶ÔÓ¦µÄ¡£
+			}	// åœ¨ç±»å‹ä¸ºå‡½æ•°åçš„æ ‡è¯†ç¬¦ä¸­æ²¡æœ‰æ‰¾åˆ°å¯¹åº”çš„ã€‚
 			SYMBOL_CHECK(SYMBOL::SEMICN);
 		}
 		else if (_peek()->equal(SYMBOL::IDENFR) && !_peek(2)->equal(SYMBOL::LPARENT))
@@ -980,12 +980,12 @@ void GrammaticalParser::__statement(int level, bool * has_return)
 
 
 /**
- * £¼¸³ÖµÓï¾ä£¾::= £¼±êÊ¶·û£¾£½£¼±í´ïÊ½£¾|£¼±êÊ¶·û£¾'['£¼±í´ïÊ½£¾']'=£¼±í´ïÊ½£¾
- * ¹æÔò¸ÄĞ´ <¸³ÖµÓï¾ä> ::= <±êÊ¶·û> ['[' <±í´ïÊ½> ']'] = <±í´ïÊ½>
- * FIRST(<¸³ÖµÓï¾ä>) = {IDENFR}
+ * ï¼œèµ‹å€¼è¯­å¥ï¼::= ï¼œæ ‡è¯†ç¬¦ï¼ï¼ï¼œè¡¨è¾¾å¼ï¼|ï¼œæ ‡è¯†ç¬¦ï¼'['ï¼œè¡¨è¾¾å¼ï¼']'=ï¼œè¡¨è¾¾å¼ï¼
+ * è§„åˆ™æ”¹å†™ <èµ‹å€¼è¯­å¥> ::= <æ ‡è¯†ç¬¦> ['[' <è¡¨è¾¾å¼> ']'] = <è¡¨è¾¾å¼>
+ * FIRST(<èµ‹å€¼è¯­å¥>) = {IDENFR}
 */
 void GrammaticalParser::__assign_statment(int level) {
-	FLAG_ENTER("<¸³ÖµÓï¾ä>", level);
+	FLAG_ENTER("<èµ‹å€¼è¯­å¥>", level);
 	Block* block = symbol_table.get_present_block();
 	
 	try {
@@ -1024,15 +1024,15 @@ void GrammaticalParser::__assign_statment(int level) {
 }
 
 /**
- * £¼Ìõ¼şÓï¾ä£¾  ::= if '('£¼Ìõ¼ş£¾')'£¼Óï¾ä£¾£Ûelse£¼Óï¾ä£¾£İ
- * FISRT(<Ìõ¼şÓï¾ä>) = {IFTK}
+ * ï¼œæ¡ä»¶è¯­å¥ï¼  ::= if '('ï¼œæ¡ä»¶ï¼')'ï¼œè¯­å¥ï¼ï¼»elseï¼œè¯­å¥ï¼ï¼½
+ * FISRT(<æ¡ä»¶è¯­å¥>) = {IFTK}
  *
- * FOLLOW(<Ìõ¼şÓï¾ä>) = {RBRACE} // <Óï¾ä> + <Óï¾äÁĞ> µÄfollow
- * FIRST(else <Óï¾ä>) = {else}
- * Á½¸öif+Ò»¸öelseµÄÇé¿öÏÂÎÄ·¨²ã¼¶½âÎö´æÔÚÆçÒå£¬´ËÊ±ĞèÒªÈËÎª¹æ¶¨ÓÅÏÈ¼¶´ÎĞò£¬½øĞĞÌ°À·Æ¥Åä£¬elseÕ³Õ³ÖÁ×î½üµÄif¼´¿É¡£
+ * FOLLOW(<æ¡ä»¶è¯­å¥>) = {RBRACE} // <è¯­å¥> + <è¯­å¥åˆ—> çš„follow
+ * FIRST(else <è¯­å¥>) = {else}
+ * ä¸¤ä¸ªif+ä¸€ä¸ªelseçš„æƒ…å†µä¸‹æ–‡æ³•å±‚çº§è§£æå­˜åœ¨æ­§ä¹‰ï¼Œæ­¤æ—¶éœ€è¦äººä¸ºè§„å®šä¼˜å…ˆçº§æ¬¡åºï¼Œè¿›è¡Œè´ªå©ªåŒ¹é…ï¼Œelseç²˜ç²˜è‡³æœ€è¿‘çš„ifå³å¯ã€‚
 */
 void GrammaticalParser::__condition_statement(int level, bool* has_return) {
-	FLAG_ENTER("<Ìõ¼şÓï¾ä>", level);
+	FLAG_ENTER("<æ¡ä»¶è¯­å¥>", level);
 	Block* block = symbol_table.get_present_block();
 	SymbolItem* else_label = SymbolFactory::create_label(block, "else");
 	SymbolItem* if_end_label = SymbolFactory::create_label(block, "endif");
@@ -1065,15 +1065,15 @@ void GrammaticalParser::__condition_statement(int level, bool* has_return) {
 }
 
 /**
- * £¼Ìõ¼ş£¾ ::=  £¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
- * FIRST(<Ìõ¼ş>) = FISRT(<±í´ïÊ½>) = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
- * ¹æÔò¸ÄĞ´£º<Ìõ¼ş> ::= <±í´ïÊ½>  [ <¹ØÏµÔËËã·û> <±í´ïÊ½> ]
+ * ï¼œæ¡ä»¶ï¼ ::=  ï¼œè¡¨è¾¾å¼ï¼ï¼œå…³ç³»è¿ç®—ç¬¦ï¼ï¼œè¡¨è¾¾å¼ï¼ï½œï¼œè¡¨è¾¾å¼ï¼
+ * FIRST(<æ¡ä»¶>) = FISRT(<è¡¨è¾¾å¼>) = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
+ * è§„åˆ™æ”¹å†™ï¼š<æ¡ä»¶> ::= <è¡¨è¾¾å¼>  [ <å…³ç³»è¿ç®—ç¬¦> <è¡¨è¾¾å¼> ]
 
- * FOLLOW<Ìõ¼ş> = {SIMICN, RPARENT}, ÓëFIRST(<¹ØÏµÔËËã·û> <±í´ïÊ½>)ÎŞ½»¼¯
- * FIRST(<¹ØÏµÔËËã·û> <±í´ïÊ½>) = {GRE, GEQ, LSS, LEQ, NEQ, EQL}
+ * FOLLOW<æ¡ä»¶> = {SIMICN, RPARENT}, ä¸FIRST(<å…³ç³»è¿ç®—ç¬¦> <è¡¨è¾¾å¼>)æ— äº¤é›†
+ * FIRST(<å…³ç³»è¿ç®—ç¬¦> <è¡¨è¾¾å¼>) = {GRE, GEQ, LSS, LEQ, NEQ, EQL}
 */
 SymbolItem* GrammaticalParser::__condition(int level) {
-	FLAG_ENTER("<Ìõ¼ş>", level);
+	FLAG_ENTER("<æ¡ä»¶>", level);
 	Block* block = symbol_table.get_present_block();
 	SymbolItem* condition;
 	try {
@@ -1085,15 +1085,15 @@ SymbolItem* GrammaticalParser::__condition(int level) {
 		if (_peek()->equal(SYMBOL::GRE) || _peek()->equal(SYMBOL::GEQ) || _peek()->equal(SYMBOL::LSS) ||
 			_peek()->equal(SYMBOL::LEQ) || _peek()->equal(SYMBOL::NEQ) || _peek()->equal(SYMBOL::EQL)) {
 			t = _peek();
-			__rel_operator(level + 1);														// <¹ØÏµÔËËã·û>
-			exp2 = __expression(level + 1, &char_detector);					// <±í´ïÊ½>
+			__rel_operator(level + 1);														// <å…³ç³»è¿ç®—ç¬¦>
+			exp2 = __expression(level + 1, &char_detector);					// <è¡¨è¾¾å¼>
 		}
 		// uni4-error-f
 		if (char_detector) {
 			_register_error(token->line, ErrorType::ConditionError);
 		}
 
-		// Éú³ÉÖĞ¼ä´úÂë
+		// ç”Ÿæˆä¸­é—´ä»£ç 
 		if (t == NULL) {
 			condition = exp1;
 		}
@@ -1123,32 +1123,32 @@ SymbolItem* GrammaticalParser::__condition(int level) {
 }
 
 /**
- * £¼Ñ­»·Óï¾ä£¾::= while '('£¼Ìõ¼ş£¾')'£¼Óï¾ä£¾ |
-				  do£¼Óï¾ä£¾while '('£¼Ìõ¼ş£¾')' |
-				  for'('£¼±êÊ¶·û£¾£½£¼±í´ïÊ½£¾;£¼Ìõ¼ş£¾;£¼±êÊ¶·û£¾£½£¼±êÊ¶·û£¾(+|-)£¼²½³¤£¾')'£¼Óï¾ä£¾
- * FISRT(<Ñ­»·Óï¾ä>) = {WHILETK, DOTK, FORTK}
+ * ï¼œå¾ªç¯è¯­å¥ï¼::= while '('ï¼œæ¡ä»¶ï¼')'ï¼œè¯­å¥ï¼ |
+				  doï¼œè¯­å¥ï¼while '('ï¼œæ¡ä»¶ï¼')' |
+				  for'('ï¼œæ ‡è¯†ç¬¦ï¼ï¼ï¼œè¡¨è¾¾å¼ï¼;ï¼œæ¡ä»¶ï¼;ï¼œæ ‡è¯†ç¬¦ï¼ï¼ï¼œæ ‡è¯†ç¬¦ï¼(+|-)ï¼œæ­¥é•¿ï¼')'ï¼œè¯­å¥ï¼
+ * FISRT(<å¾ªç¯è¯­å¥>) = {WHILETK, DOTK, FORTK}
  * FIRST(1) != FIRST(2) != FIRST(3)
 */
 void GrammaticalParser::__loop_statement(int level, bool* has_return)
 {
-	FLAG_ENTER("<Ñ­»·Óï¾ä>", level);
+	FLAG_ENTER("<å¾ªç¯è¯­å¥>", level);
 	Block* block = symbol_table.get_present_block();
 	try {
-		// while while '('£¼Ìõ¼ş£¾')'£¼Óï¾ä£¾
+		// while while '('ï¼œæ¡ä»¶ï¼')'ï¼œè¯­å¥ï¼
 		if (_peek()->equal(SYMBOL::WHILETK)) {
 			SymbolItem* head = SymbolFactory::create_label(block, "while_head");
 			SymbolItem* tail = SymbolFactory::create_label(block, "while_end");
 			SYMBOL_CHECK(SYMBOL::WHILETK);											// while
 			SYMBOL_CHECK(SYMBOL::LPARENT);											// (
 			GetSetLabelQuater(block, head);
-			SymbolItem* condition = __condition(level + 1);							// <Ìõ¼ş>
+			SymbolItem* condition = __condition(level + 1);							// <æ¡ä»¶>
 			GetBzQuater(block, tail, condition);
-			SYMBOL_CHECK(SYMBOL::RPARENT);											// £©
+			SYMBOL_CHECK(SYMBOL::RPARENT);											// ï¼‰
 			__statement(level +1 , has_return);
 			GetGotoQuater(block, head);
 			GetSetLabelQuater(block, tail);
 		}
-		// do while do£¼Óï¾ä£¾while '('£¼Ìõ¼ş£¾')'
+		// do while doï¼œè¯­å¥ï¼while '('ï¼œæ¡ä»¶ï¼')'
 		else if (_peek()->equal(SYMBOL::DOTK)) {
 			SymbolItem* head = SymbolFactory::create_label(block, "dowhile_head");
 			SymbolItem* tail = SymbolFactory::create_label(block, "dowhile_end");
@@ -1163,12 +1163,12 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			}
 
 			SYMBOL_CHECK(SYMBOL::LPARENT);								// (
-			SymbolItem* condition  = __condition(level + 1);			// <Ìõ¼ş>
+			SymbolItem* condition  = __condition(level + 1);			// <æ¡ä»¶>
 			SYMBOL_CHECK(SYMBOL::RPARENT);								// )
 			GetBnzQuater(block, head, condition);
 			GetSetLabelQuater(block, tail);
 		}
-		// for: for'('£¼±êÊ¶·û£¾£½£¼±í´ïÊ½£¾;£¼Ìõ¼ş£¾;£¼±êÊ¶·û£¾£½£¼±êÊ¶·û£¾(+|-)£¼²½³¤£¾')'£¼Óï¾ä£¾
+		// for: for'('ï¼œæ ‡è¯†ç¬¦ï¼ï¼ï¼œè¡¨è¾¾å¼ï¼;ï¼œæ¡ä»¶ï¼;ï¼œæ ‡è¯†ç¬¦ï¼ï¼ï¼œæ ‡è¯†ç¬¦ï¼(+|-)ï¼œæ­¥é•¿ï¼')'ï¼œè¯­å¥ï¼
 		else if (_peek()->equal(SYMBOL::FORTK)) {
 			SymbolItem* initial = SymbolFactory::create_label(block, "for_initial");
 			SymbolItem* judge = SymbolFactory::create_label(block, "for_judge");
@@ -1176,30 +1176,30 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			SymbolItem* head = SymbolFactory::create_label(block, "for_body_head");
 			SymbolItem* tail = SymbolFactory::create_label(block, "for_body_tail");
 			
-			// ³õÊ¼»¯²¿·Ö
+			// åˆå§‹åŒ–éƒ¨åˆ†
 			SYMBOL_CHECK(SYMBOL::FORTK);					// for
 			SYMBOL_CHECK(SYMBOL::LPARENT);					// (
 			GetSetLabelQuater(block, initial);
-			string name = __idenfr(level + 1, false);		// <±êÊ¶·û>
+			string name = __idenfr(level + 1, false);		// <æ ‡è¯†ç¬¦>
 			SymbolItem* var = find_const_var(block, name, true);
 			SYMBOL_CHECK(SYMBOL::ASSIGN);					// =
-			SymbolItem* exp = __expression(level + 1, NULL);// <±í´ïÊ½>
+			SymbolItem* exp = __expression(level + 1, NULL);// <è¡¨è¾¾å¼>
 			GetAssignQuater(block, exp, var);
 			SYMBOL_CHECK(SYMBOL::SEMICN);					// ;
 			
-			// ÅĞ¶Ï²¿·Ö
+			// åˆ¤æ–­éƒ¨åˆ†
 			GetSetLabelQuater(block, judge);
-			SymbolItem * condition = __condition(level + 1);					// <Ìõ¼ş>
+			SymbolItem * condition = __condition(level + 1);					// <æ¡ä»¶>
 			SYMBOL_CHECK(SYMBOL::SEMICN);					// ;
 			GetBzQuater(block, tail, condition);
 			GetBnzQuater(block, head, condition);
 			
-			// ¸üĞÂ²¿·Ö
+			// æ›´æ–°éƒ¨åˆ†
 			GetSetLabelQuater(block, update);
-			name = __idenfr(level + 1, false);		// <±êÊ¶·û>
+			name = __idenfr(level + 1, false);		// <æ ‡è¯†ç¬¦>
 			SymbolItem* a = find_const_var(block, name, true);
 			SYMBOL_CHECK(SYMBOL::ASSIGN);					// =
-			name = __idenfr(level + 1, false);		// <±êÊ¶·û>
+			name = __idenfr(level + 1, false);		// <æ ‡è¯†ç¬¦>
 			SymbolItem* b = find_const_var(block, name, true);
 			Token* t = _peek();
 			if (_peek()->equal(SYMBOL::PLUS)) {				// (+ | -)
@@ -1208,7 +1208,7 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			else {
 				SYMBOL_CHECK(SYMBOL::MINU);
 			}
-			int value = __step_length(level + 1);											// <²½³¤>
+			int value = __step_length(level + 1);											// <æ­¥é•¿>
 			SymbolItem* step_len = SymbolFactory::create_temp_const(block, BasicType::_int, value);
 			if (t->equal(SYMBOL::PLUS))
 			{
@@ -1220,7 +1220,7 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			SYMBOL_CHECK(SYMBOL::RPARENT);					// )
 			GetGotoQuater(block, judge);
 			
-			// Ö÷¸É²¿·Ö
+			// ä¸»å¹²éƒ¨åˆ†
 			GetSetLabelQuater(block, head);
 			__statement(level + 1, has_return);
 			GetGotoQuater(block, update);
@@ -1239,10 +1239,10 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 }
 
 /**
- * £¼²½³¤£¾::= £¼ÎŞ·ûºÅÕûÊı£¾
+ * ï¼œæ­¥é•¿ï¼::= ï¼œæ— ç¬¦å·æ•´æ•°ï¼
 */
 int GrammaticalParser::__step_length(int level) {
-	FLAG_ENTER("<²½³¤>", level);
+	FLAG_ENTER("<æ­¥é•¿>", level);
 	int value;
 	try {
 		value =  __unsigned_integer(level + 1);
@@ -1256,17 +1256,17 @@ int GrammaticalParser::__step_length(int level) {
 }
 
 /**
- * £¼ÓĞ·µ»ØÖµº¯Êıµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾'('£¼Öµ²ÎÊı±í£¾')'
- * FISRT(£¼ÓĞ·µ»ØÖµº¯Êıµ÷ÓÃÓï¾ä£¾) = {<±êÊ¶·û>}
+ * ï¼œæœ‰è¿”å›å€¼å‡½æ•°è°ƒç”¨è¯­å¥ï¼ ::= ï¼œæ ‡è¯†ç¬¦ï¼'('ï¼œå€¼å‚æ•°è¡¨ï¼')'
+ * FISRT(ï¼œæœ‰è¿”å›å€¼å‡½æ•°è°ƒç”¨è¯­å¥ï¼) = {<æ ‡è¯†ç¬¦>}
 */
 SymbolItem* GrammaticalParser::__function_call_return(int level) {
-	FLAG_ENTER("<ÓĞ·µ»ØÖµº¯Êıµ÷ÓÃÓï¾ä>", level);
+	FLAG_ENTER("<æœ‰è¿”å›å€¼å‡½æ•°è°ƒç”¨è¯­å¥>", level);
 	Block* block = symbol_table.get_present_block();
 	SymbolItem* ret=NULL;
 	try {
 		string name = __idenfr(level + 1, false);
 		SymbolItem* p = find_func(symbol_table.get_present_block(),name, true);
-		// Èç¹ûÃ»ÓĞµÄ»°£¬Ö±½ÓºöÂÔÕâ¾ä»°
+		// å¦‚æœæ²¡æœ‰çš„è¯ï¼Œç›´æ¥å¿½ç•¥è¿™å¥è¯
 		if (p == NULL) {
 			while (!_peek()->equal(SYMBOL::SEMICN))
 				_next();
@@ -1290,11 +1290,11 @@ SymbolItem* GrammaticalParser::__function_call_return(int level) {
 }
 
 /**
- * £¼ÎŞ·µ»ØÖµº¯Êıµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾'('£¼Öµ²ÎÊı±í£¾')'
- * FISRT(£¼ÎŞ·µ»ØÖµº¯Êıµ÷ÓÃÓï¾ä£¾) = {<±êÊ¶·û>}
+ * ï¼œæ— è¿”å›å€¼å‡½æ•°è°ƒç”¨è¯­å¥ï¼ ::= ï¼œæ ‡è¯†ç¬¦ï¼'('ï¼œå€¼å‚æ•°è¡¨ï¼')'
+ * FISRT(ï¼œæ— è¿”å›å€¼å‡½æ•°è°ƒç”¨è¯­å¥ï¼) = {<æ ‡è¯†ç¬¦>}
 */
 void GrammaticalParser::__function_call_void(int level) {
-	FLAG_ENTER("<ÎŞ·µ»ØÖµº¯Êıµ÷ÓÃÓï¾ä>", level);
+	FLAG_ENTER("<æ— è¿”å›å€¼å‡½æ•°è°ƒç”¨è¯­å¥>", level);
 
 	Block* block = symbol_table.get_present_block();
 
@@ -1322,16 +1322,16 @@ void GrammaticalParser::__function_call_void(int level) {
 }
 
 /**
- * £¼Öµ²ÎÊı±í£¾::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿Õ£¾
- * FISRT() = FIRST(<±í´ïÊ½>)
- * FISRT(<±í´ïÊ½>) = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
- * FOLLOW(<Öµ²ÎÊı±í>) = {RPARENT}
+ * ï¼œå€¼å‚æ•°è¡¨ï¼::= ï¼œè¡¨è¾¾å¼ï¼{,ï¼œè¡¨è¾¾å¼ï¼}ï½œï¼œç©ºï¼
+ * FISRT() = FIRST(<è¡¨è¾¾å¼>)
+ * FISRT(<è¡¨è¾¾å¼>) = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
+ * FOLLOW(<å€¼å‚æ•°è¡¨>) = {RPARENT}
  *
- * !: Ò²¿ÉÒÔ²ÉÓÃÓÃFOLLOWÅĞ¶Ï¿ÕµÄÇé¿ö£¬±ÜÃâÃ¶¾ÙFIRSTÒÅÂ©
+ * !: ä¹Ÿå¯ä»¥é‡‡ç”¨ç”¨FOLLOWåˆ¤æ–­ç©ºçš„æƒ…å†µï¼Œé¿å…æšä¸¾FIRSTé—æ¼
 */
 void GrammaticalParser::__value_parameter_list(int level, vector<SymbolItem*>* params)
 {
-	FLAG_ENTER("<Öµ²ÎÊı±í>", level);
+	FLAG_ENTER("<å€¼å‚æ•°è¡¨>", level);
 
 	Block* block = symbol_table.get_present_block();
 
@@ -1340,7 +1340,7 @@ void GrammaticalParser::__value_parameter_list(int level, vector<SymbolItem*>* p
 					 SYMBOL::PLUS, SYMBOL::MINU, SYMBOL::INTCON,
 					 SYMBOL::CHARCON };
 
-		// <±í´ïÊ½>
+		// <è¡¨è¾¾å¼>
 		int cnt = 0;
 		bool char_detector = false;
 		vector<string> temp;
@@ -1356,7 +1356,7 @@ void GrammaticalParser::__value_parameter_list(int level, vector<SymbolItem*>* p
 			} while (_peek()->equal(SYMBOL::COMMA));
 		}
 		else {
-			// <¿Õ> : ignore
+			// <ç©º> : ignore
 		}
 		// unit4-error-d
 		if (cnt != params->size()) {
@@ -1383,16 +1383,16 @@ void GrammaticalParser::__value_parameter_list(int level, vector<SymbolItem*>* p
 }
 
 /**
- * £¼Óï¾äÁĞ£¾::=£û£¼Óï¾ä£¾£ı
- * FIRST(<Óï¾ä>) =
+ * ï¼œè¯­å¥åˆ—ï¼::=ï½›ï¼œè¯­å¥ï¼ï½
+ * FIRST(<è¯­å¥>) =
  * {IFTK} + {WHILETK} + {DOTK} + {FORTK} + {LBRACE} + {IDENFR*3} + {IDENFR} + {SCANFTK} + {PRINTFTK}
  * + {SEMICN} + {RETURNTK}
- * FOLLOW(<Óï¾äÁĞ>) = {RBRACE}, Òò´Ë<¿Õ>Ñ¡ÔñÓë<Óï¾ä>Ñ¡Ôñ²»´æÔÚ»ØËİÎÊÌâ¡£
+ * FOLLOW(<è¯­å¥åˆ—>) = {RBRACE}, å› æ­¤<ç©º>é€‰æ‹©ä¸<è¯­å¥>é€‰æ‹©ä¸å­˜åœ¨å›æº¯é—®é¢˜ã€‚
  *
- * !: Ò²¿ÉÒÔ²ÉÓÃÅĞ¶Ïfollow¼¯ºÏµÄ·½Ê½£¬±ÜÃâÃ¶¾ÙFISRTÒÅÂ©.
+ * !: ä¹Ÿå¯ä»¥é‡‡ç”¨åˆ¤æ–­followé›†åˆçš„æ–¹å¼ï¼Œé¿å…æšä¸¾FISRTé—æ¼.
 */
 void GrammaticalParser::__statement_list(int level, bool * has_return) {
-	FLAG_ENTER("<Óï¾äÁĞ>", level);
+	FLAG_ENTER("<è¯­å¥åˆ—>", level);
 
 	try {
 		SYMBOL list[] = {
@@ -1420,11 +1420,11 @@ void GrammaticalParser::__statement_list(int level, bool * has_return) {
 }
 
 /**
- * £¼¶ÁÓï¾ä£¾::=  scanf '('£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}')'
- * FIRST(<¶ÁÓï¾ä>) = {SCANFTK}
+ * ï¼œè¯»è¯­å¥ï¼::=  scanf '('ï¼œæ ‡è¯†ç¬¦ï¼{,ï¼œæ ‡è¯†ç¬¦ï¼}')'
+ * FIRST(<è¯»è¯­å¥>) = {SCANFTK}
 */
 void GrammaticalParser::__read_statement(int level) {
-	FLAG_ENTER("<¶ÁÓï¾ä>", level);
+	FLAG_ENTER("<è¯»è¯­å¥>", level);
 	Block* block = symbol_table.get_present_block();
 
 	try {
@@ -1450,15 +1450,15 @@ void GrammaticalParser::__read_statement(int level) {
 }
 
 /**
- * £¼Ğ´Óï¾ä£¾ ::= printf '(' £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ')'| printf '('£¼×Ö·û´®£¾ ')'| printf '('£¼±í´ïÊ½£¾')'
- * FISRT(<¶ÁÓï¾ä>) = {PRINTFTK}
- * FISRT(<×Ö·û´®>) = {STRCON},
- * FISRT(<±í´ïÊ½>) = {PLUS, MINU, FIRST(Ïî)} = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
+ * ï¼œå†™è¯­å¥ï¼ ::= printf '(' ï¼œå­—ç¬¦ä¸²ï¼,ï¼œè¡¨è¾¾å¼ï¼ ')'| printf '('ï¼œå­—ç¬¦ä¸²ï¼ ')'| printf '('ï¼œè¡¨è¾¾å¼ï¼')'
+ * FISRT(<è¯»è¯­å¥>) = {PRINTFTK}
+ * FISRT(<å­—ç¬¦ä¸²>) = {STRCON},
+ * FISRT(<è¡¨è¾¾å¼>) = {PLUS, MINU, FIRST(é¡¹)} = {IDENFR} + {IDENFR} + {LPARENT} + {PLUS, MINU, INTCON} + {CHARCON}
  *
- * !: ÔÚÅĞ¶Ï×Ö·û´®Óë±í´ïÊ½×ßÏòÊ±£¬Ò²¿ÉÒÔ²ÉÓÃif-elseĞÍ£¬·Ç×Ö·û´®¼´±í´ïÊ½¡£
+ * !: åœ¨åˆ¤æ–­å­—ç¬¦ä¸²ä¸è¡¨è¾¾å¼èµ°å‘æ—¶ï¼Œä¹Ÿå¯ä»¥é‡‡ç”¨if-elseå‹ï¼Œéå­—ç¬¦ä¸²å³è¡¨è¾¾å¼ã€‚
 */
 void GrammaticalParser::__write_statement(int level) {
-	FLAG_ENTER("<Ğ´Óï¾ä>", level);
+	FLAG_ENTER("<å†™è¯­å¥>", level);
 	Block* block = symbol_table.get_present_block();
 	SymbolItem* newline = SymbolFactory::create_temp_const(block, BasicType::_char, '\n');
 	try {
@@ -1469,7 +1469,7 @@ void GrammaticalParser::__write_statement(int level) {
 		SYMBOL_CHECK(SYMBOL::PRINTFTK);
 		SYMBOL_CHECK(SYMBOL::LPARENT);
 
-		// printf '(' £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ')'| printf '('£¼×Ö·û´®£¾ ')'
+		// printf '(' ï¼œå­—ç¬¦ä¸²ï¼,ï¼œè¡¨è¾¾å¼ï¼ ')'| printf '('ï¼œå­—ç¬¦ä¸²ï¼ ')'
 		if (_peek()->equal(SYMBOL::STRCON)) {
 			string strcon = __string(level + 1);
 			SymbolItem* strcon_temp = SymbolFactory::create_temp_string(block, strcon);
@@ -1480,7 +1480,7 @@ void GrammaticalParser::__write_statement(int level) {
 				GetPrintQuater(block, exp);
 			}
 		}
-		// printf '('£¼±í´ïÊ½£¾')'
+		// printf '('ï¼œè¡¨è¾¾å¼ï¼')'
 		else if (_peek()->equal(exp_first, 6)) {
 			SymbolItem * exp = __expression(level + 1, NULL);
 			GetPrintQuater(block, exp);
@@ -1501,12 +1501,12 @@ void GrammaticalParser::__write_statement(int level) {
 }
 
 /**
- * £¼·µ»ØÓï¾ä£¾::=  return['('£¼±í´ïÊ½£¾')']
- * FISRT('('£¼±í´ïÊ½£¾')') = {LPARENT};
- * FOLLOW{<·µ»ØÓï¾ä>} = {SEMICN}£¬ÎŞ½»²æ¼¯ºÏ
+ * ï¼œè¿”å›è¯­å¥ï¼::=  return['('ï¼œè¡¨è¾¾å¼ï¼')']
+ * FISRT('('ï¼œè¡¨è¾¾å¼ï¼')') = {LPARENT};
+ * FOLLOW{<è¿”å›è¯­å¥>} = {SEMICN}ï¼Œæ— äº¤å‰é›†åˆ
 */
 void GrammaticalParser::__return_statement(int level, bool * has_return) {
-	FLAG_ENTER("<·µ»ØÓï¾ä>", level);
+	FLAG_ENTER("<è¿”å›è¯­å¥>", level);
 
 	try {
 		SYMBOL_CHECK(SYMBOL::RETURNTK);
