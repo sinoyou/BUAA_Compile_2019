@@ -1,4 +1,4 @@
-#include "mips_function.h"
+ï»¿#include "mips_function.h"
 #include "mips_code_utils.h"
 #include "debug.h"
 #include <set>
@@ -44,7 +44,7 @@ void mips_sp_move(vector<string>* list, int offset) {
 }
 // lw target, offset(sp) | lw target, glb_data_label | la target, string_label | li target, const
 void mips_load(vector<string>* list, string target, SymbolItem* item, MipsFunction* func) {
-	// Çé¿ö1£º³£Êı
+	// æƒ…å†µ1ï¼šå¸¸æ•°
 	if (item->type == SymbolItemType::temp_const || item->type == SymbolItemType::_const) {
 		sprintf_s(buf, "li %s %d", target.c_str(), item->value);
 	}
@@ -53,14 +53,14 @@ void mips_load(vector<string>* list, string target, SymbolItem* item, MipsFuncti
 		int offset;
 		string label;
 		func->get_addr(item, &local, &offset, &label);
-		// Çé¿ö2£º×Ö·û´®
+		// æƒ…å†µ2ï¼šå­—ç¬¦ä¸²
 		if (item->type == SymbolItemType::temp_strcon)
 			sprintf_s(buf, "la %s %s", target.c_str(),label.c_str());
 		else {
-			// Çé¿ö3£º¾Ö²¿±äÁ¿
+			// æƒ…å†µ3ï¼šå±€éƒ¨å˜é‡
 			if (local)
 				sprintf_s(buf, "lw %s %d($sp)", target.c_str(), offset);
-			// Çé¿ö4£ºÈ«¾Ö±äÁ¿
+			// æƒ…å†µ4ï¼šå…¨å±€å˜é‡
 			else {
 				sprintf_s(buf, "lw %s %s", target.c_str(), label.c_str());
 			}
@@ -236,8 +236,8 @@ void mips_array_query(vector<string>* list, string target, SymbolItem* arr, stri
 	}
 }
 
-/* --------------------------- ·Ç´úÂëÀà -------------------------- */
-/* ¸ø¶¨ËÄÔªÊ½£¬¼ì²éÆäItemsµÄÊôÓÚÇé¿ö */
+/* --------------------------- éä»£ç ç±» -------------------------- */
+/* ç»™å®šå››å…ƒå¼ï¼Œæ£€æŸ¥å…¶Itemsçš„å±äºæƒ…å†µ */
 // todo
 void quater_block_check(Quaternary* q) {
 	SymbolItem* A = q->OpA;
@@ -257,7 +257,7 @@ void quater_block_check(Quaternary* q) {
 	}
 }
 
-/* ¸ù¾İº¯Êı»ñÈ¡¸Ãº¯ÊıÏÂµÄËùÓĞËÄÔªÊ½ */
+/* æ ¹æ®å‡½æ•°è·å–è¯¥å‡½æ•°ä¸‹çš„æ‰€æœ‰å››å…ƒå¼ */
 vector<Quaternary*> get_quaternary_by_function(SymbolItem* func, vector<Quaternary*>* list) {
 	vector<Quaternary*> save;
 	for (auto it = list->begin(); it != list->end(); it++) {
@@ -267,7 +267,7 @@ vector<Quaternary*> get_quaternary_by_function(SymbolItem* func, vector<Quaterna
 	return save;
 }
 
-/* ¸ø¶¨ËÄÔªÊ½£¬·µ»ØÆäËùÓĞµÄSymbolItem */
+/* ç»™å®šå››å…ƒå¼ï¼Œè¿”å›å…¶æ‰€æœ‰çš„SymbolItem */
 map<string, SymbolItem*> get_items_by_quater(Quaternary* q) {
 	map <string, SymbolItem*> map;
 	if (q->OpA != NULL)

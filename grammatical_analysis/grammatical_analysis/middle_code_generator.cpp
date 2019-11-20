@@ -1,6 +1,7 @@
 #include "Quaternary.h"
 #include "debug.h"
 #include "Block.h"	
+#include <iostream>
 
 // 存放四元式的容器
 vector<Quaternary*> QuaterList;
