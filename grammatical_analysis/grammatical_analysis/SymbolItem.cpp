@@ -13,8 +13,7 @@ string SymbolItem::getname(bool simplify) {
 		return name;
 	// case 1 : 整型常量
 	if ((this->type == _const || this->type == temp_const) && this->basic_type == BasicType::_int) {
-		itoa(this->value, buf, 10);
-		name = string(buf);
+		name = to_string(this->value);
 	}
 	// case 2：字符型常量
 	else if ((this->type == _const || this->type == temp_const) && this->basic_type == BasicType::_char) {
