@@ -22,7 +22,7 @@ void mips_comment(vector<string>* list, string comment) {
 }
 // label: .space size 
 void mips_space_alloc(vector<string>* list, string label, int size) {
-	sprintf(buf, "%s: .space %d", label.c_str(),size);
+	sprintf(buf, "%s: .space %d", label.c_str(), size);
 	list->push_back(string(buf));
 }
 // label: .asciiz strcon
