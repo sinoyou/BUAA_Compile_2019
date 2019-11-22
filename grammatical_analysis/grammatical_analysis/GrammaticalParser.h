@@ -123,7 +123,7 @@ private:
 	int __step_length(int level);
 	SymbolItem* __function_call_return(int level);
 	void __function_call_void(int level);
-	void __value_parameter_list(int level, vector<SymbolItem*>* params);
+	void __value_parameter_list(int level, vector<SymbolItem*>* params, vector<SymbolItem*>* params_exp);
 	void __statement_list(int level, bool* has_return);
 	void __read_statement(int level);
 	void __write_statement(int level);

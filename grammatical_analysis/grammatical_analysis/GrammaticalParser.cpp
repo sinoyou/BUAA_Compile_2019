@@ -1273,7 +1273,11 @@ SymbolItem* GrammaticalParser::__function_call_return(int level) {
 		}
 		else {
 			SYMBOL_CHECK(SYMBOL::LPARENT);
-			__value_parameter_list(level+1 , &(p->paramsList));
+			// 定义vector容器，用于存储所有表示函数参数的temp，必须要统一push。
+			vector<SymbolItem*> paras_store;
+			__value_parameter_list(level+1 , &(p->paramsList), &paras_store);
+			for (auto it = paras_store.begin(); it != paras_store.end(); it++)
+				GetFuncParaPushQuater(block, *it);
 			SYMBOL_CHECK(SYMBOL::RPARENT);
 			GetFuncCallQuater(block, p);
 			ret = SymbolFactory::create_temp(block, p->basic_type);
@@ -1307,7 +1311,11 @@ void GrammaticalParser::__function_call_void(int level) {
 		}
 		else {
 			SYMBOL_CHECK(SYMBOL::LPARENT);
-			__value_parameter_list(level + 1, &(p->paramsList));
+			// 定义vector容器，用于存储所有表示函数参数的temp，必须要统一push。
+			vector<SymbolItem*> paras_store;
+			__value_parameter_list(level + 1, &(p->paramsList), &paras_store);
+			for (auto it = paras_store.begin(); it != paras_store.end(); it++)
+				GetFuncParaPushQuater(block, *it);
 			SYMBOL_CHECK(SYMBOL::RPARENT);
 			GetFuncCallQuater(block, p);
 		}
@@ -1329,7 +1337,7 @@ void GrammaticalParser::__function_call_void(int level) {
  *
  * !: 也可以采用用FOLLOW判断空的情况，避免枚举FIRST遗漏
 */
-void GrammaticalParser::__value_parameter_list(int level, vector<SymbolItem*>* params)
+void GrammaticalParser::__value_parameter_list(int level, vector<SymbolItem*>* params, vector<SymbolItem*>* params_exp)
 {
 	FLAG_ENTER("<值参数表>", level);
 
@@ -1351,7 +1359,8 @@ void GrammaticalParser::__value_parameter_list(int level, vector<SymbolItem*>* p
 					SYMBOL_CHECK(SYMBOL::COMMA);
 				char_detector = false;
 				SymbolItem* exp = __expression(level + 1, &char_detector);
-				GetFuncParaPushQuater(block, exp);
+				params_exp->push_back(exp);
+				// GetFuncParaPushQuater(block, exp);
 				temp.push_back((char_detector ? "char" : "int"));
 			} while (_peek()->equal(SYMBOL::COMMA));
 		}
