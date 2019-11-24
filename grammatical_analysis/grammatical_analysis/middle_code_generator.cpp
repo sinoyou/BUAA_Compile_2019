@@ -2,12 +2,14 @@
 #include "debug.h"
 #include "Block.h"	
 #include <iostream>
+#define SWITCH return;
 
 // 存放四元式的容器
 vector<Quaternary*> QuaterList;
 
 // 工具函数 - assert_检查
 void assert_vct(SymbolItem* item) {
+	SWITCH;
 	if (item->type == SymbolItemType::_variable ||
 		item->type == SymbolItemType::_const ||
 		item->type == SymbolItemType::temp_normal ||
@@ -21,6 +23,7 @@ void assert_vct(SymbolItem* item) {
 }
 
 void assert_vt(SymbolItem* item) {
+	SWITCH;
 	if (item->type == SymbolItemType::_variable ||
 		item->type == SymbolItemType::temp_normal||
 		item->type == SymbolItemType::temp_const ||
@@ -33,6 +36,7 @@ void assert_vt(SymbolItem* item) {
 }
 
 void assert_v(SymbolItem* item) {
+	SWITCH;
 	if (item->type == SymbolItemType::_variable) {}
 	else {
 		string mes = "[Error] Expected v not match " + item->name + " @ " + item->block->func_head->name;
@@ -41,6 +45,7 @@ void assert_v(SymbolItem* item) {
 }
 
 void assert_c(SymbolItem* item) {
+	SWITCH;
 	if (item->type == SymbolItemType::_const) {}
 	else {
 		string mes = "[Error] Expected c not match " + item->name + " @ " + item->block->func_head->name;
@@ -49,6 +54,7 @@ void assert_c(SymbolItem* item) {
 }
 
 void assert_f(SymbolItem* item) {
+	SWITCH;
 	if (item->type == SymbolItemType::function) {}
 	else {
 		string mes = "[Error] Expected f not match " + item->name + " @ " + item->block->func_head->name;
@@ -57,6 +63,7 @@ void assert_f(SymbolItem* item) {
 }
 
 void assert_l(SymbolItem* item) {
+	SWITCH;
 	if (item->type == SymbolItemType::label) {}
 	else {
 		string mes = "[Error] Expected l not match " + item->name + " @ " + item->block->func_head->name;
@@ -66,6 +73,7 @@ void assert_l(SymbolItem* item) {
 
 // VarDeclar
 Quaternary* GetVarDeclarQuater(Block* block, SymbolItem* result) {
+	SWITCH;
 	assert_v(result);
 	Quaternary* p = new Quaternary(block, QuaterType::VarDeclar, NULL, NULL, result);
 	QuaterList.push_back(p);
@@ -74,6 +82,7 @@ Quaternary* GetVarDeclarQuater(Block* block, SymbolItem* result) {
 
 // ConstDeclar
 Quaternary* GetConstDeclarQuater(Block* block, SymbolItem* result) {
+	SWITCH;
 	assert_c(result);
 	Quaternary* p = new Quaternary(block, QuaterType::ConstDeclar, NULL, NULL, result);
 	QuaterList.push_back(p);
@@ -82,6 +91,7 @@ Quaternary* GetConstDeclarQuater(Block* block, SymbolItem* result) {
 
 // FuncDeclar
 Quaternary* GetFuncDeclarQuater(Block* block, SymbolItem* result) {
+	SWITCH;
 	assert_f(result);
 	Quaternary* p = new Quaternary(block, QuaterType::FuncDeclar, NULL, NULL, result);
 	QuaterList.push_back(p);
@@ -90,6 +100,7 @@ Quaternary* GetFuncDeclarQuater(Block* block, SymbolItem* result) {
 
 // FuncParaDeclar
 Quaternary* GetFuncParaDeclarQuater(Block* block, SymbolItem* result) {
+	SWITCH;
 	assert_v(result);
 	Quaternary* p = new Quaternary(block, QuaterType::FuncParaDeclar, NULL, NULL, result);
 	QuaterList.push_back(p);
@@ -98,6 +109,7 @@ Quaternary* GetFuncParaDeclarQuater(Block* block, SymbolItem* result) {
 
 // FuncParaPush
 Quaternary* GetFuncParaPushQuater(Block* block, SymbolItem* A) {
+	SWITCH;
 	assert_vct(A);
 	Quaternary* p = new Quaternary(block, QuaterType::FuncParaPush, A, NULL, NULL);
 	QuaterList.push_back(p);
@@ -106,6 +118,7 @@ Quaternary* GetFuncParaPushQuater(Block* block, SymbolItem* A) {
 
 // FuncCall
 Quaternary* GetFuncCallQuater(Block* block, SymbolItem* A) {
+	SWITCH;
 	assert_f(A);
 	Quaternary* p = new Quaternary(block, QuaterType::FuncCall, A, NULL, NULL);
 	QuaterList.push_back(p);
@@ -114,6 +127,7 @@ Quaternary* GetFuncCallQuater(Block* block, SymbolItem* A) {
 
 // AssignRet
 Quaternary* GetAssignRetQuater(Block* block, SymbolItem* result) {
+	SWITCH;
 	assert_vt(result);
 	Quaternary* p = new Quaternary(block, QuaterType::AssignRet, NULL, NULL, result);
 	QuaterList.push_back(p);
@@ -122,6 +136,7 @@ Quaternary* GetAssignRetQuater(Block* block, SymbolItem* result) {
 
 // FuncRet
 Quaternary* GetFuncRetQuater(Block* block, SymbolItem* A) {
+	SWITCH;
 	if (A != NULL) 
 		assert_vct(A);
 	Quaternary* p = new Quaternary(block, QuaterType::FuncRet, A, NULL, NULL);
@@ -131,6 +146,7 @@ Quaternary* GetFuncRetQuater(Block* block, SymbolItem* A) {
 
 // Add
 Quaternary* GetAddQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	SWITCH;
 	assert_vct(A);
 	assert_vct(B);
 	assert_vt(Result);
@@ -141,6 +157,7 @@ Quaternary* GetAddQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem*
 
 // Sub
 Quaternary* GetSubQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	SWITCH;
 	if(A != NULL)
 		assert_vct(A);
 	assert_vct(B);
@@ -152,6 +169,7 @@ Quaternary* GetSubQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem*
 
 // Mult
 Quaternary* GetMultQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	SWITCH;
 	assert_vct(A);
 	assert_vct(B);
 	assert_vt(Result);
@@ -162,6 +180,7 @@ Quaternary* GetMultQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem
 
 // Div
 Quaternary* GetDivQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	SWITCH;
 	assert_vct(A);
 	assert_vct(B);
 	assert_vt(Result);
@@ -172,6 +191,7 @@ Quaternary* GetDivQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem*
 
 // Assign
 Quaternary* GetAssignQuater(Block* block, SymbolItem* A, SymbolItem* Result) {
+	SWITCH;
 	assert_vct(A);
 	assert_vt(Result);
 	Quaternary* p = new Quaternary(block, QuaterType::Assign, A, NULL, Result);
@@ -181,6 +201,7 @@ Quaternary* GetAssignQuater(Block* block, SymbolItem* A, SymbolItem* Result) {
 
 // Assign Array
 Quaternary* GetAssignArrayQuater(Block* block, SymbolItem* A, SymbolItem* B,SymbolItem* Result) {
+	SWITCH;
 	assert_vct(A);		// value
 	assert_vct(B);		// index
 	assert_v(Result);	// idenfr
@@ -191,6 +212,7 @@ Quaternary* GetAssignArrayQuater(Block* block, SymbolItem* A, SymbolItem* B,Symb
 
 // EqlCmp
 Quaternary* GetEqlCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	SWITCH;
 	assert_vct(A);
 	assert_vct(B);
 	assert_vt(Result);
@@ -201,6 +223,7 @@ Quaternary* GetEqlCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolIt
 
 // NeqCmp
 Quaternary* GetNeqCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	SWITCH;
 	assert_vct(A);
 	assert_vct(B);
 	assert_vt(Result);
@@ -211,6 +234,7 @@ Quaternary* GetNeqCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolIt
 
 // GtCmp
 Quaternary* GetGtCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	SWITCH;
 	assert_vct(A);
 	assert_vct(B);
 	assert_vt(Result);
@@ -221,6 +245,7 @@ Quaternary* GetGtCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolIte
 
 // GeqCmp
 Quaternary* GetGeqCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	SWITCH;
 	assert_vct(A);
 	assert_vct(B);
 	assert_vt(Result);
@@ -231,6 +256,7 @@ Quaternary* GetGeqCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolIt
 
 // LtCmp
 Quaternary* GetLtCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	SWITCH;
 	assert_vct(A);
 	assert_vct(B);
 	assert_vt(Result);
@@ -241,6 +267,7 @@ Quaternary* GetLtCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolIte
 
 // LeqCmp
 Quaternary* GetLeqCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	SWITCH;
 	assert_vct(A);
 	assert_vct(B);
 	assert_vt(Result);
@@ -251,6 +278,7 @@ Quaternary* GetLeqCmpQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolIt
 
 // Goto
 Quaternary* GetGotoQuater(Block* block, SymbolItem* A) {
+	SWITCH;
 	assert_l(A);
 	Quaternary* p = new Quaternary(block, QuaterType::Goto, A, NULL,NULL);
 	QuaterList.push_back(p);
@@ -259,6 +287,7 @@ Quaternary* GetGotoQuater(Block* block, SymbolItem* A) {
 
 // Bnz
 Quaternary* GetBnzQuater(Block* block, SymbolItem* label, SymbolItem* condition) {
+	SWITCH;
 	assert_l(label);
 	assert_vct(condition);
 	Quaternary* p = new Quaternary(block, QuaterType::Bnz, label, condition, NULL);
@@ -268,6 +297,7 @@ Quaternary* GetBnzQuater(Block* block, SymbolItem* label, SymbolItem* condition)
 
 // Bz
 Quaternary* GetBzQuater(Block* block, SymbolItem* label, SymbolItem* condition) {
+	SWITCH;
 	assert_l(label);
 	assert_vct(condition);
 	Quaternary* p = new Quaternary(block, QuaterType::Bz, label, condition, NULL);
@@ -277,6 +307,7 @@ Quaternary* GetBzQuater(Block* block, SymbolItem* label, SymbolItem* condition) 
 
 // SetLabel
 Quaternary* GetSetLabelQuater(Block* block, SymbolItem* A) {
+	SWITCH;
 	assert_l(A);
 	Quaternary* p = new Quaternary(block, QuaterType::SetLabel, A, NULL, NULL);
 	QuaterList.push_back(p);
@@ -285,6 +316,7 @@ Quaternary* GetSetLabelQuater(Block* block, SymbolItem* A) {
 
 // ArrayQuery
 Quaternary* GetArrayQueryQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result) {
+	SWITCH;
 	assert_v(A);
 	assert_vct(B);
 	assert_vt(Result);
@@ -295,6 +327,7 @@ Quaternary* GetArrayQueryQuater(Block* block, SymbolItem* A, SymbolItem* B, Symb
 
 // Scan
 Quaternary* GetScanQuater(Block* block, SymbolItem* Result) {
+	SWITCH;
 	assert_v(Result);
 	Quaternary* p = new Quaternary(block, QuaterType::Scan, NULL, NULL, Result);
 	QuaterList.push_back(p);
@@ -303,6 +336,7 @@ Quaternary* GetScanQuater(Block* block, SymbolItem* Result) {
 
 // Print
 Quaternary* GetPrintQuater(Block* block, SymbolItem* A) {
+	SWITCH;
 	assert_vct(A);
 	Quaternary* p = new Quaternary(block, QuaterType::Print, A, NULL, NULL);
 	QuaterList.push_back(p);

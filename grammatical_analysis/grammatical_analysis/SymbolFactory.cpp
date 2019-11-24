@@ -7,7 +7,7 @@ string alloc_free_temp_name(Block* block) {
 	// 确保temp名字的唯一性
 	int cnt = 0;
 	char buf[10];
-	string ori = "t";
+	string ori = "$";
 	string target = ori;
 	while (block->temp_map.find(target) != block->temp_map.end()) {
 		cnt++;
