@@ -2,14 +2,13 @@
 #include "debug.h"
 #include "Block.h"	
 #include <iostream>
-#define SWITCH return;
+#define SWITCH return NULL;
 
 // 存放四元式的容器
 vector<Quaternary*> QuaterList;
 
 // 工具函数 - assert_检查
 void assert_vct(SymbolItem* item) {
-	SWITCH;
 	if (item->type == SymbolItemType::_variable ||
 		item->type == SymbolItemType::_const ||
 		item->type == SymbolItemType::temp_normal ||
@@ -23,7 +22,6 @@ void assert_vct(SymbolItem* item) {
 }
 
 void assert_vt(SymbolItem* item) {
-	SWITCH;
 	if (item->type == SymbolItemType::_variable ||
 		item->type == SymbolItemType::temp_normal||
 		item->type == SymbolItemType::temp_const ||
@@ -36,7 +34,6 @@ void assert_vt(SymbolItem* item) {
 }
 
 void assert_v(SymbolItem* item) {
-	SWITCH;
 	if (item->type == SymbolItemType::_variable) {}
 	else {
 		string mes = "[Error] Expected v not match " + item->name + " @ " + item->block->func_head->name;
@@ -45,7 +42,6 @@ void assert_v(SymbolItem* item) {
 }
 
 void assert_c(SymbolItem* item) {
-	SWITCH;
 	if (item->type == SymbolItemType::_const) {}
 	else {
 		string mes = "[Error] Expected c not match " + item->name + " @ " + item->block->func_head->name;
@@ -54,7 +50,6 @@ void assert_c(SymbolItem* item) {
 }
 
 void assert_f(SymbolItem* item) {
-	SWITCH;
 	if (item->type == SymbolItemType::function) {}
 	else {
 		string mes = "[Error] Expected f not match " + item->name + " @ " + item->block->func_head->name;
@@ -63,7 +58,6 @@ void assert_f(SymbolItem* item) {
 }
 
 void assert_l(SymbolItem* item) {
-	SWITCH;
 	if (item->type == SymbolItemType::label) {}
 	else {
 		string mes = "[Error] Expected l not match " + item->name + " @ " + item->block->func_head->name;
