@@ -107,11 +107,11 @@ void mips_j(vector<string>* list, string label) {
 	list->push_back(string(buf));
 }
 void mips_bnz(vector<string>* list, string lable, string condition) {
-	sprintf(buf, "bnez %s %s", condition.c_str(), lable.c_str());
+	sprintf(buf, "beq %s $0 %s", condition.c_str(), lable.c_str());
 	list->push_back(string(buf));
 }
 void mips_bz(vector<string>* list, string lable, string condition) {
-	sprintf(buf, "bez %s %s", condition.c_str(), lable.c_str());
+	sprintf(buf, "bne %s $0 %s", condition.c_str(), lable.c_str());
 	list->push_back(string(buf));
 }
 
