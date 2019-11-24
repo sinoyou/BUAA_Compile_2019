@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <algorithm>
+#include <list>
 
 /* Stack Distribution */
 /*
@@ -60,7 +61,7 @@ MipsFunction::MipsFunction(
 
 			// judge if space already alloc ?
 			if (offset_map.find(t) == offset_map.end()) {
-				printf("[Function Temp Alloc] %s -> %d, size = %d\n", t->getname().c_str(), offset, size);
+				printf("[Function Alloc] %s -> %d, size = %d\n", t->getname().c_str(), offset, size);
 				offset_map[t] = offset;
 				offset += size;
 			}
@@ -75,12 +76,17 @@ MipsFunction::MipsFunction(
 	ret_offset = offset;
 	offset += 4;
 
-	// parameter
+	// parameter - must be mapped to stack in a reversed order. (because para push order when call)
+	list<Quaternary*> para_declar_quater_list;
 	for (auto it = func_quater.begin(); it != func_quater.end(); it++) {
-		if ((*it)->type == QuaterType::FuncParaDeclar) {
-			offset_map[(*it)->Result] = offset;
-			offset += 4;
-		}
+		if ((*it)->type == QuaterType::FuncParaDeclar) 
+			para_declar_quater_list.push_front((*it));
+	}
+	for (auto it = para_declar_quater_list.begin(); it != para_declar_quater_list.end(); it++) {
+		SymbolItem* t = (*it)->Result;
+		printf("[Function Alloc] %s -> %d, size = %d\n", t->getname().c_str(), offset, 4);
+		offset_map[t] = offset;
+		offset += 4;
 	}
 };
 
