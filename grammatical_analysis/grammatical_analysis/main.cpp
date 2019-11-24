@@ -56,6 +56,7 @@ void run() {
 
 	cout << QuaterList.size() << endl;
 
+	/*
 	// quaternary output
 	ofstream quater_out;
 	quater_out.open("middle.txt", ios::out | ios::trunc);
@@ -74,6 +75,7 @@ void run() {
 		mips_out << *it << endl;
 	}
 	mips_out.close();
+	*/
 }
 
 int main()
