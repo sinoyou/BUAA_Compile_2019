@@ -42,23 +42,19 @@ SymbolItem* find_const_var(Block* block, string name, bool recur=true)
 		// 1 const
 		auto ite = block->items.find(SymbolItemType::_const);
 		if (ite != block->items.end()) {
-			vector<SymbolItem*>::iterator it = ite->second.begin();
-			while (it != ite->second.end()) {
+			for (auto it = ite->second.begin(); it != ite->second.end(); it++) {
 				if ((*it)->name == name) {
 					return *it;
 				}
-				it += 1;
 			}
 		}
 		// 2 var
-		ite = block->items.find(SymbolItemType::_variable);
-		if (ite != block->items.end()) {
-			vector<SymbolItem*>::iterator it = ite->second.begin();
-			while (it != ite->second.end()) {
+		auto ite1 = block->items.find(SymbolItemType::_variable);
+		if (ite1 != block->items.end()) {
+			for (auto it = ite1->second.begin(); it != ite1->second.end(); it++) {
 				if ((*it)->name == name) {
 					return *it;
 				}
-				it += 1;
 			}
 		}
 		block = block->pre;

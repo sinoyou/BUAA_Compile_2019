@@ -14,6 +14,7 @@
 // Global Variable and Pointer
 FileReader* reader;
 FILE* f;
+ofstream log_file("log.txt", ios::out | ios::trunc);
 
 void run() {
 	vector<tuple<int, string>> error_output_list;
@@ -23,7 +24,7 @@ void run() {
 	LexParser lexParser(reader, error_output_list);
 	vector<Token> token_list = lexParser.parse();
 	for (vector<Token>::iterator it = token_list.begin(); it != token_list.end(); it++) {
-		// cout << it->line << " " << it->token << " " << symbol_dict[it->symbol] << endl;
+		log_file << it->line << " " << it->token << " " << symbol_dict[it->symbol] << endl;
 	}
 
 	/* Grammatical Parse :  Recursive Output + Error Output */
@@ -56,7 +57,7 @@ void run() {
 
 	cout << QuaterList.size() << endl;
 
-	/*
+	
 	// quaternary output
 	ofstream quater_out;
 	quater_out.open("middle.txt", ios::out | ios::trunc);
@@ -65,7 +66,7 @@ void run() {
 		quater_out << *it << endl;
 	}
 	quater_out.close();
-
+	
 	// object out
 	ofstream mips_out;
 	mips_out.open("mips.txt", ios::out | ios::trunc);
@@ -75,7 +76,7 @@ void run() {
 		mips_out << *it << endl;
 	}
 	mips_out.close();
-	*/
+	/**/
 }
 
 int main()

@@ -754,6 +754,13 @@ SymbolItem* GrammaticalParser::__expression(int level, bool *is_char) {
 
 		bool temp = false;
 		first_item = __item(level + 1, &temp);
+		// 取负操作
+		if (neg) {
+			// 取反操作 -'c' 涉及运算操作，因此需要转换为整数
+			SymbolItem* temp_neg = SymbolFactory::create_temp(block, BasicType::_int);
+			GetSubQuater(block, NULL, first_item, temp_neg);
+			first_item = temp_neg;
+		}
 		cnt++;
 		while (_peek()->equal(SYMBOL::PLUS) || _peek()->equal(SYMBOL::MINU)) {
 			Token* op = _peek();
@@ -773,10 +780,6 @@ SymbolItem* GrammaticalParser::__expression(int level, bool *is_char) {
 		// 表达式只有一个项且这个项是char，那么表达式就是char型
 		if (cnt == 1 && temp && is_char != NULL)
 			* is_char = true;
-		// 取负操作
-		if (neg) {
-			GetSubQuater(block, NULL, first_item, first_item);
-		}
 	}
 	catch (ParseException& e) {
 		FLAG_FAIL;
@@ -844,9 +847,9 @@ SymbolItem* GrammaticalParser::__factor(int level, bool *is_char) {
 	try {
 		// <标识符> [ '[' <表达式> ']' ] 
 		if (_peek()->equal(SYMBOL::IDENFR) && !_peek(2)->equal(SYMBOL::LPARENT)) {
-			__idenfr(level + 1, false);
+			string name = __idenfr(level + 1, false);
 			// 在符号表中查找变量类型
-			SymbolItem* p = find_const_var(symbol_table.get_present_block(), token->token, true);
+			SymbolItem* p = find_const_var(symbol_table.get_present_block(), name, true);
 			if (p != NULL) {
 				if (p->basic_type == BasicType::_char && is_char != NULL) {
 					*is_char = true;

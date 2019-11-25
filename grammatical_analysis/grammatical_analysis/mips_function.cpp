@@ -31,6 +31,8 @@
 	   BUTTOM
 */
 
+extern ofstream log_file;
+
 MipsFunction::MipsFunction(
 	SymbolItem* func_head, vector<Quaternary*> func_quater, map<SymbolItem*, string>* global_data) :
 	func_head(func_head), quater_list(func_quater), global_data(global_data) {
@@ -61,7 +63,9 @@ MipsFunction::MipsFunction(
 
 			// judge if space already alloc ?
 			if (offset_map.find(t) == offset_map.end()) {
-				printf("[Function Alloc] %s -> %d, size = %d\n", t->getname().c_str(), offset, size);
+				char buf[100];
+				sprintf(buf, "[Function Alloc] %s -> %d, size = %d\n", t->getname().c_str(), offset, size);
+				log_file << string(buf);
 				offset_map[t] = offset;
 				offset += size;
 			}
@@ -84,7 +88,9 @@ MipsFunction::MipsFunction(
 	}
 	for (auto it = para_declar_quater_list.begin(); it != para_declar_quater_list.end(); it++) {
 		SymbolItem* t = (*it)->Result;
-		printf("[Function Alloc] %s -> %d, size = %d\n", t->getname().c_str(), offset, 4);
+		char buf[100];
+		sprintf(buf, "[Function Alloc] %s -> %d, size = %d\n", t->getname().c_str(), offset, 4);
+		log_file << string(buf);
 		offset_map[t] = offset;
 		offset += 4;
 	}
@@ -123,6 +129,7 @@ vector<string> MipsFunction::dump() {
 	string t2 = "$s1";
 	string t3 = "$s2";
 	string ra = "$ra";
+	string zero = "$0";
 
 	// 函数
 	int func_para_cnt = 0;				// 参数推入的计数器，当推入一个参数后+1，当调用了函数后置0.
@@ -139,7 +146,6 @@ vector<string> MipsFunction::dump() {
 		QuaterType type = (*quater)->type;
 		Quaternary* q = *quater;
 		mips_comment(&codes,PrintQuaterHandler(q, type));
-		// printf("%s\n", PrintQuaterHandler(q, type).c_str());
 		switch (type)
 		{
 		case FuncDeclar:
@@ -183,10 +189,17 @@ vector<string> MipsFunction::dump() {
 			mips_save(&codes, t3, q->Result, &(*this));
 			break;
 		case Sub:
-			mips_load(&codes, t1, q->OpA, &(*this));
-			mips_load(&codes, t2, q->OpB, &(*this));
-			mips_calc(&codes, t1, t2, t3, type);
-			mips_save(&codes, t3, q->Result, &(*this));
+			if (q->OpA == NULL) {
+				mips_load(&codes, t2, q->OpB, &(*this));
+				mips_calc(&codes, zero, t2, t3, type);
+				mips_save(&codes, t3, q->Result, &(*this));
+			}
+			else {
+				mips_load(&codes, t1, q->OpA, &(*this));
+				mips_load(&codes, t2, q->OpB, &(*this));
+				mips_calc(&codes, t1, t2, t3, type);
+				mips_save(&codes, t3, q->Result, &(*this));
+			}
 			break;
 		case Mult:
 			mips_load(&codes, t1, q->OpA, &(*this));
@@ -292,4 +305,3 @@ void MipsFunction::get_addr(SymbolItem* item, bool *local, int* offset, string* 
 		DEBUG_PRINT(buf);
 	}
 }
-

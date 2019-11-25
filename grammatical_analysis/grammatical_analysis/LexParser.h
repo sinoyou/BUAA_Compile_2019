@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "FileReader.h"
 #include "Token.h"
 #include <vector>
@@ -16,5 +16,5 @@ private:
 	void _error(const char * s);
 public:
 	LexParser(FileReader& reader, vector<tuple<int, string>>& error_list);
-	const vector<Token>& parse();				// ºËĞÄÍâ²¿º¯Êı£¬Éú³É´Ê·¨½âÎöºóµÄlistÈİÆ÷
+	const vector<Token>& parse();				// æ ¸å¿ƒå¤–éƒ¨å‡½æ•°ï¼Œç”Ÿæˆè¯æ³•è§£æåçš„listå®¹å™¨
 };

@@ -1,4 +1,4 @@
-#include "Quaternary.h"
+﻿#include "Quaternary.h"
 #include "debug.h"
 #include <stdio.h>
 # define MAXBUF 200

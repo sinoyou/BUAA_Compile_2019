@@ -1,4 +1,4 @@
-#include "LexParser.h"
+ï»¿#include "LexParser.h"
 #include "utils.h"
 #include "error.h"
 
@@ -13,16 +13,16 @@ const vector<Token>& LexParser::parse() {
 	while (_getsym() >= 0) {
 		if(symbol != SYMBOL::IGNORE)
 			token_list.push_back(Token(symbol, reader.getToken(), current_line));
-		/* Ä¬ÈÏ£ºµ±Ç°½âÎö³ÌĞòÎªÏÂÒ»²½½âÎöÉè¶¨ºÃÖ¸Õë  */
+		/* é»˜è®¤ï¼šå½“å‰è§£æç¨‹åºä¸ºä¸‹ä¸€æ­¥è§£æè®¾å®šå¥½æŒ‡é’ˆ  */
 		reader.getchar();
 	}
 	return token_list;
 }
 
-/* ´Ê·¨·ÖÎöº¯Êı */
+/* è¯æ³•åˆ†æå‡½æ•° */
 int LexParser::_getsym() {
 	reader.clearToken();
-	/* Çå³ıÎŞ¹Ø¿Õ°×·û */
+	/* æ¸…é™¤æ— å…³ç©ºç™½ç¬¦ */
 	while (reader.isSpace() || reader.isNewlineN() || reader.isNewlineR() || reader.isTab()) {
 		if (reader.isNewlineN()) {
 			current_line += 1;
@@ -30,8 +30,8 @@ int LexParser::_getsym() {
 		reader.getchar();
 	}
 
-	/* Ã¶¾ÙÓÅÏÈ¼¶£º±£Áô×Ö - ±êÊ¶·û - ³£ÕûÊı - ·Ö½ç·û - ×Ö·û - ×Ö·û´® */
-	/* ±£Áô×ÖÓë±êÊ¶·û */
+	/* æšä¸¾ä¼˜å…ˆçº§ï¼šä¿ç•™å­— - æ ‡è¯†ç¬¦ - å¸¸æ•´æ•° - åˆ†ç•Œç¬¦ - å­—ç¬¦ - å­—ç¬¦ä¸² */
+	/* ä¿ç•™å­—ä¸æ ‡è¯†ç¬¦ */
 	if (reader.isLetter()) {
 		while (reader.isLetter() || reader.isDigit()) {
 			reader.catToken();
@@ -44,8 +44,8 @@ int LexParser::_getsym() {
 		else
 			symbol = resultvalue;
 	}
-	/* ³£ÕûÊı */
-	// todo : ÊÇ·ñÔÊĞíÇ°ÖÃÁã£¿
+	/* å¸¸æ•´æ•° */
+	// todo : æ˜¯å¦å…è®¸å‰ç½®é›¶ï¼Ÿ
 	else if (reader.isDigit()) {
 		// non-zero : must start with a non-zero number.
 		if (reader.isNZeroDigit()) {
@@ -68,7 +68,7 @@ int LexParser::_getsym() {
 				_error("INTCON");
 		}
 	}
-	/* Ë«·Ö½ç·û */
+	/* åŒåˆ†ç•Œç¬¦ */
 	else if (reader.isLss()) { // < | <=
 		reader.catToken();
 		reader.getchar();
@@ -121,7 +121,7 @@ int LexParser::_getsym() {
 			_error("!=");
 		}
 	}
-	/* µ¥·Ö½ç·ûºÅ */
+	/* å•åˆ†ç•Œç¬¦å· */
 	else if (reader.isPlus()) reader.catToken(), symbol = SYMBOL::PLUS;
 	else if (reader.isMinu()) reader.catToken(), symbol = SYMBOL::MINU;
 	else if (reader.isMult()) reader.catToken(), symbol = SYMBOL::MULT;
@@ -134,10 +134,10 @@ int LexParser::_getsym() {
 	else if (reader.isRbrack()) reader.catToken(), symbol = SYMBOL::RBRACK;
 	else if (reader.isLbrace()) reader.catToken(), symbol = SYMBOL::LBRACE;
 	else if (reader.isRbrace()) reader.catToken(), symbol = SYMBOL::RBRACE;
-	/* ×Ö·û */
+	/* å­—ç¬¦ */
 	else if (reader.isSinQuotation()) {
 		reader.getchar();
-		// todo : ¿É¼û×Ö·û¼´¿É»¹ÊÇĞèÒª°´ÕÕÎÄ·¨¶¨Òå½øĞĞ?
+		// todo : å¯è§å­—ç¬¦å³å¯è¿˜æ˜¯éœ€è¦æŒ‰ç…§æ–‡æ³•å®šä¹‰è¿›è¡Œ?
 		if (reader.isDigit() || reader.isLetter() || reader.isPlus() || reader.isMinu() || reader.isMult() || reader.isDiv()) {
 			reader.catToken();
 			reader.getchar();
@@ -153,13 +153,21 @@ int LexParser::_getsym() {
 			_error("CHARCON");
 		}
 	}
-	/* ×Ö·û´® */
+	/* å­—ç¬¦ä¸² */
 	else if (reader.isDouQuotation()) {
-		// ×ªÖÃ·û ÔİÊ±²»¿¼ÂÇ
+		// è½¬ç½®ç¬¦ æš‚æ—¶ä¸è€ƒè™‘
 		reader.getchar();
 		while (reader.isChar() && !reader.isDouQuotation()) {
-			reader.catToken();
-			reader.getchar();
+			if (reader.isEscape()) {
+				// ä¸ºäº†MARSæ­£ç¡®è¾“å‡ºï¼Œéœ€è¦å°†å•ä¸ª/å˜æ¢ä¸º//
+				reader.catToken();
+				reader.catToken();
+				reader.getchar();
+			}
+			else {
+				reader.catToken();
+				reader.getchar();
+			}
 		}
 		if (reader.isDouQuotation()) {
 			symbol = SYMBOL::STRCON;

@@ -6,8 +6,7 @@
 string alloc_free_temp_name(Block* block) {
 	// 确保temp名字的唯一性
 	int cnt = 0;
-	char buf[10];
-	string ori = "$";
+	string ori = "t";
 	string target = ori;
 	while (block->temp_map.find(target) != block->temp_map.end()) {
 		cnt++;
@@ -53,7 +52,6 @@ SymbolItem* SymbolFactory::create_label(Block* block, string comment) {
 	// 确保label的唯一性
 	int cnt = 0;
 	string target = comment;
-	char buf[10];
 	while (block->label_map.find(target) != block->label_map.end()) {
 		cnt++;
 		target = comment + to_string(cnt);

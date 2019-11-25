@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include<cstring>
 #include<iostream>
@@ -12,10 +12,10 @@ private:
 	int ptr;		// pointer in reading buffer
 
 public:
-	// ¹¹Ôìº¯Êý
+	// æž„é€ å‡½æ•°
 	FileReader(const char* path);
 
-	// ³ÉÔ±º¯Êý: ¾ä±ú×Ö·û²Ù×÷Àà
+	// æˆå‘˜å‡½æ•°: å¥æŸ„å­—ç¬¦æ“ä½œç±»
 	void catToken();
 	void clearToken();
 	void getchar();
@@ -23,20 +23,20 @@ public:
 	string getToken() { return token; }
 	string getText() {  return text; }
 
-	// ³ÉÔ±º¯Êý£º×Ö·û¼¶ÅÐ¶Ïº¯Êý
-	/* Ê¶±ðÏà¹Ø */
-	bool isSpace() { return text[ptr] == ' '; }							// ÅÐ¶ÏÊÇ·ñÎª¿Õ¸ñ
-	bool isNewlineN() { return text[ptr] == '\n'; }						// ÅÐ¶ÏÊÇ·ñÎª»»ÐÐ·û \n
-	bool isNewlineR() { return text[ptr] == '\r'; }						// ÅÐ¶ÏÊÇ·ñÎª»»ÐÐ·û \r
-	bool isTab() { return text[ptr] == '\t'; }							// ÅÐ¶ÏÊÇ·ñTab
+	// æˆå‘˜å‡½æ•°ï¼šå­—ç¬¦çº§åˆ¤æ–­å‡½æ•°
+	/* è¯†åˆ«ç›¸å…³ */
+	bool isSpace() { return text[ptr] == ' '; }							// åˆ¤æ–­æ˜¯å¦ä¸ºç©ºæ ¼
+	bool isNewlineN() { return text[ptr] == '\n'; }						// åˆ¤æ–­æ˜¯å¦ä¸ºæ¢è¡Œç¬¦ \n
+	bool isNewlineR() { return text[ptr] == '\r'; }						// åˆ¤æ–­æ˜¯å¦ä¸ºæ¢è¡Œç¬¦ \r
+	bool isTab() { return text[ptr] == '\t'; }							// åˆ¤æ–­æ˜¯å¦Tab
 	bool isLetter() { return (text[ptr] >= 'a' && text[ptr] <= 'z') 
 		|| (text[ptr] >= 'A' && (text[ptr] <= 'Z')) 
-		|| text[ptr] == '_'; }											// ×ÖÄ¸
-	bool isDigit() { return text[ptr] >= '0' && text[ptr] <= '9'; }		// Êý×Ö
-	bool isNZeroDigit() { return text[ptr] >= '1' && text[ptr] <= '9'; }// Êý×Ö
-	bool isComma() { return text[ptr] == ','; }							// ¶ººÅ
-	bool isSemicn() { return text[ptr] == ';'; }						// ·ÖºÅ
-	bool isEqu() { return text[ptr] == '='; }							// µÈºÅ
+		|| text[ptr] == '_'; }											// å­—æ¯
+	bool isDigit() { return text[ptr] >= '0' && text[ptr] <= '9'; }		// æ•°å­—
+	bool isNZeroDigit() { return text[ptr] >= '1' && text[ptr] <= '9'; }// æ•°å­—
+	bool isComma() { return text[ptr] == ','; }							// é€—å·
+	bool isSemicn() { return text[ptr] == ';'; }						// åˆ†å·
+	bool isEqu() { return text[ptr] == '='; }							// ç­‰å·
 	bool isPlus() { return text[ptr] == '+'; }							// +
 	bool isMinu() { return text[ptr] == '-'; }							// -
 	bool isDiv() { return text[ptr] == '/'; }							// /
@@ -52,7 +52,8 @@ public:
 	bool isRbrace() { return text[ptr] == '}'; }						// }
 	bool isChar() { return (text[ptr] >= 35 && text[ptr] <= 126) 
 		|| text[ptr] == 32 
-		|| text[ptr] == 33; }											// ×Ö·û´®µÄ×é³É¶¨Òå
+		|| text[ptr] == 33; }											// å­—ç¬¦ä¸²çš„ç»„æˆå®šä¹‰
+	bool isEscape() { return text[ptr] == '\\'; }						// è½¬ä¹‰å­—ç¬¦å‰ç¼€
 	bool isSinQuotation() { return text[ptr] == '\''; }					// '
 	bool isDouQuotation() { return text[ptr] == '\"'; }					// "
 	bool isEOT() { return text[ptr] == 0; }								// End Of Text

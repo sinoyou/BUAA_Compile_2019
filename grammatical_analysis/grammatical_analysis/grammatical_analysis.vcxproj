@@ -22,6 +22,9 @@
     <ClInclude Include="Block.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="error.h" />
+    <ClInclude Include="mips_code_utils.h" />
+    <ClInclude Include="mips_function.h" />
+    <ClInclude Include="mips_generator.h" />
     <ClInclude Include="ParseException.h" />
     <ClInclude Include="GrammaticalParser.h" />
     <ClInclude Include="Quaternary.h" />
@@ -40,6 +43,9 @@
     <ClCompile Include="check.cpp" />
     <ClCompile Include="middle_code_generator.cpp" />
     <ClCompile Include="middle_code_printer.cpp" />
+    <ClCompile Include="mips_code_utils.cpp" />
+    <ClCompile Include="mips_function.cpp" />
+    <ClCompile Include="mips_generator.cpp" />
     <ClCompile Include="ParseException.cpp" />
     <ClCompile Include="GrammaticalParser.cpp" />
     <ClCompile Include="SymbolFactory.cpp" />
@@ -78,7 +84,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>ClangCL</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
