@@ -1268,7 +1268,7 @@ SymbolItem* GrammaticalParser::__function_call_return(int level) {
 	SymbolItem* ret=NULL;
 	try {
 		string name = __idenfr(level + 1, false);
-		SymbolItem* p = find_func(symbol_table.get_present_block(),name, true);
+		SymbolItem* p = find_func(symbol_table.get_present_block(), name, true);
 		// 如果没有的话，直接忽略这句话
 		if (p == NULL) {
 			while (!_peek()->equal(SYMBOL::SEMICN))

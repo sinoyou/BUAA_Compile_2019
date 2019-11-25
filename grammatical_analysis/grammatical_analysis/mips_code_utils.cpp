@@ -126,7 +126,7 @@ void mips_calc(vector<string>* list, string A, string B, string Result, QuaterTy
 		sprintf(buf, "subu %s %s %s", Result.c_str(), A.c_str(), B.c_str());
 		break;
 	case Mult:
-		sprintf(buf, "mulo %s %s %s", Result.c_str(), A.c_str(), B.c_str());
+		sprintf(buf, "mul %s %s %s", Result.c_str(), A.c_str(), B.c_str());
 		break;
 	case Div:
 		sprintf(buf, "div %s %s %s", Result.c_str(), A.c_str(), B.c_str());
@@ -208,6 +208,7 @@ void mips_array_assign(vector<string>* list, string source, SymbolItem* arr, str
 		sprintf(buf, "addu %s %s $sp", index.c_str(), index.c_str());
 		list->push_back(string(buf));
 		sprintf(buf, "sw %s 0(%s)", source.c_str(), index.c_str());
+		list->push_back(string(buf));
 	}
 	else {
 		sprintf(buf, "sll %s %s 2", index.c_str(), index.c_str());
@@ -229,6 +230,7 @@ void mips_array_query(vector<string>* list, string target, SymbolItem* arr, stri
 		sprintf(buf, "addu %s %s $sp", target.c_str(), target.c_str());
 		list->push_back(string(buf));
 		sprintf(buf, "lw %s 0(%s)", target.c_str(), target.c_str());
+		list->push_back(string(buf));
 	}
 	else {
 		sprintf(buf, "sll %s %s 2", target.c_str(), index.c_str());
