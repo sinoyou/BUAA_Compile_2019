@@ -27,7 +27,7 @@ void mips_space_alloc(vector<string>* list, string label, int size) {
 }
 // label: .asciiz strcon
 void mips_asciiz(vector<string>* list, string label, string strcon) {
-	sprintf(buf, "%s: .asciiz \"%s\"", label.c_str() , strcon.c_str());
+	sprintf(buf, "%s: .asciiz \"%s\"", label.c_str(), strcon.c_str());
 	list->push_back(string(buf));
 	list->push_back(string(".align 2"));
 }
@@ -56,7 +56,7 @@ void mips_load(vector<string>* list, string target, SymbolItem* item, MipsFuncti
 		func->get_addr(item, &local, &offset, &label);
 		// 情况2：字符串
 		if (item->type == SymbolItemType::temp_strcon)
-			sprintf(buf, "la %s %s", target.c_str(),label.c_str());
+			sprintf(buf, "la %s %s", target.c_str(), label.c_str());
 		else {
 			// 情况3：局部变量
 			if (local)
@@ -139,6 +139,24 @@ void mips_calc(vector<string>* list, string A, string B, string Result, QuaterTy
 	}
 	list->push_back(string(buf));
 }
+
+void mips_cali(vector<string>* list, string A, int immediate, string Result, QuaterType type) {
+
+	switch (type)
+	{
+	case Add:
+		sprintf(buf, "addiu %s %s %d", Result.c_str(), A.c_str(), immediate);
+		break;
+	case Sub:
+		sprintf(buf, "subiu %s %s %d", Result.c_str(), A.c_str(), immediate);
+		break;
+	default:
+		DEBUG_PRINT("[ERROR] Unexpected QuaterType in MIPS_cali");
+		break;
+	}
+	list->push_back(string(buf));
+}
+
 void mips_cmp(vector<string>* list, string A, string B, string Result, QuaterType type) {
 	switch (type)
 	{

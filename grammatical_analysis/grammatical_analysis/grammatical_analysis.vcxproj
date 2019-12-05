@@ -65,7 +65,7 @@
     <ProjectGuid>{1D6774E0-F59E-404E-9A6A-B6C54D9577C5}</ProjectGuid>
     <RootNamespace>grammaticalanalysis</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>middle_code</ProjectName>
+    <ProjectName>optimize</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
