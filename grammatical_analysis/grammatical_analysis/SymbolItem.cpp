@@ -2,6 +2,7 @@
 #include "Block.h"
 #include <iostream>
 #include <cstdlib>
+#include "debug.h"
 
 using namespace std;
 
@@ -52,4 +53,31 @@ string SymbolItem::get_basictype() {
 		(this->basic_type == BasicType::_string) ? "string" :
 		(this->basic_type == BasicType::_void) ? "void" : "unknown";
 	return type;
+}
+
+/*
+ * 判断当前SymbolItem是否为常量
+*/
+bool SymbolItem::is_const() {
+	return (this->type == SymbolItemType::_const || this->type == SymbolItemType::temp_const);
+}
+
+/*
+ * 更新常量类型的SymbolItem的值
+*/
+void SymbolItem::modify_value(int value) {
+	if (this->type == SymbolItemType::temp_const) {
+		if (this->basic_type != BasicType::_int) {
+			char buf[100];
+			sprintf(buf, "# Auto Convert %s From %s To int", this->getname().c_str(), this->get_basictype().c_str());
+			DEBUG_PRINT(buf);
+			this->basic_type = BasicType::_int;
+		}
+		this->value = value;
+	}
+	else {
+		char buf[100];
+		sprintf(buf, "[ERROR] Can not modify a non-const(temp) SymbolItem %s", this->getname().c_str());
+		DEBUG_PRINT(buf);
+	}
 }

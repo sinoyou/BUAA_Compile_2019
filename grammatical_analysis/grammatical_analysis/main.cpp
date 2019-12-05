@@ -76,7 +76,6 @@ void run() {
 		mips_out << *it << endl;
 	}
 	mips_out.close();
-	/**/
 }
 
 int main()

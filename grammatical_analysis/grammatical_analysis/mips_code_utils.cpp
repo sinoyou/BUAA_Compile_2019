@@ -129,7 +129,9 @@ void mips_calc(vector<string>* list, string A, string B, string Result, QuaterTy
 		sprintf(buf, "mul %s %s %s", Result.c_str(), A.c_str(), B.c_str());
 		break;
 	case Div:
-		sprintf(buf, "div %s %s %s", Result.c_str(), A.c_str(), B.c_str());
+		sprintf(buf, "div %s %s", A.c_str(), B.c_str());
+		list->push_back(string(buf));
+		sprintf(buf, "mflo %s", Result.c_str());
 		break;
 	default:
 		DEBUG_PRINT("[ERROR] Unexpected QuaterType MIP_cal");

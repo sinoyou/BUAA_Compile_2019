@@ -52,6 +52,11 @@ public:
 	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, string strcon):
 		block(block), name(name), type(type), basic_type(var_type), strcon(strcon){}
 	
+	// 表达式常量传播支持 
+	// 强转int + 修改常量值
+	void modify_value(int value);
+	bool is_const();
+	
 	// 生成输出字符表示
 	string getname(bool simplify = true);
 	string get_basictype();

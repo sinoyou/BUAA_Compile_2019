@@ -1,6 +1,7 @@
 ﻿#include "GrammaticalParser.h"
 #include "utils.h"
 #include "debug.h"
+#include <list>
 
 /* 初始化函数 */
 GrammaticalParser::GrammaticalParser(
@@ -736,7 +737,7 @@ void GrammaticalParser::__main_function(int level)
  * FOLLOW(<表达式>) = {RBRACK, RPARENT, GRE,GEQ,LSS,LEQ,NEQ,EQL, COMMA} + {SEMICN}(<赋值语句新增>)
  * FIRST<加法运算符> 与 FOLLOW<表达式> 没有交集, 因此无回溯.
 */
-SymbolItem* GrammaticalParser::__expression(int level, bool *is_char) {
+SymbolItem* GrammaticalParser::__expression(int level, bool* is_char) {
 	FLAG_ENTER("<表达式>", level);
 	int cnt = 0;
 	bool neg = false;
@@ -770,9 +771,9 @@ SymbolItem* GrammaticalParser::__expression(int level, bool *is_char) {
 
 			// 根据操作符的差异，生成不同的中间式 - begin
 			SymbolItem* temp_item = SymbolFactory::create_temp(block, BasicType::_int);
-			if (op->equal(SYMBOL::PLUS)) 
+			if (op->equal(SYMBOL::PLUS))
 				GetAddQuater(block, first_item, second_item, temp_item);
-			else 
+			else
 				GetSubQuater(block, first_item, second_item, temp_item);
 			first_item = temp_item;
 			// end
@@ -798,7 +799,7 @@ SymbolItem* GrammaticalParser::__expression(int level, bool *is_char) {
  * FOLLOW(<项>) = {RBRACK, RPARENT, GRE,GEQ,LSS,LEQ,NEQ,EQL, COMMA, SEMICN} + {PLUS, MINU}
  * FIRST 与 FOLLOW 交集，故不存在回溯
 */
-SymbolItem* GrammaticalParser::__item(int level, bool *is_char) {
+SymbolItem* GrammaticalParser::__item(int level, bool* is_char) {
 	FLAG_ENTER("<项>", level);
 	int cnt = 0;
 	Block* block = symbol_table.get_present_block();
@@ -1176,8 +1177,8 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			SymbolItem* initial = SymbolFactory::create_label(block, "for_initial");
 			SymbolItem* judge = SymbolFactory::create_label(block, "for_judge");
 			SymbolItem* update = SymbolFactory::create_label(block, "for_update");
-			SymbolItem* head = SymbolFactory::create_label(block, "for_body_head");
-			SymbolItem* tail = SymbolFactory::create_label(block, "for_body_tail");
+			SymbolItem* body = SymbolFactory::create_label(block, "for_body");
+			SymbolItem* tail = SymbolFactory::create_label(block, "for_tail");
 			
 			// 初始化部分
 			SYMBOL_CHECK(SYMBOL::FORTK);					// for
@@ -1192,41 +1193,42 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			
 			// 判断部分
 			GetSetLabelQuater(block, judge);
-			SymbolItem * condition = __condition(level + 1);					// <条件>
-			SYMBOL_CHECK(SYMBOL::SEMICN);					// ;
+			SymbolItem * condition = __condition(level + 1);		// <条件>
+			SYMBOL_CHECK(SYMBOL::SEMICN);							// ;
 			GetBzQuater(block, tail, condition);
-			GetBnzQuater(block, head, condition);
 			
-			// 更新部分
-			GetSetLabelQuater(block, update);
-			name = __idenfr(level + 1, false);		// <标识符>
-			SymbolItem* a = find_const_var(block, name, true);
-			SYMBOL_CHECK(SYMBOL::ASSIGN);					// =
-			name = __idenfr(level + 1, false);		// <标识符>
-			SymbolItem* b = find_const_var(block, name, true);
-			Token* t = _peek();
-			if (_peek()->equal(SYMBOL::PLUS)) {				// (+ | -)
+			// 更新部分 - （源代码解析）
+			name = __idenfr(level + 1, false);								// <标识符>
+			SymbolItem* step_counter = find_const_var(block, name, true);
+			SYMBOL_CHECK(SYMBOL::ASSIGN);									// =
+			name = __idenfr(level + 1, false);								// <标识符>
+			SymbolItem* step_updater = find_const_var(block, name, true);
+			SYMBOL update_op;
+			if (_peek()->equal(SYMBOL::PLUS)) {								// (+ | -)
 				SYMBOL_CHECK(SYMBOL::PLUS);
+				update_op = SYMBOL::PLUS;
 			}
 			else {
 				SYMBOL_CHECK(SYMBOL::MINU);
+				update_op = SYMBOL::MINU;
 			}
-			int value = __step_length(level + 1);											// <步长>
+			int value = __step_length(level + 1);							// <步长>
 			SymbolItem* step_len = SymbolFactory::create_temp_const(block, BasicType::_int, value);
-			if (t->equal(SYMBOL::PLUS))
-			{
-				GetAddQuater(block, b, step_len, a);
-			}
-			else {
-				GetSubQuater(block, b, step_len, a);
-			}
-			SYMBOL_CHECK(SYMBOL::RPARENT);					// )
-			GetGotoQuater(block, judge);
+			SYMBOL_CHECK(SYMBOL::RPARENT);									// )
 			
 			// 主干部分
-			GetSetLabelQuater(block, head);
+			GetSetLabelQuater(block, body);
 			__statement(level + 1, has_return);
-			GetGotoQuater(block, update);
+
+			// 更新部分 - （中间码）
+			GetSetLabelQuater(block, update);
+			if (update_op == SYMBOL::PLUS)
+				GetAddQuater(block, step_updater, step_len, step_counter);
+			else 
+				GetSubQuater(block, step_updater, step_len, step_counter);
+			GetGotoQuater(block, judge);
+
+			// 循环尾部
 			GetSetLabelQuater(block, tail);
 		}
 		else {
