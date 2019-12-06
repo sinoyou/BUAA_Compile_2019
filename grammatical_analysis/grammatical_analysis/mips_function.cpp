@@ -145,6 +145,7 @@ vector<string> MipsFunction::dump() {
 	for (auto quater = quater_list.begin(); quater != quater_list.end(); quater++) {
 		QuaterType type = (*quater)->type;
 		Quaternary* q = *quater;
+		Quaternary* peek = (quater + 1 == quater_list.end()) ? NULL : *(quater + 1);
 		mips_comment(&codes, PrintQuaterHandler(q, type));
 		if (type == FuncDeclar) {
 			mips_label(&codes, q->Result->name);
@@ -234,8 +235,26 @@ vector<string> MipsFunction::dump() {
 		else if (type == EqlCmp || type == NeqCmp || type == GtCmp || type == GeqCmp || type == LtCmp || type == LeqCmp) {
 			mips_load(&codes, t1, q->OpA, &(*this));
 			mips_load(&codes, t2, q->OpB, &(*this));
-			mips_cmp(&codes, t1, t2, t3, type);
-			mips_save(&codes, t3, q->Result, &(*this));
+			// 该CMP结果仅用于跳转操作，则可以合并，进行跳转优化。
+			// branch if compare result is true.
+			if (peek && peek->type == QuaterType::Bnz
+				&& peek->OpB == q->Result && q->Result->type == SymbolItemType::temp_normal) {
+				QuaterType cmp_type = q->type;								// cmp+bnz，cmp类型保持原样即可
+				mips_branch(&codes, peek->OpA->name, t1, t2, q->type);
+				quater += 1;
+			}
+			// branch if compare result if false.
+			else if (peek && peek->type == QuaterType::Bz
+				&& peek->OpB == q->Result && q->Result->type == SymbolItemType::temp_normal) {
+				QuaterType cmp_type = cmp_reverse(type);			// cmp+bz，cmp的类型需要取反
+				mips_branch(&codes, peek->OpA->name, t1, t2, cmp_type);
+				quater += 1;
+			}
+			// compare is not for a branch
+			else {
+				mips_cmp(&codes, t1, t2, t3, type);
+				mips_save(&codes, t3, q->Result, &(*this));
+			}
 		}
 		else if (type == Goto) {
 			mips_j(&codes, q->OpA->name);

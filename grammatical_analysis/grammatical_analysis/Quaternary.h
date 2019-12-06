@@ -92,6 +92,10 @@ Quaternary* GetArrayQueryQuater(Block* block, SymbolItem* A, SymbolItem* B, Symb
 Quaternary* GetScanQuater(Block* block, SymbolItem* Result);
 Quaternary* GetPrintQuater(Block* block, SymbolItem* A);
 
+// CMP类四元式反转辅助函数
+/* 用于翻转CMP操作的类型，使其满足BZ型四元式的操作 */
+QuaterType cmp_reverse(QuaterType cmp_type);
+
 // 四元式输出辅助函数
 vector<string> PrintQuater(vector<Quaternary*>* QuaterList);
 string PrintQuaterHandler(Quaternary* q, QuaterType qtype);

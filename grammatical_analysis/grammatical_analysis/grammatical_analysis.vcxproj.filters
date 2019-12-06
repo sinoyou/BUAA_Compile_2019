@@ -173,5 +173,8 @@
     <ClCompile Include="mips_code_utils.cpp">
       <Filter>Source Files\class\object_code</Filter>
     </ClCompile>
+    <ClCompile Include="middle_code_utils.cpp">
+      <Filter>Source Files\class\middle_code</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

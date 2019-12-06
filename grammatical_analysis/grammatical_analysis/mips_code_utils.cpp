@@ -114,6 +114,23 @@ void mips_bz(vector<string>* list, string lable, string condition) {
 	sprintf(buf, "beq %s $0 %s", condition.c_str(), lable.c_str());
 	list->push_back(string(buf));
 }
+void mips_branch(vector<string>* list, string label, string cmpA, string cmpB, QuaterType cmp_type) {
+	if (cmp_type == QuaterType::EqlCmp)
+		sprintf(buf, "beq %s %s %s", cmpA.c_str(), cmpB.c_str(), label.c_str());
+	else if (cmp_type == QuaterType::GeqCmp)
+		sprintf(buf, "bge %s %s %s", cmpA.c_str(), cmpB.c_str(), label.c_str());
+	else if (cmp_type == QuaterType::GtCmp)
+		sprintf(buf, "bgt %s %s %s", cmpA.c_str(), cmpB.c_str(), label.c_str());
+	else if (cmp_type == QuaterType::LeqCmp)
+		sprintf(buf, "ble %s %s %s", cmpA.c_str(), cmpB.c_str(), label.c_str());
+	else if (cmp_type == QuaterType::LtCmp)
+		sprintf(buf, "blt %s %s %s", cmpA.c_str(), cmpB.c_str(), label.c_str());
+	else if (cmp_type == QuaterType::NeqCmp)
+		sprintf(buf, "bne %s %s %s", cmpA.c_str(), cmpB.c_str(), label.c_str());
+	else
+		DEBUG_PRINT("[ERROR] Unexpected Compare Type in mips_branch");
+	list->push_back(string(buf));
+}
 
 /* Archimetic */
 void mips_calc(vector<string>* list, string A, string B, string Result, QuaterType type) {

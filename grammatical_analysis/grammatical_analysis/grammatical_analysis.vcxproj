@@ -43,6 +43,7 @@
     <ClCompile Include="check.cpp" />
     <ClCompile Include="middle_code_generator.cpp" />
     <ClCompile Include="middle_code_printer.cpp" />
+    <ClCompile Include="middle_code_utils.cpp" />
     <ClCompile Include="mips_code_utils.cpp" />
     <ClCompile Include="mips_function.cpp" />
     <ClCompile Include="mips_generator.cpp" />

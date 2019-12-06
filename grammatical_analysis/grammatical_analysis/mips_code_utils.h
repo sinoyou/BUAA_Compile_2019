@@ -36,6 +36,7 @@ void mips_jal(vector<string>* list, string label);
 void mips_j(vector<string>* list, string label);
 void mips_bnz(vector<string>* list, string lable, string condition);
 void mips_bz(vector<string>* list, string lable, string condition);
+void mips_branch(vector<string>* list, string label, string cmpA, string cmpB, QuaterType cmp_type);
 
 /* Archimetic */
 void mips_calc(vector<string>* list, string A, string B, string Result, QuaterType type);
