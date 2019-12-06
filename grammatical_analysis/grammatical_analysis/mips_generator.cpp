@@ -63,11 +63,7 @@ void MipsGenerator::dump_global_memory() {
 */
 void MipsGenerator::cal_function_stack() {
 	// 求出函数SymbolItem的vector
-	vector<SymbolItem*> func_list;
-	for (auto it = item_set.begin(); it != item_set.end(); it++) {
-		if ((*it)->type == SymbolItemType::function)
-			func_list.push_back(*it);
-	}
+	vector<SymbolItem*> func_list = get_funcs(&item_set);
 
 	// 针对每个函数创建mips_function类
 	for (auto it = func_list.begin(); it != func_list.end(); it++) {

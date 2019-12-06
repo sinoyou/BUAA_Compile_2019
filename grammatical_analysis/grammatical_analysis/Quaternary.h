@@ -92,10 +92,6 @@ Quaternary* GetArrayQueryQuater(Block* block, SymbolItem* A, SymbolItem* B, Symb
 Quaternary* GetScanQuater(Block* block, SymbolItem* Result);
 Quaternary* GetPrintQuater(Block* block, SymbolItem* A);
 
-// CMP类四元式反转辅助函数
-/* 用于翻转CMP操作的类型，使其满足BZ型四元式的操作 */
-QuaterType cmp_reverse(QuaterType cmp_type);
-
 // 四元式输出辅助函数
 vector<string> PrintQuater(vector<Quaternary*>* QuaterList);
 string PrintQuaterHandler(Quaternary* q, QuaterType qtype);
@@ -118,6 +114,18 @@ string PutSetLabelQuater(Quaternary* Q);
 string PutArrayQueryQuater(Quaternary* Q);
 string PutScanQuater(Quaternary* Q);
 string PutPrintQuater(Quaternary* Q);
+
+// 组织与优化 工具函数
+/* 用于翻转CMP操作的类型，使其满足BZ型四元式的操作 */
+QuaterType cmp_reverse(QuaterType cmp_type);
+/* 四元式正确性检查：检查参数量 */
+void quater_block_check(Quaternary* q);
+/* 返回该段中间码的函数集合 */
+vector<SymbolItem*> get_funcs(set<SymbolItem*>* list);
+/* 指定函数，返回该函数下的所有四元式 */
+vector<Quaternary*> get_quaternary_by_function(SymbolItem* func, vector<Quaternary*>* list);
+/* 给定四元式，返回其所有的SymbolItem */
+map<string, SymbolItem*> get_items_by_quater(Quaternary* q);
 
 #endif // !1
 
