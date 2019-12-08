@@ -133,11 +133,11 @@ vector<Quaternary*> inline_generator(SymbolItem* caller, SymbolItem* func,
 				it--;
 			}
 			else if(ret != NULL && (*it)->OpA != NULL){
-				Quaternary* q = new Quaternary(caller->block, QuaterType::Assign, (*it)->OpA, NULL, ret);
+				auto q = GetAssignQuater(caller->block, (*it)->OpA, ret, false);
 				it = inline_code.insert(it, q);	// assign*, ret
 				it++;																			// assign, ret*
 				it = inline_code.erase(it);														// assign, other*
-				q = new Quaternary(caller->block, QuaterType::Goto, end_label, NULL, NULL);
+				q = GetGotoQuater(caller->block, end_label, false);
 				it = inline_code.insert(it, q);			// assign, goto*, other
 			}
 			else {
@@ -146,10 +146,9 @@ vector<Quaternary*> inline_generator(SymbolItem* caller, SymbolItem* func,
 		}
 	}
 	// step 5
-	Quaternary* q = NULL;
-	q = new Quaternary(caller->block, QuaterType::SetLabel, begin_label, NULL,NULL);
+	auto q = GetSetLabelQuater(caller->block, begin_label, false);
 	inline_code.insert(inline_code.begin(), q);
-	q = new Quaternary(caller->block, QuaterType::SetLabel, end_label, NULL, NULL);
+	q = GetSetLabelQuater(caller->block, end_label, false);
 	inline_code.push_back(q);
 
 	return inline_code;
