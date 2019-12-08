@@ -1051,12 +1051,14 @@ void GrammaticalParser::__condition_statement(int level, bool* has_return) {
 
 		__statement(level + 1, has_return);
 
-		GetGotoQuater(block, if_end_label);
-		GetSetLabelQuater(block, else_label);
-
 		if (_peek()->equal(SYMBOL::ELSETK)) {
+			GetGotoQuater(block, if_end_label);
+			GetSetLabelQuater(block, else_label);
 			SYMBOL_CHECK(SYMBOL::ELSETK);
 			__statement(level + 1, has_return);
+		}
+		else {
+			GetSetLabelQuater(block, else_label);
 		}
 
 		GetSetLabelQuater(block, if_end_label);
@@ -1143,15 +1145,31 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 		if (_peek()->equal(SYMBOL::WHILETK)) {
 			block->register_statement(StatementType::while_stat);
 			SymbolItem* head = SymbolFactory::create_label(block, "while_head");
+			SymbolItem* judge_init = SymbolFactory::create_label(block, "while_judge_init");
+			SymbolItem* body = SymbolFactory::create_label(block, "while_body");
+			SymbolItem* judge_after = SymbolFactory::create_label(block, "while_judge_after");
 			SymbolItem* tail = SymbolFactory::create_label(block, "while_end");
 			SYMBOL_CHECK(SYMBOL::WHILETK);											// while
 			SYMBOL_CHECK(SYMBOL::LPARENT);											// (
+
 			GetSetLabelQuater(block, head);
+			GetSetLabelQuater(block, judge_init);
+			auto condition_begin = QuaterList.end() - QuaterList.begin();
 			SymbolItem* condition = __condition(level + 1);							// <条件>
+			auto condition_end = QuaterList.end() - QuaterList.begin();
 			GetBzQuater(block, tail, condition);
+
 			SYMBOL_CHECK(SYMBOL::RPARENT);											// ）
+
+			GetSetLabelQuater(block, body);
 			__statement(level +1 , has_return);
-			GetGotoQuater(block, head);
+			
+			// 优化 - 降低跳转次数
+			// GetGotoQuater(block, head);	// 优化前
+			GetSetLabelQuater(block, judge_after);
+			QuaterList.insert(QuaterList.end(), QuaterList.begin() + condition_begin, QuaterList.begin() + condition_end);
+			GetBnzQuater(block, body, condition);
+
 			GetSetLabelQuater(block, tail);
 		}
 		// do while do＜语句＞while '('＜条件＞')'
@@ -1178,8 +1196,9 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 		// for: for'('＜标识符＞＝＜表达式＞;＜条件＞;＜标识符＞＝＜标识符＞(+|-)＜步长＞')'＜语句＞
 		else if (_peek()->equal(SYMBOL::FORTK)) {
 			block->register_statement(StatementType::for_stat);
-			SymbolItem* initial = SymbolFactory::create_label(block, "for_initial");
-			SymbolItem* judge = SymbolFactory::create_label(block, "for_judge");
+			SymbolItem* initial = SymbolFactory::create_label(block, "for_init");
+			SymbolItem* judge_init = SymbolFactory::create_label(block, "for_judge_init");
+			SymbolItem* judge_after = SymbolFactory::create_label(block, "for_judge_after");
 			SymbolItem* update = SymbolFactory::create_label(block, "for_update");
 			SymbolItem* body = SymbolFactory::create_label(block, "for_body");
 			SymbolItem* tail = SymbolFactory::create_label(block, "for_tail");
@@ -1196,9 +1215,11 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			SYMBOL_CHECK(SYMBOL::SEMICN);					// ;
 			
 			// 判断部分
-			GetSetLabelQuater(block, judge);
+			GetSetLabelQuater(block, judge_init);
+			auto condition_begin = QuaterList.end() - QuaterList.begin();
 			SymbolItem * condition = __condition(level + 1);		// <条件>
 			SYMBOL_CHECK(SYMBOL::SEMICN);							// ;
+			auto condition_end = QuaterList.end() - QuaterList.begin();
 			GetBzQuater(block, tail, condition);
 			
 			// 更新部分 - （源代码解析）
@@ -1230,7 +1251,12 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 				GetAddQuater(block, step_updater, step_len, step_counter);
 			else 
 				GetSubQuater(block, step_updater, step_len, step_counter);
-			GetGotoQuater(block, judge);
+			// 判断部分 - （优化，减少jump）
+			// GetGotoQuater(block, judge_init);		// 非优化模式
+			GetSetLabelQuater(block, judge_after);
+			QuaterList.insert(QuaterList.end(), 
+				QuaterList.begin() + condition_begin, QuaterList.begin() + condition_end);
+			GetBnzQuater(block, body, condition);
 
 			// 循环尾部
 			GetSetLabelQuater(block, tail);
