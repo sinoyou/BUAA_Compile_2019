@@ -55,6 +55,12 @@
     <Filter Include="Header Files\class\object_code">
       <UniqueIdentifier>{9c219482-d238-432f-b087-798a816a0dca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\class\optimizer">
+      <UniqueIdentifier>{8a7188db-e0e8-457e-bf5f-82da7ce7b457}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\class\optimizer">
+      <UniqueIdentifier>{acb1dd0b-3dba-4f38-872d-c78d13da474c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -110,6 +116,12 @@
     </ClInclude>
     <ClInclude Include="mips_code_utils.h">
       <Filter>Header Files\class\object_code</Filter>
+    </ClInclude>
+    <ClInclude Include="Optimizer.h">
+      <Filter>Header Files\class\optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="InlineOptimizer.h">
+      <Filter>Header Files\class\optimizer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +187,12 @@
     </ClCompile>
     <ClCompile Include="middle_code_utils.cpp">
       <Filter>Source Files\class\middle_code</Filter>
+    </ClCompile>
+    <ClCompile Include="InlineOptimizer.cpp">
+      <Filter>Source Files\class\optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer.cpp">
+      <Filter>Source Files\class\optimizer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

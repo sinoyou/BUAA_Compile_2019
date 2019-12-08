@@ -64,6 +64,29 @@ void assert_l(SymbolItem* item) {
 	}
 }
 
+/* 产生用于inline嵌入的四元式副本 */
+SymbolItem* ItemTransfer(SymbolItem* item, map<SymbolItem*, SymbolItem*> copy_map) {
+	if (item == NULL)
+		return NULL;
+	else if (copy_map.find(item) != copy_map.end())
+		return copy_map[item];
+	else {
+		if (item->block->pre != NULL && item->type != SymbolItemType::function) {
+			char buf[200];
+			sprintf(buf, "[Error]: Item inline transfer failed, neither in copy_map nor global/function %s");
+			DEBUG_PRINT(buf);
+		}
+		return item;
+	}
+}
+Quaternary* GetInlineCopyQuater(Block* block, Quaternary* original, map<SymbolItem*, SymbolItem*> copy_map) {
+	SymbolItem* A = ItemTransfer(original->OpA, copy_map);
+	SymbolItem* B = ItemTransfer(original->OpB, copy_map);
+	SymbolItem* Result = ItemTransfer(original->Result, copy_map);
+	Quaternary* p = new Quaternary(block, original->type, A, B, Result);
+	return p; // 不推入四元式列表中
+}
+
 // VarDeclar
 Quaternary* GetVarDeclarQuater(Block* block, SymbolItem* result) {
 	assert_v(result);

@@ -23,6 +23,7 @@ QuaterType cmp_reverse(QuaterType cmp_type) {
 		sprintf(buf, "[ERROR] Unexpected Compare Type in cmp_fit_from_bnz_to_bz %d", cmp_type);
 		DEBUG_PRINT(buf);
 	}
+	return QuaterType::Undefined;
 }
 
 /* 给定四元式，检查其Items的属于情况 */
@@ -56,12 +57,15 @@ vector<Quaternary*> get_quaternary_by_function(SymbolItem* func, vector<Quaterna
 }
 
 /* 返回该段中间码的函数集合 */
-vector<SymbolItem*> get_funcs(set<SymbolItem*>* list) {
-	vector<SymbolItem*> func_list;
+vector<SymbolItem*> get_funcs(vector<Quaternary*>* list) {
+	set<SymbolItem*> func_set;
 	for (auto it = list->begin(); it != list->end(); it++) {
-		if ((*it)->type == SymbolItemType::function)
-			func_list.push_back(*it);
+		if ((*it)->type == QuaterType::FuncDeclar)
+			func_set.insert(func_set.end(),(*it)->Result);
 	}
+	vector<SymbolItem*> func_list;
+	for (auto it = func_set.begin(); it != func_set.end(); it++)
+		func_list.push_back(*it);
 	return func_list;
 }
 

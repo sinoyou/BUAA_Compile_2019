@@ -2,6 +2,7 @@
 #define __QUATERNARY_H__
 
 #include "SymbolItem.h"
+#include <map>
 
 /* 除数值以外，其余均为SymbolItem类，f - function, c - const, v - variable, t - temp, l - label */
 /* 四元式类型 ------------- 解释 ---------------------- 操作数A ----------- 操作数B ------------ 结果数 */
@@ -64,6 +65,7 @@ public:
 extern vector<Quaternary*> QuaterList;
 
 // 四元式生成辅助函数
+Quaternary* GetInlineCopyQuater(Block* block, Quaternary* original, map<SymbolItem*, SymbolItem*> copy_map);
 Quaternary* GetVarDeclarQuater(Block* block, SymbolItem* result);
 Quaternary* GetConstDeclarQuater(Block* block, SymbolItem* result);
 Quaternary* GetFuncDeclarQuater(Block* block, SymbolItem* result);
@@ -121,7 +123,7 @@ QuaterType cmp_reverse(QuaterType cmp_type);
 /* 四元式正确性检查：检查参数量 */
 void quater_block_check(Quaternary* q);
 /* 返回该段中间码的函数集合 */
-vector<SymbolItem*> get_funcs(set<SymbolItem*>* list);
+vector<SymbolItem*> get_funcs(vector<Quaternary*>* list);
 /* 指定函数，返回该函数下的所有四元式 */
 vector<Quaternary*> get_quaternary_by_function(SymbolItem* func, vector<Quaternary*>* list);
 /* 给定四元式，返回其所有的SymbolItem */

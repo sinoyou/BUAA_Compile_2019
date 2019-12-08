@@ -22,9 +22,11 @@
     <ClInclude Include="Block.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="error.h" />
+    <ClInclude Include="InlineOptimizer.h" />
     <ClInclude Include="mips_code_utils.h" />
     <ClInclude Include="mips_function.h" />
     <ClInclude Include="mips_generator.h" />
+    <ClInclude Include="Optimizer.h" />
     <ClInclude Include="ParseException.h" />
     <ClInclude Include="GrammaticalParser.h" />
     <ClInclude Include="Quaternary.h" />
@@ -41,12 +43,14 @@
   <ItemGroup>
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="check.cpp" />
+    <ClCompile Include="InlineOptimizer.cpp" />
     <ClCompile Include="middle_code_generator.cpp" />
     <ClCompile Include="middle_code_printer.cpp" />
     <ClCompile Include="middle_code_utils.cpp" />
     <ClCompile Include="mips_code_utils.cpp" />
     <ClCompile Include="mips_function.cpp" />
     <ClCompile Include="mips_generator.cpp" />
+    <ClCompile Include="optimizer.cpp" />
     <ClCompile Include="ParseException.cpp" />
     <ClCompile Include="GrammaticalParser.cpp" />
     <ClCompile Include="SymbolFactory.cpp" />

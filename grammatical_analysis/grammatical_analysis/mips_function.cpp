@@ -240,7 +240,7 @@ vector<string> MipsFunction::dump() {
 			if (peek && peek->type == QuaterType::Bnz
 				&& peek->OpB == q->Result && q->Result->type == SymbolItemType::temp_normal) {
 				QuaterType cmp_type = q->type;								// cmp+bnz，cmp类型保持原样即可
-				mips_branch(&codes, peek->OpA->name, t1, t2, q->type);
+				mips_branch(&codes, peek->OpA->name, t1, t2, cmp_type);
 				quater += 1;
 			}
 			// branch if compare result if false.

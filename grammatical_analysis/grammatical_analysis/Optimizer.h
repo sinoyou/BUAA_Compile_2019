@@ -5,14 +5,10 @@
 #include "Quaternary.h"
 #include "debug.h"
 
-
+// 优化器-抽象函数
 class Optimizer
 {
 public:
-	vector<Quaternary*> middle_code;			// 输入中间码
-	string optimizer_name;						// 优化器名称
-	vector<Quaternary*> optimized_code;			// 输出中间码
-
 	// 构造函数
 	Optimizer(string name, vector<Quaternary*> middle) :optimizer_name(name), middle_code(middle) {}
 
@@ -20,11 +16,10 @@ public:
 	vector<Quaternary*> get_optimized_quaters();
 	void dumps();
 
-private:
-	// 预处理函数
-	void preprocess();
-	// 优化函数
-	void optimizer();
+protected:
+	string optimizer_name;						// 优化器名称
+	vector<Quaternary*> middle_code;			// 输入中间码
+	vector<Quaternary*> optimized_code;			// 输出中间码
 };
 
 #endif // !__OPTIMIZER_H__

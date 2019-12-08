@@ -931,6 +931,7 @@ SymbolItem* GrammaticalParser::__factor(int level, bool *is_char) {
 void GrammaticalParser::__statement(int level, bool * has_return)
 {
 	FLAG_ENTER("<语句>", level);
+	Block* block = symbol_table.get_present_block();
 	try {
 		SYMBOL loop_first[] = { SYMBOL::WHILETK, SYMBOL::FORTK, SYMBOL::DOTK };
 
@@ -1140,6 +1141,7 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 	try {
 		// while while '('＜条件＞')'＜语句＞
 		if (_peek()->equal(SYMBOL::WHILETK)) {
+			block->register_statement(StatementType::while_stat);
 			SymbolItem* head = SymbolFactory::create_label(block, "while_head");
 			SymbolItem* tail = SymbolFactory::create_label(block, "while_end");
 			SYMBOL_CHECK(SYMBOL::WHILETK);											// while
@@ -1154,6 +1156,7 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 		}
 		// do while do＜语句＞while '('＜条件＞')'
 		else if (_peek()->equal(SYMBOL::DOTK)) {
+			block->register_statement(StatementType::dowhile_stat);
 			SymbolItem* head = SymbolFactory::create_label(block, "dowhile_head");
 			SymbolItem* tail = SymbolFactory::create_label(block, "dowhile_end");
 			GetSetLabelQuater(block, head);
@@ -1174,6 +1177,7 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 		}
 		// for: for'('＜标识符＞＝＜表达式＞;＜条件＞;＜标识符＞＝＜标识符＞(+|-)＜步长＞')'＜语句＞
 		else if (_peek()->equal(SYMBOL::FORTK)) {
+			block->register_statement(StatementType::for_stat);
 			SymbolItem* initial = SymbolFactory::create_label(block, "for_initial");
 			SymbolItem* judge = SymbolFactory::create_label(block, "for_judge");
 			SymbolItem* update = SymbolFactory::create_label(block, "for_update");

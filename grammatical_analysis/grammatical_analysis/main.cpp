@@ -10,6 +10,9 @@
 #include "ParseException.h"
 #include "Quaternary.h"
 #include "mips_generator.h"
+#include "InlineOptimizer.h"
+
+#define OPTIMIZE 1
 
 // Global Variable and Pointer
 FileReader* reader;
@@ -56,7 +59,6 @@ void run() {
 	error_out.close();
 
 	cout << QuaterList.size() << endl;
-
 	
 	// quaternary output
 	ofstream quater_out;
@@ -67,6 +69,14 @@ void run() {
 	}
 	quater_out.close();
 	
+	// Inline Optimize
+	if (OPTIMIZE == 1) {
+		InlineOptimizer* inline_opt = new InlineOptimizer(QuaterList);
+		QuaterList = inline_opt->get_optimized_quaters();
+		inline_opt->dumps();
+		QuaterList = inline_opt->get_optimized_quaters();
+	}
+	
 	// object out
 	ofstream mips_out;
 	mips_out.open("mips.txt", ios::out | ios::trunc);
@@ -76,10 +86,24 @@ void run() {
 		mips_out << *it << endl;
 	}
 	mips_out.close();
+	/**/
 }
 
 int main()
 {
 	run();
+	/*
+	vector<int> v;
+	v.push_back(1);
+	v.push_back(2);
+	v.push_back(3);
+	v.push_back(4);
+	v.push_back(5);
+	v.push_back(6);
+	auto begin = v.begin() + 1;
+	auto end = v.begin() + 3;
+	auto it = v.insert(v.begin() + 4, begin, end);
+	printf("%d", *it);
+	*/
 	return 0;
 }

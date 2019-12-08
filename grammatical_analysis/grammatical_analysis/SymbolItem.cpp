@@ -35,10 +35,10 @@ string SymbolItem::getname(bool simplify) {
 	if (this->type == SymbolItemType::label
 		|| this->type == SymbolItemType::function
 		|| this->type == SymbolItemType::temp_const
-		|| this->type == SymbolItemType::temp_normal
 		|| this->type == SymbolItemType::temp_strcon)
 		return name;
 	else
+		// temp_normal, variable, const
 		return name + "@" + this->block->func_head->name; // 调试 - 查看各变量是否处在自定义的作用域中
 		// return name;
 }
