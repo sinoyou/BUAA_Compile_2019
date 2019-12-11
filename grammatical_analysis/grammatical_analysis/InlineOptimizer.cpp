@@ -125,7 +125,7 @@ vector<Quaternary*> inline_generator(SymbolItem* caller, SymbolItem* func,
 	if (cnt != paras.size())
 		DEBUG_PRINT("[ERROR] Paramertes number not match");
 	// step 4
-	for (auto it = inline_code.begin(); it != inline_code.end(); it++) {
+	for (auto it = inline_code.begin(); it != inline_code.end(); it = (it == inline_code.end()) ? it : it + 1 ) {
 		if ((*it)->type == QuaterType::FuncRet) {
 			if (ret == NULL && (*it)->OpA == NULL)
 			{
@@ -134,11 +134,13 @@ vector<Quaternary*> inline_generator(SymbolItem* caller, SymbolItem* func,
 			}
 			else if(ret != NULL && (*it)->OpA != NULL){
 				auto q = GetAssignQuater(caller->block, (*it)->OpA, ret, false);
-				it = inline_code.insert(it, q);	// assign*, ret
+				it = inline_code.insert(it, q);													// assign*, ret
 				it++;																			// assign, ret*
 				it = inline_code.erase(it);														// assign, other*
-				q = GetGotoQuater(caller->block, end_label, false);
-				it = inline_code.insert(it, q);			// assign, goto*, other
+				if (it != inline_code.end()) {
+					q = GetGotoQuater(caller->block, end_label, false);
+					it = inline_code.insert(it, q);												// assign, goto*, other
+				}
 			}
 			else {
 				DEBUG_PRINT("[ERROR] Return Type not match.");
