@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BasicBlock.h" />
+    <ClInclude Include="basic_block_debug.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="error.h" />
@@ -30,6 +32,11 @@
     <ClInclude Include="ParseException.h" />
     <ClInclude Include="GrammaticalParser.h" />
     <ClInclude Include="Quaternary.h" />
+    <ClInclude Include="RegisterPool.h" />
+    <ClInclude Include="register_mips_code_utils.h" />
+    <ClInclude Include="register_mips_function.h" />
+    <ClInclude Include="register_mips_generator.h" />
+    <ClInclude Include="SeekOptimizer.h" />
     <ClInclude Include="SymbolFactory.h" />
     <ClInclude Include="SymbolItem.h" />
     <ClInclude Include="SymbolTable.h" />
@@ -41,8 +48,12 @@
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="active_analysis.cpp" />
+    <ClCompile Include="BasicBlock.cpp" />
+    <ClCompile Include="basic_block_debug.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="check.cpp" />
+    <ClCompile Include="debug.cpp" />
     <ClCompile Include="InlineOptimizer.cpp" />
     <ClCompile Include="middle_code_generator.cpp" />
     <ClCompile Include="middle_code_printer.cpp" />
@@ -53,6 +64,11 @@
     <ClCompile Include="optimizer.cpp" />
     <ClCompile Include="ParseException.cpp" />
     <ClCompile Include="GrammaticalParser.cpp" />
+    <ClCompile Include="RegisterPool.cpp" />
+    <ClCompile Include="register_mips_code_utils.cpp" />
+    <ClCompile Include="register_mips_function.cpp" />
+    <ClCompile Include="register_mips_generator.cpp" />
+    <ClCompile Include="SeekOptimizer.cpp" />
     <ClCompile Include="SymbolFactory.cpp" />
     <ClCompile Include="SymbolItem.cpp" />
     <ClCompile Include="SymbolTable.cpp" />

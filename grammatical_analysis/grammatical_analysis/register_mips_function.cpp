@@ -136,11 +136,11 @@ vector<string> RegMipsFunction::dump() {
 	// IO：Print, Scan
 	vector<string>* codes = &sub_object_code;
 
-	string ra = "$ra";
-	string a0 = "$a0";
-	string zero = "$0";
-	string ret = "$v0";
-	string array_temp = "$k0";
+	string ra = register_pool->ra;
+	string a0 = register_pool->a0;
+	string zero = register_pool->zero;
+	string ret = register_pool->ret;
+	string array_temp = register_pool->array_temp;
 
 	// 函数
 	int func_para_cnt = 0;				// 参数推入的计数器，当推入一个参数后+1，当调用了函数后置0.
@@ -268,7 +268,7 @@ vector<string> RegMipsFunction::dump() {
 				&& peek->OpB == q->Result && q->Result->type == SymbolItemType::temp_normal) {
 				reg_mips_comment(codes, "Together with Bnz");
 				auto map = register_pool->request(q->OpA, q->OpB, NULL);
-				QuaterType cmp_type = q->type;								// cmp+bnz，cmp类型保持原样即可
+				QuaterType cmp_type = q->type;						// cmp+bnz，cmp类型保持原样即可
 				// !!!
 				register_pool->clear_all_and_dump_active(quater_basicblock[q]->active_out);						
 				reg_mips_branch(codes, peek->OpA->name, map[q->OpA], map[q->OpB], cmp_type);

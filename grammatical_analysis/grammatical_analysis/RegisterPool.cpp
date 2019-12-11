@@ -86,7 +86,7 @@ void RegisterPool::clear_all_and_dump_all() {
 }
 
 // private
-// 临时寄存器申请，策略：FIFO
+// 寄存器申请，临时：FIFO，全局：引用计数
 string RegisterPool::temp_apply(SymbolItem* item, set<string> forbid, bool forwrite) {
 	string applied_reg;
 	// if already have map relation
@@ -163,7 +163,7 @@ bool RegisterPool::flush_and_link(string reg, SymbolItem* newitem, bool writebac
 		if (symbol_register.find(newitem) != symbol_register.end()) {
 			char buf[150];
 			sprintf(buf, "[ERROR] Item %s already Mapped to %s", newitem->getname().c_str(), symbol_register[newitem].c_str());
-			DEBUG_PRINT(buf);
+			ERROR_REGISTER(func->get_funchead()->getname(),string(buf));
 		}
 		if(noload == false)
 			reg_mips_load(mips, reg, newitem, func);

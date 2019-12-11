@@ -105,7 +105,7 @@ vector<BasicBlock*> generate_basic_blocks(vector<Quaternary*> middle, map<Quater
 			*/
 		}
 		else {
-			// 当前块 -> 当前块
+			// 当前块 -> 下一个块
 			if (it != block_list.end() - 1)
 				build_connection(*it, *(it + 1));
 		}

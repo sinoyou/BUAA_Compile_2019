@@ -61,6 +61,24 @@
     <Filter Include="Header Files\class\optimizer">
       <UniqueIdentifier>{acb1dd0b-3dba-4f38-872d-c78d13da474c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\class\object_code\register">
+      <UniqueIdentifier>{51e210ae-679e-4390-bb2c-d31a53c679bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\class\object_code\basic">
+      <UniqueIdentifier>{f3031ed4-9d18-41ba-afa7-7f40e0c6a3c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\class\object_code\basic">
+      <UniqueIdentifier>{f0abaa27-bdc4-485d-9c3a-ffecdcf3984f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\class\object_code\register">
+      <UniqueIdentifier>{18b7d6e2-c58c-435c-aca9-e6b539753cb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\class\graph">
+      <UniqueIdentifier>{c9354da6-da95-48c9-bda0-35a4c3a20dee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\class\graph">
+      <UniqueIdentifier>{cae7e757-4aa1-45f8-944f-b39ca634eeed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -108,19 +126,40 @@
     <ClInclude Include="FileReader.h">
       <Filter>Header Files\class\input</Filter>
     </ClInclude>
-    <ClInclude Include="mips_generator.h">
-      <Filter>Header Files\class\object_code</Filter>
-    </ClInclude>
-    <ClInclude Include="mips_function.h">
-      <Filter>Header Files\class\object_code</Filter>
-    </ClInclude>
-    <ClInclude Include="mips_code_utils.h">
-      <Filter>Header Files\class\object_code</Filter>
-    </ClInclude>
     <ClInclude Include="Optimizer.h">
       <Filter>Header Files\class\optimizer</Filter>
     </ClInclude>
     <ClInclude Include="InlineOptimizer.h">
+      <Filter>Header Files\class\optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="register_mips_code_utils.h">
+      <Filter>Header Files\class\object_code\register</Filter>
+    </ClInclude>
+    <ClInclude Include="register_mips_function.h">
+      <Filter>Header Files\class\object_code\register</Filter>
+    </ClInclude>
+    <ClInclude Include="register_mips_generator.h">
+      <Filter>Header Files\class\object_code\register</Filter>
+    </ClInclude>
+    <ClInclude Include="mips_code_utils.h">
+      <Filter>Header Files\class\object_code\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="mips_function.h">
+      <Filter>Header Files\class\object_code\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="mips_generator.h">
+      <Filter>Header Files\class\object_code\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicBlock.h">
+      <Filter>Header Files\class\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="basic_block_debug.h">
+      <Filter>Header Files\class\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="RegisterPool.h">
+      <Filter>Header Files\class\object_code\register</Filter>
+    </ClInclude>
+    <ClInclude Include="SeekOptimizer.h">
       <Filter>Header Files\class\optimizer</Filter>
     </ClInclude>
   </ItemGroup>
@@ -176,15 +215,6 @@
     <ClCompile Include="FileReader.cpp">
       <Filter>Source Files\class\input</Filter>
     </ClCompile>
-    <ClCompile Include="mips_generator.cpp">
-      <Filter>Source Files\class\object_code</Filter>
-    </ClCompile>
-    <ClCompile Include="mips_function.cpp">
-      <Filter>Source Files\class\object_code</Filter>
-    </ClCompile>
-    <ClCompile Include="mips_code_utils.cpp">
-      <Filter>Source Files\class\object_code</Filter>
-    </ClCompile>
     <ClCompile Include="middle_code_utils.cpp">
       <Filter>Source Files\class\middle_code</Filter>
     </ClCompile>
@@ -192,6 +222,42 @@
       <Filter>Source Files\class\optimizer</Filter>
     </ClCompile>
     <ClCompile Include="optimizer.cpp">
+      <Filter>Source Files\class\optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="mips_code_utils.cpp">
+      <Filter>Source Files\class\object_code\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="mips_function.cpp">
+      <Filter>Source Files\class\object_code\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="mips_generator.cpp">
+      <Filter>Source Files\class\object_code\basic</Filter>
+    </ClCompile>
+    <ClCompile Include="register_mips_code_utils.cpp">
+      <Filter>Source Files\class\object_code\register</Filter>
+    </ClCompile>
+    <ClCompile Include="register_mips_function.cpp">
+      <Filter>Source Files\class\object_code\register</Filter>
+    </ClCompile>
+    <ClCompile Include="register_mips_generator.cpp">
+      <Filter>Source Files\class\object_code\register</Filter>
+    </ClCompile>
+    <ClCompile Include="BasicBlock.cpp">
+      <Filter>Source Files\class\graph</Filter>
+    </ClCompile>
+    <ClCompile Include="active_analysis.cpp">
+      <Filter>Source Files\class\graph</Filter>
+    </ClCompile>
+    <ClCompile Include="basic_block_debug.cpp">
+      <Filter>Source Files\class\graph</Filter>
+    </ClCompile>
+    <ClCompile Include="RegisterPool.cpp">
+      <Filter>Source Files\class\object_code\register</Filter>
+    </ClCompile>
+    <ClCompile Include="debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SeekOptimizer.cpp">
       <Filter>Source Files\class\optimizer</Filter>
     </ClCompile>
   </ItemGroup>
