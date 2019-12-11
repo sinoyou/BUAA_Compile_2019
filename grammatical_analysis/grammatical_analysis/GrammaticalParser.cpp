@@ -757,10 +757,15 @@ SymbolItem* GrammaticalParser::__expression(int level, bool* is_char) {
 		first_item = __item(level + 1, &temp);
 		// 取负操作
 		if (neg) {
-			// 取反操作 -'c' 涉及运算操作，因此需要转换为整数
-			SymbolItem* temp_neg = SymbolFactory::create_temp(block, BasicType::_int);
-			GetSubQuater(block, NULL, first_item, temp_neg);
-			first_item = temp_neg;
+			if (first_item->type == SymbolItemType::temp_const) {
+				// 取反操作 -'c' 涉及运算操作，因此需要转换为整数
+				first_item->modify_value(-first_item->value);
+			}
+			else {
+				SymbolItem* temp_neg = SymbolFactory::create_temp(block, BasicType::_int);
+				GetSubQuater(block, NULL, first_item, temp_neg);
+				first_item = temp_neg;
+			}
 		}
 		cnt++;
 		while (_peek()->equal(SYMBOL::PLUS) || _peek()->equal(SYMBOL::MINU)) {
@@ -768,15 +773,23 @@ SymbolItem* GrammaticalParser::__expression(int level, bool* is_char) {
 			__add_operator(level + 1);
 			SymbolItem* second_item = __item(level + 1, NULL);
 			cnt++;
-
-			// 根据操作符的差异，生成不同的中间式 - begin
-			SymbolItem* temp_item = SymbolFactory::create_temp(block, BasicType::_int);
-			if (op->equal(SYMBOL::PLUS))
-				GetAddQuater(block, first_item, second_item, temp_item);
-			else
-				GetSubQuater(block, first_item, second_item, temp_item);
-			first_item = temp_item;
-			// end
+			
+			if (first_item->type == SymbolItemType::temp_const && second_item->type == SymbolItemType::temp_const) {
+				if (op->equal(SYMBOL::PLUS))
+					first_item->modify_value(first_item->value + second_item->value);
+				else
+					first_item->modify_value(first_item->value - second_item->value);
+			}
+			else {
+				// 根据操作符的差异，生成不同的中间式 - begin
+				SymbolItem* temp_item = SymbolFactory::create_temp(block, BasicType::_int);
+				if (op->equal(SYMBOL::PLUS))
+					GetAddQuater(block, first_item, second_item, temp_item);
+				else
+					GetSubQuater(block, first_item, second_item, temp_item);
+				first_item = temp_item;
+				// end
+			}
 		}
 		// 表达式只有一个项且这个项是char，那么表达式就是char型
 		if (cnt == 1 && temp && is_char != NULL)
@@ -813,14 +826,22 @@ SymbolItem* GrammaticalParser::__item(int level, bool* is_char) {
 			__mult_operator(level + 1);
 			SymbolItem* secord_factor = __factor(level + 1, NULL);
 			cnt++;
-
-			// 根据操作符，生成相应中间代码
-			SymbolItem* temp = SymbolFactory::create_temp(block, BasicType::_int);
-			if (op->equal(SYMBOL::MULT))
-				GetMultQuater(block, first_factor, secord_factor, temp);
-			else
-				GetDivQuater(block, first_factor, secord_factor, temp);
-			first_factor = temp;
+			
+			if (first_factor->type == SymbolItemType::temp_const && secord_factor->type == SymbolItemType::temp_const) {
+				if (op->equal(SYMBOL::MULT))
+					first_factor->modify_value(first_factor->value * secord_factor->value);
+				else
+					first_factor->modify_value(first_factor->value / secord_factor->value);
+			}
+			else {
+				// 根据操作符，生成相应中间代码
+				SymbolItem* temp = SymbolFactory::create_temp(block, BasicType::_int);
+				if (op->equal(SYMBOL::MULT))
+					GetMultQuater(block, first_factor, secord_factor, temp);
+				else
+					GetDivQuater(block, first_factor, secord_factor, temp);
+				first_factor = temp;
+			}
 		}
 		// 若果只有一个因子并且因子为char，则为char
 		if (cnt == 1 && temp && is_char) {
@@ -893,8 +914,8 @@ SymbolItem* GrammaticalParser::__factor(int level, bool *is_char) {
 			// 由于表达式周围存在()括号，因此char必须强行转换为int.
 			SYMBOL_CHECK(SYMBOL::LPARENT);
 			SymbolItem* temp = __expression(level + 1, NULL);
-			factor = SymbolFactory::create_temp(block, BasicType::_int);
-			GetAssignQuater(block, temp, factor);
+			temp->modify_type_as_int();
+			factor = temp;			
 			SYMBOL_CHECK(SYMBOL::RPARENT);
 		}
 		// <整数>
@@ -1167,7 +1188,11 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			// 优化 - 降低跳转次数
 			// GetGotoQuater(block, head);	// 优化前
 			GetSetLabelQuater(block, judge_after);
-			QuaterList.insert(QuaterList.end(), QuaterList.begin() + condition_begin, QuaterList.begin() + condition_end);
+			vector<Quaternary*> temp;
+			for (auto it = QuaterList.begin() + condition_begin; it != QuaterList.begin() + condition_end; it++)
+				temp.push_back(*it);
+			for (auto it = temp.begin(); it != temp.end(); it++)
+				GetCopyQuater(block, *it);
 			GetBnzQuater(block, body, condition);
 
 			GetSetLabelQuater(block, tail);
@@ -1254,8 +1279,11 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			// 判断部分 - （优化，减少jump）
 			// GetGotoQuater(block, judge_init);		// 非优化模式
 			GetSetLabelQuater(block, judge_after);
-			QuaterList.insert(QuaterList.end(), 
-				QuaterList.begin() + condition_begin, QuaterList.begin() + condition_end);
+			vector<Quaternary*> temp;
+			for (auto it = QuaterList.begin() + condition_begin; it != QuaterList.begin() + condition_end; it++)
+				temp.push_back(*it);
+			for (auto it = temp.begin(); it != temp.end(); it++)
+				GetCopyQuater(block, *it);
 			GetBnzQuater(block, body, condition);
 
 			// 循环尾部
