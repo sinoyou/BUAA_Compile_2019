@@ -76,7 +76,7 @@ void SymbolItem::modify_value(int value) {
 		this->value = value;
 	}
 	else {
-		char buf[100];
+		char buf[200];
 		sprintf(buf, "[ERROR] Can not modify a non-const(temp) SymbolItem %s", this->getname().c_str());
 		DEBUG_PRINT(buf);
 	}
