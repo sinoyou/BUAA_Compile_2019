@@ -93,6 +93,8 @@ Quaternary* GetSetLabelQuater(Block* block, SymbolItem* A, bool push = true);
 Quaternary* GetArrayQueryQuater(Block* block, SymbolItem* A, SymbolItem* B, SymbolItem* Result, bool push = true);
 Quaternary* GetScanQuater(Block* block, SymbolItem* Result, bool push = true);
 Quaternary* GetPrintQuater(Block* block, SymbolItem* A, bool push = true);
+Quaternary* GetCopyQuater(Block* block, Quaternary* original, bool push = true);
+
 
 // 四元式输出辅助函数
 vector<string> PrintQuater(vector<Quaternary*>* QuaterList);

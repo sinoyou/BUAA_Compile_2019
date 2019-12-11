@@ -53,15 +53,6 @@ void mips_print(vector<string>* list, string source, BasicType type);
 void mips_array_assign(vector<string>* list, string source, SymbolItem* arr, string index, MipsFunction* func);
 void mips_array_query(vector<string>* list, string target, SymbolItem* arr, string index, MipsFunction* func);
 
-/* ------------------------------------------ 非代码类 --------------------------------------- */
-/* 给定四元式，求其属于的块 */
-void quater_block_check(Quaternary* q);
-
-/* 根据函数获取该函数下的所有四元式 */
-vector<Quaternary*> get_quaternary_by_function(SymbolItem* func, vector<Quaternary*>* list);
-
-/* 给定四元式，返回其所有的SymbolItem */
-map<string, SymbolItem*> get_items_by_quater(Quaternary* q);
 
 
 #endif // !_MIPS_CODE_UTILS_H__

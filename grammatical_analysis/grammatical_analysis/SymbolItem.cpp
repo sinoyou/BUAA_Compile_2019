@@ -81,3 +81,10 @@ void SymbolItem::modify_value(int value) {
 		DEBUG_PRINT(buf);
 	}
 }
+
+/*
+ * 强制改动类型为int型
+*/
+void SymbolItem::modify_type_as_int() {
+	this->basic_type = BasicType::_int;
+}

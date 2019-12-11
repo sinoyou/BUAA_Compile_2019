@@ -59,13 +59,13 @@ vector<Quaternary*> get_quaternary_by_function(SymbolItem* func, vector<Quaterna
 /* 返回该段中间码的函数集合 */
 vector<SymbolItem*> get_funcs(vector<Quaternary*>* list) {
 	set<SymbolItem*> func_set;
-	for (auto it = list->begin(); it != list->end(); it++) {
-		if ((*it)->type == QuaterType::FuncDeclar)
-			func_set.insert(func_set.end(),(*it)->Result);
-	}
 	vector<SymbolItem*> func_list;
-	for (auto it = func_set.begin(); it != func_set.end(); it++)
-		func_list.push_back(*it);
+	for (auto it = list->begin(); it != list->end(); it++) {
+		if ((*it)->type == QuaterType::FuncDeclar && func_set.find((*it)->Result) == func_set.end()) {
+			func_set.insert(func_set.end(), (*it)->Result);
+			func_list.push_back((*it)->Result);
+		}
+	}
 	return func_list;
 }
 

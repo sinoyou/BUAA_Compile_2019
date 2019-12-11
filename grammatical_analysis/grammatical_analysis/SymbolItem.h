@@ -54,6 +54,7 @@ public:
 	
 	// 表达式常量传播支持 
 	// 强转int + 修改常量值
+	void modify_type_as_int();
 	void modify_value(int value);
 	bool is_const();
 	

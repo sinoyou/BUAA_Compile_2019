@@ -73,7 +73,7 @@ SymbolItem* ItemTransfer(SymbolItem* item, map<SymbolItem*, SymbolItem*> copy_ma
 	else {
 		if (item->block->pre != NULL && item->type != SymbolItemType::function) {
 			char buf[200];
-			sprintf(buf, "[Error]: Item inline transfer failed, neither in copy_map nor global/function %s");
+			sprintf(buf, "[Error]: Item inline transfer failed, neither in copy_map nor global/function");
 			DEBUG_PRINT(buf);
 		}
 		return item;
@@ -354,6 +354,15 @@ Quaternary* GetScanQuater(Block* block, SymbolItem* Result, bool push) {
 Quaternary* GetPrintQuater(Block* block, SymbolItem* A, bool push) {
 	assert_vct(A);
 	Quaternary* p = new Quaternary(block, QuaterType::Print, A, NULL, NULL);
+	if (push)
+		QuaterList.push_back(p);
+	return p;
+}
+
+// Copy
+Quaternary* GetCopyQuater(Block* block, Quaternary* original, bool push)
+{
+	Quaternary* p = new Quaternary(original->block, original->type, original->OpA, original->OpB, original->Result);
 	if (push)
 		QuaterList.push_back(p);
 	return p;
