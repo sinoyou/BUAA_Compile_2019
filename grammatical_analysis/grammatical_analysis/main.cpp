@@ -15,6 +15,7 @@
 
 // optimize
 #include "InlineOptimizer.h"
+#include "SeekOptimizer.h"
 #include "basic_block_debug.h"
 #include "BasicBlock.h"
 
@@ -81,17 +82,22 @@ void run() {
 		InlineOptimizer* inline_opt = new InlineOptimizer(QuaterList);
 		QuaterList = inline_opt->get_optimized_quaters();
 		inline_opt->dumps();
-		QuaterList = inline_opt->get_optimized_quaters();
 	}
-	/**/
+
+	
 
 	// Basic Blocks and Data Flow
 	map<Quaternary*, BasicBlock*> quater_block_map;
 	auto block_list = generate_basic_blocks(QuaterList, &quater_block_map);
 	dump_basic_blocks(block_list, "basic_block.txt");
+	
+	if (OPTIMIZE == 1) {
+		SeekOptimizer* seek_opt = new SeekOptimizer(QuaterList, quater_block_map);
+		QuaterList = seek_opt->get_optimized_quaters();
+		seek_opt->dumps();
+	}
 
 	// object out
-	// note 2019.12.11 - 此处有bug，会导致运行时间过长。
 	if (OPTIMIZE == 1) {
 		RegMipsGenerator object_gen(QuaterList, quater_block_map);
 		vector<string> mips = object_gen.simple_dump();

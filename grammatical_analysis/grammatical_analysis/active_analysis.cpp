@@ -15,7 +15,7 @@ void active_analysis(vector<BasicBlock*> blocks) {
 	auto start = blocks.end();
 	while(start > blocks.begin()) {
 		start = start - 1;
-		string info = "Start a new bfs with " + (*start)->id;
+		string info = "Start a new bfs with " + to_string((*start)->id);
 		DEBUG_BASICBLOCK(info.c_str());
 		list<BasicBlock*> queue;
 		queue.push_back(*start);

@@ -3,6 +3,7 @@
 
 #include<string>
 #include<vector>
+#include<set>
 using namespace std;
 
 class Block;
@@ -25,6 +26,11 @@ enum BasicType {
 	_int,
 	_void,
 	_string
+};
+
+enum Tag {
+	repeat_begin,
+	repeat_end
 };
 
 /* 符号表项的统一结构 */
@@ -52,17 +58,20 @@ public:
 	SymbolItem(Block* block, string name, SymbolItemType type, BasicType var_type, string strcon):
 		block(block), name(name), type(type), basic_type(var_type), strcon(strcon){}
 	
+	/* 优化 */
 	// 表达式常量传播支持 
 	// 强转int + 修改常量值
 	void modify_type_as_int();
 	void modify_value(int value);
 	bool is_const();
+	void add_tag(Tag tag);
 	
 	// 生成输出字符表示
 	string getname(bool simplify = true);
 	string get_basictype();
 
 	Block* block;
+	set<Tag> tags;
 	string name;
 	SymbolItemType type;
 

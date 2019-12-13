@@ -1167,9 +1167,11 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			block->register_statement(StatementType::while_stat);
 			SymbolItem* head = SymbolFactory::create_label(block, "while_head");
 			SymbolItem* judge_init = SymbolFactory::create_label(block, "while_judge_init");
-			SymbolItem* body = SymbolFactory::create_label(block, "while_body");
+			SymbolItem* body = SymbolFactory::create_label(block, "while_body"); 
 			SymbolItem* judge_after = SymbolFactory::create_label(block, "while_judge_after");
 			SymbolItem* tail = SymbolFactory::create_label(block, "while_end");
+			body->add_tag(Tag::repeat_begin);
+			tail->add_tag(Tag::repeat_end);
 			SYMBOL_CHECK(SYMBOL::WHILETK);											// while
 			SYMBOL_CHECK(SYMBOL::LPARENT);											// (
 
@@ -1202,6 +1204,8 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			block->register_statement(StatementType::dowhile_stat);
 			SymbolItem* head = SymbolFactory::create_label(block, "dowhile_head");
 			SymbolItem* tail = SymbolFactory::create_label(block, "dowhile_end");
+			head->add_tag(Tag::repeat_begin);
+			tail->add_tag(Tag::repeat_end);
 			GetSetLabelQuater(block, head);
 			SYMBOL_CHECK(SYMBOL::DOTK);							// do
 			__statement(level + 1, has_return);
@@ -1223,10 +1227,12 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			block->register_statement(StatementType::for_stat);
 			SymbolItem* initial = SymbolFactory::create_label(block, "for_init");
 			SymbolItem* judge_init = SymbolFactory::create_label(block, "for_judge_init");
-			SymbolItem* judge_after = SymbolFactory::create_label(block, "for_judge_after");
-			SymbolItem* update = SymbolFactory::create_label(block, "for_update");
 			SymbolItem* body = SymbolFactory::create_label(block, "for_body");
+			SymbolItem* update = SymbolFactory::create_label(block, "for_update");
+			SymbolItem* judge_after = SymbolFactory::create_label(block, "for_judge_after");
 			SymbolItem* tail = SymbolFactory::create_label(block, "for_tail");
+			body->add_tag(Tag::repeat_begin);
+			tail->add_tag(Tag::repeat_end);
 			
 			// 初始化部分
 			SYMBOL_CHECK(SYMBOL::FORTK);					// for

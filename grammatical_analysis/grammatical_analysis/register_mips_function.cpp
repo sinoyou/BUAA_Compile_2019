@@ -46,7 +46,7 @@ RegMipsFunction::RegMipsFunction(
 	map<Quaternary*, BasicBlock*> quater_basicblock) :
 	func_head(func_head), quater_list(func_quater), global_data(global_data), quater_basicblock(quater_basicblock) {
 	/* 寄存器池定义 */
-	register_pool = new RegisterPool(this, &sub_object_code);
+	register_pool = new RegisterPool(this, quater_list, quater_basicblock, &sub_object_code);
 	/* 内存偏移计算 */
 	int offset = 0;
 	// varibales (including array)
@@ -172,6 +172,7 @@ vector<string> RegMipsFunction::dump() {
 			reg_mips_label(codes, q->Result->name);
 			reg_mips_sp_move(codes, -func_stack_size);
 			reg_mips_save(codes, ra, ra_offset);
+			register_pool->global_load();
 		}
 		else if (type == FuncRet) {
 			if (q->OpA != NULL)
@@ -179,7 +180,7 @@ vector<string> RegMipsFunction::dump() {
 				auto map = register_pool->request(q->OpA, NULL, NULL);
 				reg_mips_move(codes, map[q->OpA], ret);
 			}
-			register_pool->clear_all_and_dump_active(quater_basicblock[*quater]->active_out);
+			register_pool->clear_all_and_dump_temp_active(quater_basicblock[*quater]->active_out);
 			reg_mips_load(codes, ra, ra_offset);
 			// !!!
 			reg_mips_sp_move(codes, func_stack_size);		// $sp + stack_size
@@ -193,9 +194,10 @@ vector<string> RegMipsFunction::dump() {
 		else if (type == FuncCall) {
 			func_para_cnt = 0;
 			// !!!
-			register_pool->clear_all_and_dump_active(quater_basicblock[*quater]->active_out);
+			register_pool->clear_all_and_dump_all_active(quater_basicblock[*quater]->active_out);
 			reg_mips_jal(codes, q->OpA->name);
 			called_func = q->OpA;
+			register_pool->global_load();
 		}
 		else if (type == AssignRet) {
 			reg_mips_save(codes, ret, q->Result, &(*this));
@@ -270,7 +272,7 @@ vector<string> RegMipsFunction::dump() {
 				auto map = register_pool->request(q->OpA, q->OpB, NULL);
 				QuaterType cmp_type = q->type;						// cmp+bnz，cmp类型保持原样即可
 				// !!!
-				register_pool->clear_all_and_dump_active(quater_basicblock[q]->active_out);						
+				register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);						
 				reg_mips_branch(codes, peek->OpA->name, map[q->OpA], map[q->OpB], cmp_type);
 				quater += 1;
 			}
@@ -281,7 +283,7 @@ vector<string> RegMipsFunction::dump() {
 				auto map = register_pool->request(q->OpA, q->OpB, NULL);
 				QuaterType cmp_type = cmp_reverse(type);			// cmp+bz，cmp的类型需要取反
 				// !!!
-				register_pool->clear_all_and_dump_active(quater_basicblock[q]->active_out);
+				register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);
 				reg_mips_branch(codes, peek->OpA->name, map[q->OpA], map[q->OpB] , cmp_type);
 				quater += 1;
 			}
@@ -293,17 +295,17 @@ vector<string> RegMipsFunction::dump() {
 		}
 		else if (type == Goto) {
 			// !!!
-			register_pool->clear_all_and_dump_active(quater_basicblock[q]->active_out);
+			register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);
 			reg_mips_j(codes, q->OpA->name);
 		}
 		else if (type == Bz) {
 			auto map = register_pool->request(q->OpB, NULL, NULL);
-			register_pool->clear_all_and_dump_active(quater_basicblock[q]->active_out);
+			register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);
 			reg_mips_bz(codes, q->OpA->name, map[q->OpB]);
 		}
 		else if (type == Bnz) {
 			auto map = register_pool->request(q->OpB, NULL, NULL);
-			register_pool->clear_all_and_dump_active(quater_basicblock[q]->active_out);
+			register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);
 			reg_mips_bnz(codes, q->OpA->name, map[q->OpB]);
 		}
 		else if (type == SetLabel) {
@@ -330,9 +332,9 @@ vector<string> RegMipsFunction::dump() {
 			quater == quater_list.end() - 1) {
 			// 如果是跳转类语句（branch, goto, funcall, funcret) 则无需处理，因此已经处理过了
 			auto type = (*quater)->type;
-			if (type == Bnz || type == Bz || type == FuncCall || type == FuncRet){}
+			if (type == Goto || type == Bnz || type == Bz || type == FuncCall || type == FuncRet){}
 			else {
-				register_pool->clear_all_and_dump_active(quater_basicblock[*quater]->active_out);
+				register_pool->clear_all_and_dump_temp_active(quater_basicblock[*quater]->active_out);
 			}
 			reg_mips_string(codes, "");
 			reg_mips_string(codes, "");

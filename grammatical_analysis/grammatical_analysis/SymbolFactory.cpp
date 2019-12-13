@@ -108,6 +108,51 @@ SymbolItem* SymbolFactory::create_temp_string(Block* block, string strcon) {
 	return p;
 }
 
+/*
+ * 创建副本SymbolItem, 除了名字，其余完全一致。
+*/
+SymbolItem* SymbolFactory::create_item_copy(SymbolItem* original) {
+	SymbolItem* p = NULL;
+	string new_name;
+	if (original->block->pre == NULL) {
+		char buf[100];
+		sprintf(buf, "[WARNING] Creating a copy of GLOBAL variables %s.", original->getname().c_str());
+		DEBUG_PRINT(buf);
+	}
+	switch (original->type)
+	{
+	case SymbolItemType::function:
+		return original;
+		break;
+	case SymbolItemType::label:
+		p = SymbolFactory::create_label(original->block, original->name);
+		break;
+	case SymbolItemType::temp_const:
+		p = SymbolFactory::create_temp_const(original->block, original->basic_type, original->value);
+		break;
+	case SymbolItemType::temp_normal:
+		p = SymbolFactory::create_temp(original->block, original->basic_type);
+		break;
+	case SymbolItemType::temp_strcon:
+		p = SymbolFactory::create_temp_string(original->block, original->strcon);
+		break;
+	case SymbolItemType::_const:
+		new_name = alloc_free_temp_name(original->block, original->name);
+		p = SymbolFactory::create_const(original->block, new_name, original->basic_type, original->value);
+		break;
+	case SymbolItemType::_variable:
+		new_name = alloc_free_temp_name(original->block, original->name);
+		p = SymbolFactory::create_variable(original->block, new_name, original->basic_type, original->array_size, original->isArray);
+		// p = SymbolFactory::create_temp(original->block, original->basic_type);
+		break;
+	default:
+		DEBUG_PRINT("[ERROR] Unknown SymbolItem Type Here");
+		break;
+	}
+	p->tags = original->tags;
+	p->name = "#" + p->name;
+	return p;
+}
 
 /*
  * 创建用于Inline函数嵌入的副本SymbolItem

@@ -2,6 +2,7 @@
 #include "debug.h"
 #include "Block.h"	
 #include <iostream>
+#include "SymbolFactory.h"
 
 // 存放四元式的容器
 vector<Quaternary*> QuaterList;
@@ -362,6 +363,9 @@ Quaternary* GetPrintQuater(Block* block, SymbolItem* A, bool push) {
 // Copy
 Quaternary* GetCopyQuater(Block* block, Quaternary* original, bool push)
 {
+	// auto OpA = (original->OpA->block->pre == NULL) ? original->OpA : SymbolFactory::create_item_copy(original->OpA);
+	// auto OpB = (original->OpB->block->pre == NULL) ? original->OpB : SymbolFactory::create_item_copy(original->OpB);
+	// auto Result = (original->Result->block->pre == NULL) ? original->Result : SymbolFactory::create_item_copy(original->Result);
 	Quaternary* p = new Quaternary(original->block, original->type, original->OpA, original->OpB, original->Result);
 	if (push)
 		QuaterList.push_back(p);

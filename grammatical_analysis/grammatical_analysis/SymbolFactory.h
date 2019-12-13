@@ -14,6 +14,7 @@ public:
 	static SymbolItem* create_temp(Block* block, BasicType var_type);
 	static SymbolItem* create_temp_const(Block* block, BasicType var_type, int value);
 	static SymbolItem* create_temp_string(Block* block, string strcon);
+	static SymbolItem* create_item_copy(SymbolItem* original);
 	static SymbolItem* create_inline_copy(Block* block, SymbolItem* original);
 };
 

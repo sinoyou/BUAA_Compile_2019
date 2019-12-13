@@ -88,3 +88,14 @@ void SymbolItem::modify_value(int value) {
 void SymbolItem::modify_type_as_int() {
 	this->basic_type = BasicType::_int;
 }
+
+/* 增加SymbolItem的tag标签 */
+void SymbolItem::add_tag(Tag tag) {
+	if (tags.find(tag) != tags.end()) {
+		string info = "[WARNING] Tag already exists." + to_string(tag);
+		DEBUG_PRINT(info.c_str());
+	}
+	else {
+		tags.insert(tag);
+	}
+}
