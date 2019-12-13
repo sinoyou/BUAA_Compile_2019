@@ -19,7 +19,10 @@
 #include "basic_block_debug.h"
 #include "BasicBlock.h"
 
-#define OPTIMIZE 1
+#define INLINE_OPTIMIZE 1
+#define SEEK_OPTIMIZE 1
+#define REG_OPTIMIZE 0
+#define LOOP_OPTIMIZE 1
 
 // Global Variable and Pointer
 FileReader reader("testfile.txt");
@@ -78,7 +81,7 @@ void run() {
 
 	
 	// Inline Optimize
-	if (OPTIMIZE == 1) {
+	if (INLINE_OPTIMIZE == 1) {
 		InlineOptimizer* inline_opt = new InlineOptimizer(QuaterList);
 		QuaterList = inline_opt->get_optimized_quaters();
 		inline_opt->dumps();
@@ -91,14 +94,14 @@ void run() {
 	auto block_list = generate_basic_blocks(QuaterList, &quater_block_map);
 	dump_basic_blocks(block_list, "basic_block.txt");
 	
-	if (OPTIMIZE == 1) {
+	if (SEEK_OPTIMIZE == 1) {
 		SeekOptimizer* seek_opt = new SeekOptimizer(QuaterList, quater_block_map);
 		QuaterList = seek_opt->get_optimized_quaters();
 		seek_opt->dumps();
 	}
 
 	// object out
-	if (OPTIMIZE == 1) {
+	if (REG_OPTIMIZE == 1) {
 		RegMipsGenerator object_gen(QuaterList, quater_block_map);
 		vector<string> mips = object_gen.simple_dump();
 		for (auto it = mips.begin(); it != mips.end(); it++) {
