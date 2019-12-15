@@ -59,7 +59,7 @@ void RegisterPool::specific_request(SymbolItem* item, string target) {
 	}
 }
 
-void RegisterPool::global_dump() {
+void RegisterPool::global_load() {
 	for (auto it = global_map.begin(); it != global_map.end(); it++) {
 		flush_and_link(it->second, it->first, false, false);
 	}

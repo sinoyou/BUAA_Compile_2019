@@ -25,7 +25,7 @@ public:
 	/* 寄存器申请：向寄存器池提请至多2个操作数寄存器申请和至多1个结果寄存器申请 */
 	map<SymbolItem*, string> request(SymbolItem* A, SymbolItem* B, SymbolItem* Result);
 	/* 全局寄存器加载：必须要统一进行 */
-	void global_dump();
+	void global_load();
 	/* 特定寄存器申请：所指定的寄存器不能是寄存器池中的，包括全局和临时。 */
 	void specific_request(SymbolItem* item, string target);
 	/* 擦除映射 + 回写所有脏临时变量 - Called when leaving basic block of the function. */

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <algorithm>
 #include <list>
+#include "config.h"
 
 /*
  * 寄存器分配踩过的坑：
@@ -250,8 +251,23 @@ vector<string> RegMipsFunction::dump() {
 			}
 		}
 		else if (type == Mult || type == Div) {
-			auto map = register_pool->request(q->OpA, q->OpB, q->Result);
-			reg_mips_calc(codes, map[q->OpA], map[q->OpB], map[q->Result], type);
+			// MOD操作优化
+			if (MOD_OPTIMIZE == 1) {
+				auto mod = mod_judge(quater, quater_list.end());
+				if (type == Div && mod != NULL) {
+					auto map = register_pool->request(q->OpA, q->OpB, mod);
+					regs_mips_mod_special(codes, map[q->OpA], map[q->OpB], map[mod]);
+					quater = quater + 2;
+				}
+				else {
+					auto map = register_pool->request(q->OpA, q->OpB, q->Result);
+					reg_mips_calc(codes, map[q->OpA], map[q->OpB], map[q->Result], type);
+				}
+			}
+			else {
+				auto map = register_pool->request(q->OpA, q->OpB, q->Result);
+				reg_mips_calc(codes, map[q->OpA], map[q->OpB], map[q->Result], type);
+			}
 		}
 		else if (type == Assign) {
 			if (q->OpA->is_const()) {
@@ -269,23 +285,43 @@ vector<string> RegMipsFunction::dump() {
 			if (peek && peek->type == QuaterType::Bnz
 				&& peek->OpB == q->Result && q->Result->type == SymbolItemType::temp_normal) {
 				reg_mips_comment(codes, "Together with Bnz");
-				auto map = register_pool->request(q->OpA, q->OpB, NULL);
-				QuaterType cmp_type = q->type;						// cmp+bnz，cmp类型保持原样即可
-				// !!!
-				register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);						
-				reg_mips_branch(codes, peek->OpA->name, map[q->OpA], map[q->OpB], cmp_type);
-				quater += 1;
+				if (q->OpB->is_const() && q->OpB->value == 0 && BRANCH_ZERO_OPTIMIZE == 1) {
+					auto map = register_pool->request(q->OpA, NULL, NULL);
+					QuaterType cmp_type = q->type;						// cmp+bnz，cmp类型保持原样即可
+					// !!!
+					register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);
+					reg_mips_branch_zero(codes, peek->OpA->name, map[q->OpA], cmp_type);
+					quater += 1;
+				}
+				else {
+					auto map = register_pool->request(q->OpA, q->OpB, NULL);
+					QuaterType cmp_type = q->type;						// cmp+bnz，cmp类型保持原样即可
+					// !!!
+					register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);
+					reg_mips_branch(codes, peek->OpA->name, map[q->OpA], map[q->OpB], cmp_type);
+					quater += 1;
+				}
 			}
 			// branch if compare result if false.
 			else if (peek && peek->type == QuaterType::Bz
 				&& peek->OpB == q->Result && q->Result->type == SymbolItemType::temp_normal) {
 				reg_mips_comment(codes, "Together with Bz");
-				auto map = register_pool->request(q->OpA, q->OpB, NULL);
-				QuaterType cmp_type = cmp_reverse(type);			// cmp+bz，cmp的类型需要取反
-				// !!!
-				register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);
-				reg_mips_branch(codes, peek->OpA->name, map[q->OpA], map[q->OpB] , cmp_type);
-				quater += 1;
+				if (q->OpB->is_const() && q->OpB->value == 0 && BRANCH_ZERO_OPTIMIZE == 1) {
+					auto map = register_pool->request(q->OpA, NULL, NULL);
+					QuaterType cmp_type = cmp_reverse(type);			// cmp+bz，cmp的类型需要取反
+					// !!!
+					register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);
+					reg_mips_branch_zero(codes, peek->OpA->name, map[q->OpA], cmp_type);
+					quater += 1;
+				}
+				else {
+					auto map = register_pool->request(q->OpA, q->OpB, NULL);
+					QuaterType cmp_type = cmp_reverse(type);			// cmp+bz，cmp的类型需要取反
+					// !!!
+					register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);
+					reg_mips_branch(codes, peek->OpA->name, map[q->OpA], map[q->OpB], cmp_type);
+					quater += 1;
+				}
 			}
 			// compare is not for a branch
 			else {

@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "debug.h"
 #include <list>
+#include "config.h"
 
 /* 初始化函数 */
 GrammaticalParser::GrammaticalParser(
@@ -1188,14 +1189,18 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			__statement(level +1 , has_return);
 			
 			// 优化 - 降低跳转次数
-			// GetGotoQuater(block, head);	// 优化前
-			GetSetLabelQuater(block, judge_after);
-			vector<Quaternary*> temp;
-			for (auto it = QuaterList.begin() + condition_begin; it != QuaterList.begin() + condition_end; it++)
-				temp.push_back(*it);
-			for (auto it = temp.begin(); it != temp.end(); it++)
-				GetCopyQuater(block, *it);
-			GetBnzQuater(block, body, condition);
+			if (LOOP_OPTIMIZE == 1) {
+				GetSetLabelQuater(block, judge_after);
+				vector<Quaternary*> temp;
+				for (auto it = QuaterList.begin() + condition_begin; it != QuaterList.begin() + condition_end; it++)
+					temp.push_back(*it);
+				for (auto it = temp.begin(); it != temp.end(); it++)
+					GetCopyQuater(block, *it);
+				GetBnzQuater(block, body, condition);
+			}
+			else {
+				GetGotoQuater(block, head);	// 优化前
+			}
 
 			GetSetLabelQuater(block, tail);
 		}
@@ -1283,15 +1288,18 @@ void GrammaticalParser::__loop_statement(int level, bool* has_return)
 			else 
 				GetSubQuater(block, step_updater, step_len, step_counter);
 			// 判断部分 - （优化，减少jump）
-			// GetGotoQuater(block, judge_init);		// 非优化模式
-			GetSetLabelQuater(block, judge_after);
-			vector<Quaternary*> temp;
-			for (auto it = QuaterList.begin() + condition_begin; it != QuaterList.begin() + condition_end; it++)
-				temp.push_back(*it);
-			for (auto it = temp.begin(); it != temp.end(); it++)
-				GetCopyQuater(block, *it);
-			GetBnzQuater(block, body, condition);
-
+			if (LOOP_OPTIMIZE == 1) {
+				GetSetLabelQuater(block, judge_after);
+				vector<Quaternary*> temp;
+				for (auto it = QuaterList.begin() + condition_begin; it != QuaterList.begin() + condition_end; it++)
+					temp.push_back(*it);
+				for (auto it = temp.begin(); it != temp.end(); it++)
+					GetCopyQuater(block, *it);
+				GetBnzQuater(block, body, condition);
+			}
+			else {
+				GetGotoQuater(block, judge_init);		// 非优化模式
+			}
 			// 循环尾部
 			GetSetLabelQuater(block, tail);
 		}

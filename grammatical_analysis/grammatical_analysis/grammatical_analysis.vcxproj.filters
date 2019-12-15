@@ -162,6 +162,12 @@
     <ClInclude Include="SeekOptimizer.h">
       <Filter>Header Files\class\optimizer</Filter>
     </ClInclude>
+    <ClInclude Include="DeadOptimizer.h">
+      <Filter>Header Files\class\optimizer</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -258,6 +264,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SeekOptimizer.cpp">
+      <Filter>Source Files\class\optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="DeadOptimizer.cpp">
       <Filter>Source Files\class\optimizer</Filter>
     </ClCompile>
   </ItemGroup>

@@ -12,17 +12,14 @@
 #include "Quaternary.h"
 #include "mips_generator.h"
 #include "register_mips_generator.h"
+#include "config.h"
 
 // optimize
 #include "InlineOptimizer.h"
 #include "SeekOptimizer.h"
+#include "DeadOptimizer.h"
 #include "basic_block_debug.h"
 #include "BasicBlock.h"
-
-#define INLINE_OPTIMIZE 1
-#define SEEK_OPTIMIZE 1
-#define REG_OPTIMIZE 0
-#define LOOP_OPTIMIZE 1
 
 // Global Variable and Pointer
 FileReader reader("testfile.txt");
@@ -87,17 +84,23 @@ void run() {
 		inline_opt->dumps();
 	}
 
-	
-
 	// Basic Blocks and Data Flow
 	map<Quaternary*, BasicBlock*> quater_block_map;
 	auto block_list = generate_basic_blocks(QuaterList, &quater_block_map);
 	dump_basic_blocks(block_list, "basic_block.txt");
 	
+	// 块内 Assign 优化
 	if (SEEK_OPTIMIZE == 1) {
 		SeekOptimizer* seek_opt = new SeekOptimizer(QuaterList, quater_block_map);
 		QuaterList = seek_opt->get_optimized_quaters();
 		seek_opt->dumps();
+	}
+
+	// 块内死代码优化
+	if (DEAD_OPTIMIZE == 1) {
+		DeadOptimizer* dead_opt = new DeadOptimizer(QuaterList, quater_block_map);
+		QuaterList = dead_opt->get_optimized_quaters();
+		dead_opt->dumps();
 	}
 
 	// object out
@@ -117,7 +120,6 @@ void run() {
 		}
 		mips_out.close();
 	}
-	
 }
 
 int main()

@@ -7,6 +7,26 @@
 
 #define MAXBUF 200
 
+/* ---------------------------- OTHER --------------------------- */
+SymbolItem* mod_judge(vector<Quaternary*>::iterator it, vector<Quaternary*>::iterator end) {
+	if (it >= end - 2)
+		return NULL;
+	auto divee = (*it)->OpA;
+	auto diver = (*it)->OpB;
+	auto t1 = (*it)->Result;
+	auto t2 = (*(it + 1))->Result;
+	auto t3 = (*(it + 2))->Result;
+
+	auto quater1 = *(it + 1);
+	if (quater1->type == Mult && quater1->OpA == t1 && quater1->OpB == diver) {
+		auto quater2 = *(it + 2);
+		if (quater2->type == Sub && quater2->OpA == divee && quater2->OpB == t2)
+			return t3;
+	}
+	return NULL;
+}
+
+
 /* ---------------------------- MIPS ----------------------------*/
 static char buf[MAXBUF];
 
@@ -138,6 +158,24 @@ void reg_mips_branch(vector<string>* list, string label, string cmpA, string cmp
 	list->push_back(string(buf));
 }
 
+void reg_mips_branch_zero(vector<string>* list, string label, string cmpA, QuaterType cmp_type) {
+	if (cmp_type == QuaterType::EqlCmp)
+		sprintf(buf, "beq %s $0 %s", cmpA.c_str(), label.c_str());
+	else if (cmp_type == QuaterType::GeqCmp)
+		sprintf(buf, "bgez %s %s", cmpA.c_str(), label.c_str());
+	else if (cmp_type == QuaterType::GtCmp)
+		sprintf(buf, "bgtz %s %s", cmpA.c_str(), label.c_str());
+	else if (cmp_type == QuaterType::LeqCmp)
+		sprintf(buf, "blez %s %s", cmpA.c_str(), label.c_str());
+	else if (cmp_type == QuaterType::LtCmp)
+		sprintf(buf, "bltz %s %s", cmpA.c_str(), label.c_str());
+	else if (cmp_type == QuaterType::NeqCmp)
+		sprintf(buf, "bne %s $0 %s", cmpA.c_str(), label.c_str());
+	else
+		DEBUG_PRINT("[ERROR] Unexpected Compare Type in reg_mips_branch_zero");
+	list->push_back(string(buf));
+}
+
 /* Archimetic */
 void reg_mips_calc(vector<string>* list, string A, string B, string Result, QuaterType type) {
 	switch (type)
@@ -212,6 +250,15 @@ void reg_mips_li(vector<string>* list, int value, string Result) {
 	sprintf(buf, "li %s %d", Result.c_str(), value);
 	list->push_back(string(buf));
 }
+
+// 取模运算 - 目标代码优化，无中间码类型对应
+void regs_mips_mod_special(vector<string>* list, string A, string B, string Result) {
+	sprintf(buf, "div %s %s", A.c_str(), B.c_str());
+	list->push_back(string(buf));
+	sprintf(buf, "mfhi %s", Result.c_str());
+	list->push_back(string(buf));
+}
+
 
 /* IO */
 // scan : int|char
