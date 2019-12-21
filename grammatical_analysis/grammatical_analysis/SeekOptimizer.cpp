@@ -47,6 +47,7 @@ vector<Quaternary*>::iterator copy_zone(vector<Quaternary*>::iterator start,
 }
 
 void SeekOptimizer::optimizer() {
+	// Assign的操作数直接向下传播
 	for (auto it = middle_code.begin(); it != middle_code.end(); it++) {
 		if ((*it)->type == QuaterType::Assign) {
 			auto result = (*it)->Result;
@@ -73,7 +74,7 @@ void SeekOptimizer::optimizer() {
 					}
 					vector<Quaternary*> temp;
 					temp.push_back(*it);
-					cout << "[Seek Optimizer] Delete Assign " + PrintQuater(&temp)[0] << endl;
+					cout << "[Seek Optimizer] Spread Assign " + PrintQuater(&temp)[0] << endl;
 				}
 				else {
 					optimized_code.push_back(*it);
@@ -86,5 +87,31 @@ void SeekOptimizer::optimizer() {
 		else {
 			optimized_code.push_back(*it);
 		}
+	}
+
+
+	// 优化二：Assign的结果数充当赋值的最后一步
+	// BEFORE:
+	// temp_normal = X calc_op Y
+	// target = temp_normal
+	// AFTER:
+	// target = X calc_op Y
+	auto optimize_code_copy = optimized_code;
+	optimized_code.clear();
+	for (auto it = optimize_code_copy.begin(); it != optimize_code_copy.end(); it++) {
+		if ((*it)->type == QuaterType::Assign && it != optimize_code_copy.begin()) {
+			auto it_pre = it - 1;
+			// 只是一个赋值操作，并且衔接量是temp型
+			if ((*it)->OpA == (*it_pre)->Result && (*it_pre)->Result->type == SymbolItemType::temp_normal) {
+				// 不再添加，将尾巴上的运算结果换成(*it)->Result
+				(*(optimized_code.end() - 1))->Result = (*it)->Result;
+				vector<Quaternary*> temp;
+				temp.push_back(*it);
+				cout << "[Seek Optimizer] Delete Assign " + PrintQuater(&temp)[0] << endl;
+				continue;
+			}
+		}
+
+		optimized_code.push_back(*it);
 	}
 }

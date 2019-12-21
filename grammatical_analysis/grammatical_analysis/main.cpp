@@ -90,7 +90,7 @@ void run() {
 	dump_basic_blocks(block_list, "basic_block.txt");
 	
 	// 块内 Assign 优化
-	if (SEEK_OPTIMIZE == 1) {
+	if (ASSIGN_OPTIMIZE == 1) {
 		SeekOptimizer* seek_opt = new SeekOptimizer(QuaterList, quater_block_map);
 		QuaterList = seek_opt->get_optimized_quaters();
 		seek_opt->dumps();

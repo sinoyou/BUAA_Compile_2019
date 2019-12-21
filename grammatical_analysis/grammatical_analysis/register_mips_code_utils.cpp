@@ -300,11 +300,9 @@ void reg_mips_array_assign(vector<string>* list, string source, SymbolItem* arr,
 	if (local) {
 		sprintf(buf, "sll %s %s 2", temp.c_str(), index.c_str());
 		list->push_back(string(buf));
-		sprintf(buf, "addiu %s %s %d", temp.c_str(), temp.c_str(), offset);
-		list->push_back(string(buf));
 		sprintf(buf, "addu %s %s $sp", temp.c_str(), temp.c_str());
 		list->push_back(string(buf));
-		sprintf(buf, "sw %s 0(%s)", source.c_str(), temp.c_str());
+		sprintf(buf, "sw %s %d(%s)", source.c_str(), offset, temp.c_str());
 		list->push_back(string(buf));
 	}
 	else {
@@ -322,11 +320,9 @@ void reg_mips_array_query(vector<string>* list, string target, SymbolItem* arr, 
 	if (local) {
 		sprintf(buf, "sll %s %s 2", temp.c_str(), index.c_str());
 		list->push_back(string(buf));
-		sprintf(buf, "addiu %s %s %d", temp.c_str(), temp.c_str(), offset);
-		list->push_back(string(buf));
 		sprintf(buf, "addu %s %s $sp", temp.c_str(), temp.c_str());
 		list->push_back(string(buf));
-		sprintf(buf, "lw %s 0(%s)", target.c_str(), temp.c_str());
+		sprintf(buf, "lw %s %d(%s)", target.c_str(), offset, temp.c_str());
 		list->push_back(string(buf));
 	}
 	else {
