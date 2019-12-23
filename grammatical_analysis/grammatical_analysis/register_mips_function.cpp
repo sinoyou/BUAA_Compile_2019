@@ -181,7 +181,7 @@ vector<string> RegMipsFunction::dump() {
 				auto map = register_pool->request(q->OpA, NULL, NULL);
 				reg_mips_move(codes, map[q->OpA], ret);
 			}
-			register_pool->clear_all_and_dump_temp_active(quater_basicblock[*quater]->active_out);
+			register_pool->clear_all_and_dump_all_active(quater_basicblock[*quater]->active_out);
 			reg_mips_load(codes, ra, ra_offset);
 			// !!!
 			reg_mips_sp_move(codes, func_stack_size);		// $sp + stack_size
@@ -201,7 +201,8 @@ vector<string> RegMipsFunction::dump() {
 			register_pool->global_load();
 		}
 		else if (type == AssignRet) {
-			reg_mips_save(codes, ret, q->Result, &(*this));
+			auto map = register_pool->request(NULL, NULL, q->Result);
+			reg_mips_move(codes, ret, map[q->Result]);
 		}
 		else if (type == AssignArray) {			
 			auto map = register_pool->request(q->OpA, q->OpB, NULL);
@@ -335,12 +336,12 @@ vector<string> RegMipsFunction::dump() {
 			reg_mips_j(codes, q->OpA->name);
 		}
 		else if (type == Bz) {
-			auto map = register_pool->request(q->OpB, NULL, NULL);
+			auto map = register_pool->request(NULL, q->OpB, NULL);
 			register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);
 			reg_mips_bz(codes, q->OpA->name, map[q->OpB]);
 		}
 		else if (type == Bnz) {
-			auto map = register_pool->request(q->OpB, NULL, NULL);
+			auto map = register_pool->request(NULL, q->OpB, NULL);
 			register_pool->clear_all_and_dump_temp_active(quater_basicblock[q]->active_out);
 			reg_mips_bnz(codes, q->OpA->name, map[q->OpB]);
 		}
