@@ -1,5 +1,6 @@
 #include "SeekOptimizer.h"
 #include "Block.h"
+#include "config.h"
 
 void SeekOptimizer::preprocess() {
 
@@ -69,7 +70,7 @@ void SeekOptimizer::optimizer() {
 						if ((*jt)->OpB == result)
 							(*jt)->OpB = quater->OpA;
 						if ((*jt)->Result == result)							// 出现新的赋值, 放在赋值以后因为新赋值操作数可能是原来的
-							break;
+							DEBUG_PRINT("[ERROR] Result assigned is not expected here.");
 						jt++;
 					}
 					vector<Quaternary*> temp;
@@ -96,22 +97,23 @@ void SeekOptimizer::optimizer() {
 	// target = temp_normal
 	// AFTER:
 	// target = X calc_op Y
-	auto optimize_code_copy = optimized_code;
-	optimized_code.clear();
-	for (auto it = optimize_code_copy.begin(); it != optimize_code_copy.end(); it++) {
-		if ((*it)->type == QuaterType::Assign && it != optimize_code_copy.begin()) {
-			auto it_pre = it - 1;
-			// 只是一个赋值操作，并且衔接量是temp型
-			if ((*it)->OpA == (*it_pre)->Result && (*it_pre)->Result->type == SymbolItemType::temp_normal) {
-				// 不再添加，将尾巴上的运算结果换成(*it)->Result
-				(*(optimized_code.end() - 1))->Result = (*it)->Result;
-				vector<Quaternary*> temp;
-				temp.push_back(*it);
-				cout << "[Seek Optimizer] Delete Assign " + PrintQuater(&temp)[0] << endl;
-				continue;
+	if (ASSIGN_DELETE_OPTIMIZE == 1) {
+		auto optimize_code_copy = optimized_code;
+		optimized_code.clear();
+		for (auto it = optimize_code_copy.begin(); it != optimize_code_copy.end(); it++) {
+			if ((*it)->type == QuaterType::Assign && it != optimize_code_copy.begin()) {
+				auto it_pre = it - 1;
+				// 只是一个赋值操作，并且衔接量是temp型
+				if ((*it)->OpA == (*it_pre)->Result && (*it_pre)->Result->type == SymbolItemType::temp_normal) {
+					// 不再添加，将尾巴上的运算结果换成(*it)->Result
+					(*(optimized_code.end() - 1))->Result = (*it)->Result;
+					vector<Quaternary*> temp;
+					temp.push_back(*it);
+					cout << "[Seek Optimizer] Delete Assign " + PrintQuater(&temp)[0] << endl;
+					continue;
+				}
 			}
+			optimized_code.push_back(*it);
 		}
-
-		optimized_code.push_back(*it);
 	}
 }

@@ -114,7 +114,7 @@ void RegisterPool::clear_all_and_dump_all_active(set<SymbolItem*> active_set) {
 	for (auto it = global_map.begin(); it != global_map.end(); it++) {
 		auto item = it->first;
 		auto reg = it->second;
-		if (dirty[reg] == 1 && active_set.find(item) != active_set.end())
+		if (item->block->pre == NULL || (dirty[reg] == 1 && active_set.find(item) != active_set.end()))
 			flush_and_link(reg, NULL, true, false);
 		else
 			flush_and_link(reg, NULL, false, false);
@@ -254,7 +254,7 @@ map<SymbolItem*, string> get_global_map(string func_name,
 			}
 			if (B != NULL) {
 				level[B] = (level.find(B) == level.end()) ? pow(REPEAT_WEIGHT, (loop_level - 1)) :
-					pow(REPEAT_WEIGHT, (loop_level - 1)) * loop_level + level[B];
+					pow(REPEAT_WEIGHT, (loop_level - 1)) + level[B];
 				item_block_set[B] = (item_block_set.find(B) == item_block_set.end()) ?
 					set<BasicBlock*>() : item_block_set[B];
 				item_block_set[B].insert(quater_block[*it]);

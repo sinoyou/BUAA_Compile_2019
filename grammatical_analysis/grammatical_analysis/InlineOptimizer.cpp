@@ -98,7 +98,7 @@ vector<Quaternary*> inline_generator(SymbolItem* caller, SymbolItem* func,
 		for (auto jt = items.begin(); jt != items.end(); jt++) {
 			auto item = (*jt).second;
 			// 没有映射过，并且是属于inline函数自己的SymbolItem
-			if (copy_map.find(item) == copy_map.end() and item->block == func->block) {
+			if (copy_map.find(item) == copy_map.end() && item->block == func->block) {
 				SymbolItem* inline_item = SymbolFactory::create_inline_copy(caller->block, item);
 				copy_map[item] = inline_item;
 			}
@@ -117,7 +117,8 @@ vector<Quaternary*> inline_generator(SymbolItem* caller, SymbolItem* func,
 		SymbolItem* para = (*head)->Result;
 		SymbolItem* para_out = paras[cnt];
 
-		Quaternary* q = new Quaternary(caller->block, QuaterType::Assign, para_out, NULL, para);
+		Quaternary* q = GetAssignQuater(caller->block, para_out, para, false);
+		// Quaternary* q = new Quaternary(caller->block, QuaterType::Assign, para_out, NULL, para);
 		head = inline_code.erase(head);
 		head = inline_code.insert(head, q);
 		head += 1;
