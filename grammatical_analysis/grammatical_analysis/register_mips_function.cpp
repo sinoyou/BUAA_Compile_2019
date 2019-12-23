@@ -181,7 +181,7 @@ vector<string> RegMipsFunction::dump() {
 				auto map = register_pool->request(q->OpA, NULL, NULL);
 				reg_mips_move(codes, map[q->OpA], ret);
 			}
-			register_pool->clear_all_and_dump_all_active(quater_basicblock[*quater]->active_out);
+			register_pool->clear_all_and_dump_temp_active(quater_basicblock[*quater]->active_out);
 			reg_mips_load(codes, ra, ra_offset);
 			// !!!
 			reg_mips_sp_move(codes, func_stack_size);		// $sp + stack_size

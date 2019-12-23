@@ -114,7 +114,7 @@ void RegisterPool::clear_all_and_dump_all_active(set<SymbolItem*> active_set) {
 	for (auto it = global_map.begin(); it != global_map.end(); it++) {
 		auto item = it->first;
 		auto reg = it->second;
-		if (item->block->pre == NULL || (dirty[reg] == 1 && active_set.find(item) != active_set.end()))
+		if (dirty[reg] == 1 && active_set.find(item) != active_set.end())
 			flush_and_link(reg, NULL, true, false);
 		else
 			flush_and_link(reg, NULL, false, false);
