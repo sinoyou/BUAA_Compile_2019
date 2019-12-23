@@ -266,7 +266,6 @@ map<SymbolItem*, string> get_global_map(string func_name,
 	map<SymbolItem*, string> reg_map;
 	vector<pair<SymbolItem*, int>> vec(level.begin(), level.end());
 	std::sort(vec.begin(), vec.end(), cmp);
-	auto it = vec.begin();
 	for (auto it = vec.begin(); it != vec.end(); it ++) {
 		// 非全局 && 跨块变量 && 权重大于1 && 还有剩余的s型寄存器 && 类型为变量(var/temp_normal）
 		if (it->first->block->pre != NULL && 

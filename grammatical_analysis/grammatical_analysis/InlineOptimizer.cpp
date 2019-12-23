@@ -64,9 +64,10 @@ void InlineOptimizer::optimizer() {
 				tail = func_middle.erase(head, tail + 1);
 				// 获取inline部分中间码并拼接
 				auto inline_code = inline_generator(func, callee, parameters, ret_idenfr, &middle_code);
-				head = func_middle.insert(tail, inline_code.begin(), inline_code.end());
+				auto order = tail - middle_code.begin();
+				func_middle.insert(tail, inline_code.begin(), inline_code.end());
 				// 重置quater指针位置
-				quater = head + inline_code.size() - 1;
+				quater = inline_code.begin() + order + inline_code.size() - 1;
 		}
 		// 插入内联化后的代码
 		for (auto jt = func_middle.begin(); jt != func_middle.end(); jt++)
