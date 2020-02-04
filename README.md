@@ -1,5 +1,5 @@
 # BUAA_Compile_2019
-Codes for course design of BUAA Compiler 2019 (the highest challenging branches). Implemented with C++.
+Codes for course design of BUAA Compiler 2019 (the highest challenge). Implemented with C++.
 
 Author: Zinuo You
 
@@ -8,7 +8,7 @@ Course Final Grade: 96
 ## Run
 - Compiler: Clang
 - Recommended Development Enviroment: Visual Studio 2019+.
-- !!! Due to auto judge enviroment, there'is not practical directories and all codes are in the same file. If you want to view codes more carefully, I strongly recommend you to clone the codes and use Visual Studio open .vcxproj file (virtual directories will show).
+- !!! Due to auto judge enviroment, there'is not practical directories and all codes are in the same directory. If you want to view codes more carefully, I strongly recommend you to clone the codes and use Visual Studio open .vcxproj file (virtual directories will show).
 - Input file: testfile.txt
 - Output files: 
   1. output.txt: objects codes (can run on MARS)
