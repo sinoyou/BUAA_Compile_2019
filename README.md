@@ -32,8 +32,8 @@ Codes for course design of BUAA Compiler 2019 (the highest challenge). Implement
 
 
 ## Branches
-- **unit2** : Implement lexical parser.
-- **unit3** : Implement grammer parser with recursive descent method (from top to bottom). Use peeking (next one/two) to make recursive no recalls.
+- **unit2** : Implement lexical parser on FSM. 
+- **unit3** : Implement grammer parser with recursive descent method (from top to bottom). Use peeking (next one/two) to make sure no recall.
 - **unit4** : Implement error analysis of grammer errors and semantic errors.
-- **unit5** : Implement object codes generation. Codes can run on MARS but do not get non optimization. Only three registers are used, so you can almost regard it as a stack symbol machine.
-- **unit6** : Current version, see features for details. 
+- **unit5** : Implement object codes generation of generating middle codes and generating MIPS codes. Object codes can run on MARS but do not have any optimization with only three registers being used, so you can almost regard it as a stack symbol machine.
+- **unit6** : Current version, see "features" for details. 
