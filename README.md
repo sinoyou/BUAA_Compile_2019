@@ -8,7 +8,7 @@ Course Final Grade: 96
 ## Run
 - Compiler: Clang
 - Recommended Development Enviroment: Visual Studio 2019+.
-- !!! Due to auto judge enviroment, there'is not practical directories and all codes are in the same directory. If you want to view codes more carefully, I strongly recommend you to clone the codes and use Visual Studio open .vcxproj file (virtual directories will show).
+- Due to automatic judgement enviroment, there's not practical directories and all codes are in the same directory. If you want to view codes more carefully, I strongly recommend you to clone the codes and use Visual Studio open .vcxproj file (virtual directories will show).
 - Input file: testfile.txt
 - Output files: 
   1. output.txt: objects codes (can run on MARS)
@@ -20,9 +20,9 @@ Course Final Grade: 96
 - Source Code: Persuade C (similar to C, but simplified for education.)
 - Object Code: MIPS-32
 - Pluggable Compiling Optimization
-  1. inline optimizing.
-  2. assign spread optimizing.
-  3. dead code optimizing.
+  1. inline optimization.
+  2. assignment spread optimizing.
+  3. dead code optimization.
   4. register allocation (global registers: reference count, local registers: FIFO with active analysis on data flow graph).
   5. seek optimization for object codes generation. (branch, mod and etc.)
 
