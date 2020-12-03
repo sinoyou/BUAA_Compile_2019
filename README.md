@@ -5,6 +5,8 @@ Codes for course design of BUAA Compiler 2019 (the highest challenge). Implement
 
 **Course Final Grade**: 96
 
+**Guide Book**: [Guide Book (Chinese)](./Compiler GuideBook.pdf)
+
 ## Run
 - **Compiler**: Clang
 - **Recommended Development Enviroment**: Visual Studio 2019+.
@@ -25,7 +27,7 @@ Codes for course design of BUAA Compiler 2019 (the highest challenge). Implement
   3. dead code optimization.
   4. register allocation (global registers: reference count, local registers: FIFO with active analysis on data flow graph).
   5. seek optimization for object codes generation. (branch, mod and etc.)
-  6. Final Optimization Race: 6/306, please see [Optimization Report(Chinese)] for details. (./Optimization Report.pdf)
+  6. Final Optimization Race: 6/306, please see [Optimization Report(Chinese)](./Optimization Report.pdf) for details. 
 
 
 
