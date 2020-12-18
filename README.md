@@ -10,7 +10,7 @@ Codes for course design of BUAA Compiler 2019 (the highest challenge). Implement
 ## Run
 - **Compiler**: Clang
 - **Recommended Development Enviroment**: Visual Studio 2019+.
-- **Notice**: Due to automatic judgement enviroment, there's not practical directories and all codes are in the same directory. If you want to view codes more carefully, I strongly recommend you to clone the codes and use Visual Studio open .vcxproj file (virtual directories will show).
+- **Notice**: Due to automatic judgement enviroment, there's not physical directories and all codes are in the same directory. If you want to view codes more carefully, I strongly recommend you to clone the codes and use Visual Studio open .vcxproj file (virtual directories will show).
 - **Input file**: testfile.txt
 - **Output files**: 
   1. output.txt: objects codes (can run on MARS)
